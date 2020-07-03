@@ -18,7 +18,7 @@
 	url = https://github.com/20k/funvectormaths
 [submodule "deps/imgui"]
 	path = deps/imgui
-	url = https://github.com/20k/imgui
+	url = https://github.com/20k/imgui-fork
 [submodule "deps/imguicolortextedit"]
 	path = deps/imguicolortextedit
 	url = https://github.com/BalazsJako/ImGuiColorTextEdit

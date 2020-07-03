@@ -91,6 +91,8 @@
 		<Unit filename="deps/toolkit/texture.cpp" />
 		<Unit filename="deps/toolkit/texture.hpp" />
 		<Unit filename="deps/toolkit/vertex.hpp" />
+		<Unit filename="levels.cpp" />
+		<Unit filename="levels.hpp" />
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<code_completion />
