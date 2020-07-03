@@ -72,7 +72,6 @@ namespace level
         return {0};
     }
 
-
     level_context start(int level)
     {
         level_context ctx;
@@ -87,7 +86,7 @@ namespace level
         return ctx;
     }
 
-    stats validate(const level_context& ctx)
+    stats validate(level_context& ctx)
     {
         stats rstat;
 
@@ -95,7 +94,7 @@ namespace level
         {
             std::vector<uint16_t> in;
 
-            for(int i=0; i < 1024; i++)
+            for(int i=0; i < 256; i++)
             {
                 in.push_back(i);
             }
@@ -110,11 +109,17 @@ namespace level
             auto inc = sim_input(in);
             auto outc = sim_output(in.size());
 
-            std::vector<dcpu::sim::CPU> user;
+            std::vector<dcpu::sim::CPU*> user;
 
-            for(const dcpu::ide::editor& edit : ctx.cpus)
+            for(dcpu::ide::editor& edit : ctx.cpus)
             {
-                dcpu::sim::CPU& next = user.emplace_back();
+                edit.c = dcpu::sim::CPU();
+
+                dcpu::sim::CPU& next = edit.c;
+
+                user.push_back(&next);
+
+                //dcpu::sim::CPU& next = user.emplace_back();
 
                 auto [rinfo_opt2, err2] = assemble_fwd(edit.get_text());
 
@@ -136,7 +141,7 @@ namespace level
 
             for(auto& i : user)
             {
-                cpus.push_back(&i);
+                cpus.push_back(i);
             }
 
             dcpu::sim::fabric fab;
@@ -147,13 +152,11 @@ namespace level
             {
                 for(int kk=0; kk < (int)cpus.size(); kk++)
                 {
-                    cpus[kk]->step(&fab);
+                    cpus[kk]->cycle_step(&fab);
                 }
 
                 dcpu::sim::resolve_interprocessor_communication(cpus, fab);
             }
-
-            rstat.success = true;
 
             rstat.success = check_output(outc, out) == -1;
         }

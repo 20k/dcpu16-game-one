@@ -26,7 +26,7 @@ namespace level
 
     level_context start(int level);
 
-    stats validate(const level_context& ctx);
+    stats validate(level_context& ctx);
 }
 
 #endif // LEVELS_HPP_INCLUDED

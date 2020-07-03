@@ -27,11 +27,13 @@ int main()
 
     level_context clevel;
 
+    dcpu::ide::reference_card card;
+
     while(!win.should_close())
     {
         win.poll();
 
-        //card.render();
+        card.render();
 
         ImGui::Begin("Levels", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
