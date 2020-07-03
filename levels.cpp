@@ -2,6 +2,69 @@
 #include <dcpu16-asm/base_asm.hpp>
 #include <iostream>
 
+dcpu::sim::CPU sim_input(const std::vector<uint16_t>& input)
+{
+    std::string vals;
+
+    for(uint16_t i : input)
+    {
+        vals = vals + "SND " + std::to_string(i) + ", 0\n";
+    }
+
+    dcpu::sim::CPU inc;
+
+    {
+        auto [rinfo_opt, err] = assemble_fwd(vals);
+
+        assert(rinfo_opt.has_value());
+
+        inc.load(rinfo_opt.value().mem, 0);
+    }
+
+    return inc;
+}
+
+dcpu::sim::CPU sim_output(int len)
+{
+    std::string out_str;
+
+    uint16_t output_address = 0x8000;
+
+    for(int i=0; i < len; i++)
+    {
+        uint16_t fin_address = output_address + i;
+
+        out_str += "RCV [" + std::to_string(fin_address) + "], 1\n";
+    }
+
+    dcpu::sim::CPU outc;
+
+    {
+        auto [rinfo_out, errout] = assemble_fwd(out_str);
+
+        assert(rinfo_out.has_value());
+
+        outc.load(rinfo_out.value().mem, 0);
+    }
+
+    return outc;
+}
+
+int check_output(const dcpu::sim::CPU& in, const std::vector<uint16_t>& output)
+{
+    uint16_t output_address = 0x8000;
+
+    for(int i=0; i < (int)output.size(); i++)
+    {
+        uint16_t fin_address = output_address + i;
+
+        if(in.mem[fin_address] != output[i])
+            return i;
+    }
+
+    return -1;
+}
+
 namespace level
 {
     std::vector<int> get_available()
@@ -44,42 +107,8 @@ namespace level
                 out.push_back(i);
             }
 
-            std::string vals;
-
-            for(auto& i : in)
-            {
-                vals = vals + "SND " + std::to_string(i) + ", 0\n";
-            }
-
-            std::string out_str;
-
-            uint16_t output_address = 0x8000;
-
-            for(int i=0; i < (int)in.size(); i++)
-            {
-                uint16_t fin_address = output_address + i;
-
-                out_str += "RCV [" + std::to_string(fin_address) + "], 1\n";
-            }
-
-            dcpu::sim::CPU inc;
-            dcpu::sim::CPU outc;
-
-            {
-                auto [rinfo_opt, err] = assemble_fwd(vals);
-
-                assert(rinfo_opt.has_value());
-
-                inc.load(rinfo_opt.value().mem, 0);
-            }
-
-            {
-                auto [rinfo_out, errout] = assemble_fwd(out_str);
-
-                assert(rinfo_out.has_value());
-
-                outc.load(rinfo_out.value().mem, 0);
-            }
+            auto inc = sim_input(in);
+            auto outc = sim_output(in.size());
 
             std::vector<dcpu::sim::CPU> user;
 
@@ -126,19 +155,7 @@ namespace level
 
             rstat.success = true;
 
-            for(int i=0; i < (int)in.size(); i++)
-            {
-                uint16_t offset = output_address + i;
-
-                uint16_t v = outc.fetch_location(dcpu::sim::location::memory{offset});
-
-                //std::cout << "FOUND " << v << " AT " << offset << std::endl;
-
-                if(v != out[i])
-                {
-                    rstat.success = false;
-                }
-            }
+            rstat.success = check_output(outc, out) == -1;
         }
 
         return rstat;
