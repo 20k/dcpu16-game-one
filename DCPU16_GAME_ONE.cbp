@@ -30,8 +30,67 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="-std=c++20" />
 			<Add option="-fexceptions" />
+			<Add option="-DIMGUI_IMPL_OPENGL_LOADER_GLEW" />
+			<Add option="-DSUBPIXEL_FONT_RENDERING" />
+			<Add option="-DNO_OPENCL" />
+			<Add option="-DNO_STACKTRACE" />
+			<Add directory="deps" />
+			<Add directory="deps/imgui" />
+			<Add directory="C:/msys64/mingw64/include/freetype2" />
+			<Add directory="deps/toml" />
 		</Compiler>
+		<Linker>
+			<Add option="-lmingw32" />
+			<Add option="-lglfw3" />
+			<Add option="-lglew32" />
+			<Add option="-lsfml-audio" />
+			<Add option="-lsfml-system" />
+			<Add option="-Wl,--start-group" />
+			<Add option="-lharfbuzz" />
+			<Add option="-lfreetype" />
+			<Add option="-Wl,--end-group" />
+			<Add option="-lgraphite2" />
+			<Add option="-lopengl32" />
+			<Add option="-lole32" />
+			<Add option="-ldbgeng" />
+			<Add option="-lwinmm" />
+			<Add option="-lgdi32" />
+		</Linker>
+		<Unit filename="deps/dcpu16-asm/base_asm.cpp" />
+		<Unit filename="deps/dcpu16-asm/base_asm.hpp" />
+		<Unit filename="deps/dcpu16-asm/shared.hpp" />
+		<Unit filename="deps/dcpu16-asm/stack_vector.hpp" />
+		<Unit filename="deps/dcpu16-asm/util.hpp" />
+		<Unit filename="deps/dcpu16-ide/base_ide.cpp" />
+		<Unit filename="deps/dcpu16-ide/base_ide.hpp" />
+		<Unit filename="deps/dcpu16-sim/base_sim.hpp" />
+		<Unit filename="deps/imgui/examples/imgui_impl_glfw.cpp" />
+		<Unit filename="deps/imgui/examples/imgui_impl_opengl3.cpp" />
+		<Unit filename="deps/imgui/imgui.cpp" />
+		<Unit filename="deps/imgui/imgui_draw.cpp" />
+		<Unit filename="deps/imgui/imgui_widgets.cpp" />
+		<Unit filename="deps/imgui/misc/freetype/imgui_freetype.cpp" />
+		<Unit filename="deps/imguicolortextedit/TextEditor.cpp" />
+		<Unit filename="deps/toolkit/base_serialisables.cpp" />
+		<Unit filename="deps/toolkit/base_serialisables.hpp" />
+		<Unit filename="deps/toolkit/clipboard.cpp" />
+		<Unit filename="deps/toolkit/clipboard.hpp" />
+		<Unit filename="deps/toolkit/clock.cpp" />
+		<Unit filename="deps/toolkit/clock.hpp" />
+		<Unit filename="deps/toolkit/config.hpp" />
+		<Unit filename="deps/toolkit/fs_helpers.cpp" />
+		<Unit filename="deps/toolkit/fs_helpers.hpp" />
+		<Unit filename="deps/toolkit/opencl.cpp" />
+		<Unit filename="deps/toolkit/opencl.hpp" />
+		<Unit filename="deps/toolkit/render_window.cpp" />
+		<Unit filename="deps/toolkit/render_window.hpp" />
+		<Unit filename="deps/toolkit/stacktrace.cpp" />
+		<Unit filename="deps/toolkit/stacktrace.hpp" />
+		<Unit filename="deps/toolkit/texture.cpp" />
+		<Unit filename="deps/toolkit/texture.hpp" />
+		<Unit filename="deps/toolkit/vertex.hpp" />
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<code_completion />
