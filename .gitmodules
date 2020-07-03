@@ -1,0 +1,27 @@
+[submodule "deps/dcpu16-ide"]
+	path = deps/dcpu16-ide
+	url = https://github.com/20k/dcpu16-ide
+[submodule "deps/dcpu16-sim"]
+	path = deps/dcpu16-sim
+	url = https://github.com/20k/dcpu16-sim
+[submodule "deps/dcpu16-asm"]
+	path = deps/dcpu16-asm
+	url = https://github.com/20k/dcpu16-asm
+[submodule "deps/networking"]
+	path = deps/networking
+	url = https://github.com/20k/clientservernetworking
+[submodule "deps/toolkit"]
+	path = deps/toolkit
+	url = https://github.com/20k/JGameToolkit
+[submodule "deps/vec"]
+	path = deps/vec
+	url = https://github.com/20k/funvectormaths
+[submodule "deps/imgui"]
+	path = deps/imgui
+	url = https://github.com/20k/imgui
+[submodule "deps/imguicolortextedit"]
+	path = deps/imguicolortextedit
+	url = https://github.com/BalazsJako/ImGuiColorTextEdit
+[submodule "deps/toml"]
+	path = deps/toml
+	url = https://github.com/ToruNiina/toml11
