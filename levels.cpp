@@ -86,6 +86,8 @@ namespace level
         return ctx;
     }
 
+    ///TODO: Step by step validation, dummy example and
+    ///then more comprehensive tests
     stats validate(level_context& ctx)
     {
         stats rstat;
