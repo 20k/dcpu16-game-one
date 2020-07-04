@@ -26,6 +26,7 @@ int main()
     render_window win(sett, "DCPU16-GAME-ONE");
 
     level_context clevel;
+    dcpu::ide::project_instance current_project;
 
     dcpu::ide::reference_card card;
 
