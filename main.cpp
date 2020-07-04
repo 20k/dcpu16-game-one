@@ -8,6 +8,7 @@
 #include <toolkit/fs_helpers.hpp>
 #include "levels.hpp"
 #include <iostream>
+#include <filesystem>
 
 /*:start
 
@@ -28,6 +29,8 @@ int main()
     level_context clevel;
     dcpu::ide::project_instance current_project;
 
+    std::filesystem::create_directory("saves/");
+
     dcpu::ide::reference_card card;
 
     while(!win.should_close())
@@ -44,6 +47,30 @@ int main()
         {
             if(ImGui::Button(("LVL: " + std::to_string(lvl[i])).c_str()))
             {
+                std::filesystem::create_directories("saves/" + std::to_string(lvl[i]));
+
+                std::string full_filename = "saves/" + std::to_string(lvl[i]) + "/save.dcpu_project";
+
+                std::cout << "DOOT " << current_project.editors.size() << " TWO " << current_project.proj.assembly_data.size() << std::endl;
+
+                if(current_project.proj.project_file.size() > 0)
+                    current_project.save();
+
+                current_project = dcpu::ide::project_instance();
+
+                if(file::exists(full_filename))
+                {
+                    current_project.load(full_filename);
+                }
+                else
+                {
+                    current_project.proj.project_file = full_filename;
+                    current_project.proj.assembly_files = {"saves/" + std::to_string(lvl[i]) + "/cpu0.d16"};
+                    current_project.proj.assembly_data = {""};
+
+                    current_project.editors.emplace_back();
+                }
+
                 clevel = level::start(lvl[i]);
             }
         }
@@ -58,14 +85,14 @@ int main()
 
         if(ImGui::Button("Validate"))
         {
-            stats s = level::validate(clevel);
+            stats s = level::validate(clevel, current_project);
 
             std::cout << "VALID? " << s.success << std::endl;
         }
 
         ImGui::End();
 
-        for(auto& i : clevel.cpus)
+        for(auto& i : current_project.editors)
         {
             i.render();
         }

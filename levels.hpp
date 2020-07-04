@@ -8,7 +8,8 @@
 
 struct level_context
 {
-    std::vector<dcpu::ide::editor> cpus;
+    //std::vector<dcpu::ide::editor> cpus;
+    int cpus = 0;
     int level = 0;
     std::string description;
 };
@@ -26,7 +27,7 @@ namespace level
 
     level_context start(int level);
 
-    stats validate(level_context& ctx);
+    stats validate(level_context& ctx, dcpu::ide::project_instance& instance);
 }
 
 #endif // LEVELS_HPP_INCLUDED

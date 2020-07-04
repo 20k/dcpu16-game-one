@@ -80,7 +80,7 @@ namespace level
         if(ctx.level == 0)
         {
             ctx.description = "Intro to the DCPU-16";
-            ctx.cpus.emplace_back();
+            ctx.cpus = 1;
         }
 
         return ctx;
@@ -88,7 +88,7 @@ namespace level
 
     ///TODO: Step by step validation, dummy example and
     ///then more comprehensive tests
-    stats validate(level_context& ctx)
+    stats validate(level_context& ctx, dcpu::ide::project_instance& instance)
     {
         stats rstat;
 
@@ -113,7 +113,7 @@ namespace level
 
             std::vector<dcpu::sim::CPU*> user;
 
-            for(dcpu::ide::editor& edit : ctx.cpus)
+            for(dcpu::ide::editor& edit : instance.editors)
             {
                 edit.c = dcpu::sim::CPU();
 
