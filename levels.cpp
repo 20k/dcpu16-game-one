@@ -116,23 +116,6 @@ namespace level
 
         if(ctx.level == 0)
         {
-            /*std::vector<uint16_t> in;
-
-            for(int i=0; i < 256; i++)
-            {
-                in.push_back(i);
-            }
-
-            std::vector<uint16_t> out;
-
-            for(auto& i : in)
-            {
-                out.push_back(i);
-            }
-
-            auto inc = sim_input(in);
-            auto outc = sim_output(in.size());*/
-
             std::map<int, dcpu::sim::CPU> inputs;
 
             for(auto& [channel, vec] : ctx.channel_to_input)
