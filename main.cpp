@@ -18,6 +18,29 @@ SND X, 1
 SET PC, start
 */
 
+void format_column(int channel, const std::vector<uint16_t>& values, int offset, int count)
+{
+    ImGui::BeginGroup();
+
+    ImGui::Text("C: %i\n", channel);
+
+    std::string formatted;
+
+    /*for(auto v : values)
+    {
+        formatted += std::to_string(v) + "\n";
+    }*/
+
+    for(int i=offset; i < (int)values.size() && i < (offset + count); i++)
+    {
+        formatted += std::to_string(values[i]) + "\n";
+    }
+
+    ImGui::Text(formatted.c_str());
+
+    ImGui::EndGroup();
+}
+
 int main()
 {
     render_settings sett;
@@ -89,6 +112,56 @@ int main()
 
             std::cout << "VALID? " << s.success << std::endl;
         }
+
+        ImGui::End();
+
+        ImGui::Begin("Task", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+
+        ImGui::BeginGroup();
+
+        ImGui::Text("In");
+
+        for(auto& [channel, vals] : clevel.channel_to_input)
+        {
+            format_column(channel, vals, 0, 16);
+
+            ImGui::SameLine();
+        }
+
+        ImGui::EndGroup();
+
+        ImGui::SameLine();
+
+        ImGui::BeginGroup();
+
+        ImGui::Text("Out");
+
+        for(auto& [channel, vals] : clevel.channel_to_output)
+        {
+            format_column(channel, vals, 0, 16);
+
+            ImGui::SameLine();
+        }
+
+        ImGui::EndGroup();
+
+        ImGui::SameLine();
+
+        ImGui::BeginGroup();
+
+        ImGui::Text("User");
+
+        for(auto& [channel, vals] : clevel.channel_to_output)
+        {
+            if(auto it = clevel.found_output.find(channel); it != clevel.found_output.end())
+            {
+                format_column(channel, it->second, 0, 16);
+
+                ImGui::SameLine();
+            }
+        }
+
+        ImGui::EndGroup();
 
         ImGui::End();
 

@@ -2,13 +2,13 @@
 #include <dcpu16-asm/base_asm.hpp>
 #include <iostream>
 
-dcpu::sim::CPU sim_input(const std::vector<uint16_t>& input)
+dcpu::sim::CPU sim_input(const std::vector<uint16_t>& input, int channel)
 {
     std::string vals;
 
     for(uint16_t i : input)
     {
-        vals = vals + "SND " + std::to_string(i) + ", 0\n";
+        vals = vals + "SND " + std::to_string(i) + ", " + std::to_string(channel) + "\n";
     }
 
     dcpu::sim::CPU inc;
@@ -24,7 +24,7 @@ dcpu::sim::CPU sim_input(const std::vector<uint16_t>& input)
     return inc;
 }
 
-dcpu::sim::CPU sim_output(int len)
+dcpu::sim::CPU sim_output(int len, int channel)
 {
     std::string out_str;
 
@@ -34,7 +34,7 @@ dcpu::sim::CPU sim_output(int len)
     {
         uint16_t fin_address = output_address + i;
 
-        out_str += "RCV [" + std::to_string(fin_address) + "], 1\n";
+        out_str += "RCV [" + std::to_string(fin_address) + "], " + std::to_string(channel) + "\n";
     }
 
     dcpu::sim::CPU outc;
@@ -50,9 +50,16 @@ dcpu::sim::CPU sim_output(int len)
     return outc;
 }
 
-int check_output(const dcpu::sim::CPU& in, const std::vector<uint16_t>& output)
+int check_output(const dcpu::sim::CPU& in, const std::vector<uint16_t>& output, std::vector<uint16_t>& found)
 {
     uint16_t output_address = 0x8000;
+
+    for(int i=0; i < (int)output.size(); i++)
+    {
+        uint16_t fin_address = output_address + i;
+
+        found.push_back(in.mem[fin_address]);
+    }
 
     for(int i=0; i < (int)output.size(); i++)
     {
@@ -81,6 +88,18 @@ namespace level
         {
             ctx.description = "Intro to the DCPU-16";
             ctx.cpus = 1;
+
+            std::vector<uint16_t> input;
+            std::vector<uint16_t> output;
+
+            for(int i=0; i < 256; i++)
+            {
+                input.push_back(i);
+                output.push_back(i);
+            }
+
+            ctx.channel_to_input[0] = input;
+            ctx.channel_to_output[1] = output;
         }
 
         return ctx;
@@ -90,11 +109,13 @@ namespace level
     ///then more comprehensive tests
     stats validate(level_context& ctx, dcpu::ide::project_instance& instance)
     {
+        ctx.found_output.clear();
+
         stats rstat;
 
         if(ctx.level == 0)
         {
-            std::vector<uint16_t> in;
+            /*std::vector<uint16_t> in;
 
             for(int i=0; i < 256; i++)
             {
@@ -109,7 +130,21 @@ namespace level
             }
 
             auto inc = sim_input(in);
-            auto outc = sim_output(in.size());
+            auto outc = sim_output(in.size());*/
+
+            std::map<int, dcpu::sim::CPU> inputs;
+
+            for(auto& [channel, vec] : ctx.channel_to_input)
+            {
+                inputs[channel] = sim_input(vec, channel);
+            }
+
+            std::map<int, dcpu::sim::CPU> outputs;
+
+            for(auto& [channel, vec] : ctx.channel_to_output)
+            {
+                outputs[channel] = sim_output(vec.size(), channel);
+            }
 
             std::vector<dcpu::sim::CPU*> user;
 
@@ -138,8 +173,18 @@ namespace level
 
             stack_vector<dcpu::sim::CPU*, 64> cpus;
 
-            cpus.push_back(&inc);
-            cpus.push_back(&outc);
+            /*cpus.push_back(&inc);
+            cpus.push_back(&outc);*/
+
+            for(auto& [channel, sim] : inputs)
+            {
+                cpus.push_back(&sim);
+            }
+
+            for(auto& [channel, sim] : outputs)
+            {
+                cpus.push_back(&sim);
+            }
 
             for(auto& i : user)
             {
@@ -160,7 +205,23 @@ namespace level
                 dcpu::sim::resolve_interprocessor_communication(cpus, fab);
             }
 
-            rstat.success = check_output(outc, out) == -1;
+            rstat.success = true;
+
+            for(auto& [channel, sim] : outputs)
+            {
+                const std::vector<uint16_t>& output_val = ctx.channel_to_output[channel];
+
+                //ctx.found_output[channel] = output_val;
+
+                std::vector<uint16_t> found;
+
+                if(check_output(sim, output_val, found) != -1)
+                    rstat.success = false;
+
+                ctx.found_output[channel] = found;
+            }
+
+            //rstat.success = check_output(outc, out) == -1;
         }
 
         return rstat;

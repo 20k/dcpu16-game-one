@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <map>
 #include <dcpu16-sim/base_sim.hpp>
 #include <dcpu16-ide/base_ide.hpp>
 
@@ -12,6 +13,11 @@ struct level_context
     int cpus = 0;
     int level = 0;
     std::string description;
+
+    std::map<int, std::vector<uint16_t>> channel_to_input;
+    std::map<int, std::vector<uint16_t>> channel_to_output;
+
+    std::map<int, std::vector<uint16_t>> found_output;
 };
 
 struct stats
