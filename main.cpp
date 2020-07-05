@@ -47,7 +47,7 @@ int main()
         {
             if(ImGui::Button(("LVL: " + std::to_string(lvl[i])).c_str()))
             {
-                std::filesystem::create_directories("saves/" + std::to_string(lvl[i]));
+                std::filesystem::create_directory("saves/" + std::to_string(lvl[i]));
 
                 std::string full_filename = "saves/" + std::to_string(lvl[i]) + "/save.dcpu_project";
 
