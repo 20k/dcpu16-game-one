@@ -110,6 +110,8 @@ namespace level
         ctx.found_output.clear();
         ctx.error_locs.clear();
 
+        ctx.inf.fab = dcpu::sim::fabric();
+
         ctx.inf.input_cpus.clear();
         ctx.inf.output_cpus.clear();
 
@@ -124,6 +126,11 @@ namespace level
         {
             ctx.inf.output_cpus[channel] = sim_output(vec.size(), channel);
         }
+
+        for(dcpu::ide::editor& edit : instance.editors)
+        {
+            edit.c = dcpu::sim::CPU();
+        }
     }
 
     void step_validation(level_context& ctx, dcpu::ide::project_instance& instance, int cycles)
@@ -135,8 +142,6 @@ namespace level
 
         for(dcpu::ide::editor& edit : instance.editors)
         {
-            edit.c = dcpu::sim::CPU();
-
             dcpu::sim::CPU& next = edit.c;
 
             user.push_back(&next);
@@ -151,6 +156,8 @@ namespace level
             }
 
             next.load(rinfo_opt2.value().mem, 0);
+
+            edit.translation_map = rinfo_opt2.value().translation_map;
         }
 
         stack_vector<dcpu::sim::CPU*, 64> cpus;
@@ -170,18 +177,16 @@ namespace level
             cpus.push_back(i);
         }
 
-        dcpu::sim::fabric fab;
-
         int max_cycles = cycles;
 
         for(int i=0; i < max_cycles; i++)
         {
             for(int kk=0; kk < (int)cpus.size(); kk++)
             {
-                cpus[kk]->cycle_step(&fab);
+                cpus[kk]->cycle_step(&ctx.inf.fab);
             }
 
-            dcpu::sim::resolve_interprocessor_communication(cpus, fab);
+            dcpu::sim::resolve_interprocessor_communication(cpus, ctx.inf.fab);
         }
 
         for(auto& [channel, sim] : ctx.inf.output_cpus)
@@ -190,7 +195,7 @@ namespace level
 
             std::vector<uint16_t> found;
 
-            int err_pos = check_output(sim, output_val, found);
+            check_output(sim, output_val, found);
 
             for(int i=0; i < (int)found.size() && i < (int)output_val.size(); i++)
             {

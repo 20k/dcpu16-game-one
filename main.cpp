@@ -75,6 +75,8 @@ int main()
 
     dcpu::ide::reference_card card;
 
+    int step_amount = 0;
+
     while(!win.should_close())
     {
         win.poll();
@@ -114,6 +116,8 @@ int main()
                 }
 
                 clevel = level::start(lvl[i]);
+
+                level::setup_validation(clevel, current_project);
             }
         }
 
@@ -131,6 +135,21 @@ int main()
 
             std::cout << "VALID? " << s.success << std::endl;
         }
+
+        if(ImGui::Button("Reset"))
+        {
+            level::setup_validation(clevel, current_project);
+        }
+
+        if(ImGui::Button("Step Puzzle"))
+        {
+            level::step_validation(clevel, current_project, step_amount);
+        }
+
+        ImGui::InputInt("Step Amount", &step_amount);
+
+        if(step_amount < 1)
+            step_amount = 1;
 
         ImGui::End();
 
