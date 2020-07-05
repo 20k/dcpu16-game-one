@@ -110,6 +110,7 @@ namespace level
     stats validate(level_context& ctx, dcpu::ide::project_instance& instance)
     {
         ctx.found_output.clear();
+        ctx.error_locs.clear();
 
         stats rstat;
 
@@ -215,9 +216,18 @@ namespace level
 
                 std::vector<uint16_t> found;
 
-                if(check_output(sim, output_val, found) != -1)
+                int err_pos = check_output(sim, output_val, found);
+
+                if(err_pos != -1)
                     rstat.success = false;
 
+                for(int i=0; i < (int)found.size() && i < (int)output_val.size(); i++)
+                {
+                    if(found[i] != output_val[i])
+                        ctx.error_locs.push_back(i);
+                }
+
+                //ctx.error_loc = err_pos;
                 ctx.found_output[channel] = found;
             }
 

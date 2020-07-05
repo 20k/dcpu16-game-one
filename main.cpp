@@ -9,6 +9,7 @@
 #include "levels.hpp"
 #include <iostream>
 #include <filesystem>
+#include <set>
 
 /*:start
 
@@ -18,11 +19,18 @@ SND X, 1
 SET PC, start
 */
 
-void format_column(int channel, const std::vector<uint16_t>& values, int offset, int count)
+void format_column(int channel, const std::vector<uint16_t>& values, int offset, int count, const std::vector<int>& highlight)
 {
     ImGui::BeginGroup();
 
     ImGui::Text("C: %i\n", channel);
+
+    std::set<int> highlight_set;
+
+    for(auto i : highlight)
+    {
+        highlight_set.insert(i);
+    }
 
     std::string formatted;
 
@@ -31,9 +39,20 @@ void format_column(int channel, const std::vector<uint16_t>& values, int offset,
         formatted += std::to_string(v) + "\n";
     }*/
 
+    if(offset < 0)
+        offset = 0;
+
     for(int i=offset; i < (int)values.size() && i < (offset + count); i++)
     {
-        formatted += std::to_string(values[i]) + "\n";
+        /*if(i != highlight)
+            ImGui::Text("%i", values[i]);
+        else
+            ImGui::TextColored(ImVec4(255, 0, 0, 255), "%i", values[i]);*/
+
+        if(highlight_set.find(i) == highlight_set.end())
+            formatted += std::to_string(values[i]) + "\n";
+        else
+            formatted += std::to_string(values[i]) + " <\n";
     }
 
     ImGui::Text(formatted.c_str());
@@ -121,9 +140,11 @@ int main()
 
         ImGui::Text("In");
 
+        int start_error_line = clevel.error_locs.size() > 0 ? (clevel.error_locs.front() - 8) : 0;
+
         for(auto& [channel, vals] : clevel.channel_to_input)
         {
-            format_column(channel, vals, 0, 16);
+            format_column(channel, vals, start_error_line, 16, {});
 
             ImGui::SameLine();
         }
@@ -138,7 +159,7 @@ int main()
 
         for(auto& [channel, vals] : clevel.channel_to_output)
         {
-            format_column(channel, vals, 0, 16);
+            format_column(channel, vals, start_error_line, 16, {});
 
             ImGui::SameLine();
         }
@@ -155,7 +176,7 @@ int main()
         {
             if(auto it = clevel.found_output.find(channel); it != clevel.found_output.end())
             {
-                format_column(channel, it->second, 0, 16);
+                format_column(channel, it->second, start_error_line, 16, clevel.error_locs);
 
                 ImGui::SameLine();
             }

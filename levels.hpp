@@ -18,6 +18,7 @@ struct level_context
     std::map<int, std::vector<uint16_t>> channel_to_output;
 
     std::map<int, std::vector<uint16_t>> found_output;
+    std::vector<int> error_locs;
 };
 
 struct stats
