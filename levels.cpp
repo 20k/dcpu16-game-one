@@ -105,6 +105,103 @@ namespace level
         return ctx;
     }
 
+    void setup_validation(level_context& ctx, dcpu::ide::project_instance& instance)
+    {
+        ctx.found_output.clear();
+        ctx.error_locs.clear();
+
+        ctx.inf.input_cpus.clear();
+        ctx.inf.output_cpus.clear();
+
+        ctx.inf.cycle = 0;
+
+        for(auto& [channel, vec] : ctx.channel_to_input)
+        {
+            ctx.inf.input_cpus[channel] = sim_input(vec, channel);
+        }
+
+        for(auto& [channel, vec] : ctx.channel_to_output)
+        {
+            ctx.inf.output_cpus[channel] = sim_output(vec.size(), channel);
+        }
+    }
+
+    void step_validation(level_context& ctx, dcpu::ide::project_instance& instance, int cycles)
+    {
+        ctx.found_output.clear();
+        ctx.error_locs.clear();
+
+        std::vector<dcpu::sim::CPU*> user;
+
+        for(dcpu::ide::editor& edit : instance.editors)
+        {
+            edit.c = dcpu::sim::CPU();
+
+            dcpu::sim::CPU& next = edit.c;
+
+            user.push_back(&next);
+
+            auto [rinfo_opt2, err2] = assemble_fwd(edit.get_text());
+
+            if(!rinfo_opt2.has_value())
+            {
+                printf("Error %s\n", err2.data());
+
+                return;
+            }
+
+            next.load(rinfo_opt2.value().mem, 0);
+        }
+
+        stack_vector<dcpu::sim::CPU*, 64> cpus;
+
+        for(auto& [channel, sim] : ctx.inf.input_cpus)
+        {
+            cpus.push_back(&sim);
+        }
+
+        for(auto& [channel, sim] : ctx.inf.output_cpus)
+        {
+            cpus.push_back(&sim);
+        }
+
+        for(auto& i : user)
+        {
+            cpus.push_back(i);
+        }
+
+        dcpu::sim::fabric fab;
+
+        int max_cycles = cycles;
+
+        for(int i=0; i < max_cycles; i++)
+        {
+            for(int kk=0; kk < (int)cpus.size(); kk++)
+            {
+                cpus[kk]->cycle_step(&fab);
+            }
+
+            dcpu::sim::resolve_interprocessor_communication(cpus, fab);
+        }
+
+        for(auto& [channel, sim] : ctx.inf.output_cpus)
+        {
+            const std::vector<uint16_t>& output_val = ctx.channel_to_output[channel];
+
+            std::vector<uint16_t> found;
+
+            int err_pos = check_output(sim, output_val, found);
+
+            for(int i=0; i < (int)found.size() && i < (int)output_val.size(); i++)
+            {
+                if(found[i] != output_val[i])
+                    ctx.error_locs.push_back(i);
+            }
+
+            ctx.found_output[channel] = found;
+        }
+    }
+
     ///TODO: Step by step validation, dummy example and
     ///then more comprehensive tests
     stats validate(level_context& ctx, dcpu::ide::project_instance& instance)
@@ -116,105 +213,11 @@ namespace level
 
         if(ctx.level == 0)
         {
-            std::map<int, dcpu::sim::CPU> inputs;
+            setup_validation(ctx, instance);
 
-            for(auto& [channel, vec] : ctx.channel_to_input)
-            {
-                inputs[channel] = sim_input(vec, channel);
-            }
+            step_validation(ctx, instance, 1000000);
 
-            std::map<int, dcpu::sim::CPU> outputs;
-
-            for(auto& [channel, vec] : ctx.channel_to_output)
-            {
-                outputs[channel] = sim_output(vec.size(), channel);
-            }
-
-            std::vector<dcpu::sim::CPU*> user;
-
-            for(dcpu::ide::editor& edit : instance.editors)
-            {
-                edit.c = dcpu::sim::CPU();
-
-                dcpu::sim::CPU& next = edit.c;
-
-                user.push_back(&next);
-
-                //dcpu::sim::CPU& next = user.emplace_back();
-
-                auto [rinfo_opt2, err2] = assemble_fwd(edit.get_text());
-
-                if(!rinfo_opt2.has_value())
-                {
-                    printf("Error %s\n", err2.data());
-                    rstat.success = false;
-
-                    return rstat;
-                }
-
-                next.load(rinfo_opt2.value().mem, 0);
-            }
-
-            stack_vector<dcpu::sim::CPU*, 64> cpus;
-
-            /*cpus.push_back(&inc);
-            cpus.push_back(&outc);*/
-
-            for(auto& [channel, sim] : inputs)
-            {
-                cpus.push_back(&sim);
-            }
-
-            for(auto& [channel, sim] : outputs)
-            {
-                cpus.push_back(&sim);
-            }
-
-            for(auto& i : user)
-            {
-                cpus.push_back(i);
-            }
-
-            dcpu::sim::fabric fab;
-
-            int max_cycles = 1000000;
-
-            for(int i=0; i < max_cycles; i++)
-            {
-                for(int kk=0; kk < (int)cpus.size(); kk++)
-                {
-                    cpus[kk]->cycle_step(&fab);
-                }
-
-                dcpu::sim::resolve_interprocessor_communication(cpus, fab);
-            }
-
-            rstat.success = true;
-
-            for(auto& [channel, sim] : outputs)
-            {
-                const std::vector<uint16_t>& output_val = ctx.channel_to_output[channel];
-
-                //ctx.found_output[channel] = output_val;
-
-                std::vector<uint16_t> found;
-
-                int err_pos = check_output(sim, output_val, found);
-
-                if(err_pos != -1)
-                    rstat.success = false;
-
-                for(int i=0; i < (int)found.size() && i < (int)output_val.size(); i++)
-                {
-                    if(found[i] != output_val[i])
-                        ctx.error_locs.push_back(i);
-                }
-
-                //ctx.error_loc = err_pos;
-                ctx.found_output[channel] = found;
-            }
-
-            //rstat.success = check_output(outc, out) == -1;
+            rstat.success = ctx.error_locs.size() == 0;
         }
 
         return rstat;
