@@ -19,7 +19,28 @@ SND X, 1
 SET PC, start
 */
 
-void format_column(int channel, const std::vector<uint16_t>& values, int offset, int count, const std::vector<int>& highlight)
+std::string to_hex(int val)
+{
+    std::stringstream str;
+
+    str << std::hex << val;
+
+    std::string rval = str.str();
+
+    for(int i=(int)rval.size(); i < 4; i++)
+    {
+        rval = "0" + rval;
+    }
+
+    return "0x" + rval;
+}
+
+std::string format(int val, bool hex)
+{
+    return hex ? to_hex(val) : std::to_string(val);
+}
+
+void format_column(int channel, const std::vector<uint16_t>& values, int offset, int count, const std::vector<int>& highlight, bool is_hex)
 {
     ImGui::BeginGroup();
 
@@ -50,9 +71,9 @@ void format_column(int channel, const std::vector<uint16_t>& values, int offset,
             ImGui::TextColored(ImVec4(255, 0, 0, 255), "%i", values[i]);*/
 
         if(highlight_set.find(i) == highlight_set.end())
-            formatted += std::to_string(values[i]) + "\n";
+            formatted += format(values[i], is_hex) + "\n";
         else
-            formatted += std::to_string(values[i]) + " <\n";
+            formatted += format(values[i], is_hex) + " <\n";
     }
 
     ImGui::Text(formatted.c_str());
@@ -76,6 +97,8 @@ int main()
     dcpu::ide::reference_card card;
 
     int step_amount = 0;
+
+    bool is_hex = true;
 
     while(!win.should_close())
     {
@@ -155,6 +178,8 @@ int main()
 
         ImGui::Begin("Task", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
+        ImGui::Checkbox("Hex", &is_hex);
+
         ImGui::BeginGroup();
 
         ImGui::Text("In");
@@ -163,7 +188,7 @@ int main()
 
         for(auto& [channel, vals] : clevel.channel_to_input)
         {
-            format_column(channel, vals, start_error_line, 16, {});
+            format_column(channel, vals, start_error_line, 16, {}, is_hex);
 
             ImGui::SameLine();
         }
@@ -178,7 +203,7 @@ int main()
 
         for(auto& [channel, vals] : clevel.channel_to_output)
         {
-            format_column(channel, vals, start_error_line, 16, {});
+            format_column(channel, vals, start_error_line, 16, {}, is_hex);
 
             ImGui::SameLine();
         }
@@ -195,7 +220,7 @@ int main()
         {
             if(auto it = clevel.found_output.find(channel); it != clevel.found_output.end())
             {
-                format_column(channel, it->second, start_error_line, 16, clevel.error_locs);
+                format_column(channel, it->second, start_error_line, 16, clevel.error_locs, is_hex);
 
                 ImGui::SameLine();
             }

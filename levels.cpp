@@ -1,6 +1,7 @@
 #include "levels.hpp"
 #include <dcpu16-asm/base_asm.hpp>
 #include <iostream>
+#include <cmath>
 
 dcpu::sim::CPU sim_input(const std::vector<uint16_t>& input, int channel)
 {
@@ -72,17 +73,34 @@ int check_output(const dcpu::sim::CPU& in, const std::vector<uint16_t>& output, 
     return -1;
 }
 
+uint16_t lcg(uint64_t& state)
+{
+    uint64_t a = 2862933555777941757;
+    uint64_t b = 3037000493;
+
+    state = a * state + b;
+
+    return state >> (64-16);
+}
+
 namespace level
 {
     std::vector<int> get_available()
     {
-        return {0};
+        return {0, 1, 2};
     }
 
     level_context start(int level)
     {
         level_context ctx;
         ctx.level = level;
+
+        uint64_t seed = level * 2 + 1;
+
+        for(int i=0; i < 128; i++)
+        {
+            lcg(seed);
+        }
 
         if(ctx.level == 0)
         {
@@ -100,6 +118,65 @@ namespace level
 
             ctx.channel_to_input[0] = input;
             ctx.channel_to_output[1] = output;
+        }
+
+        if(ctx.level == 1)
+        {
+            ctx.description = "Amplify the input - Multiply by 16";
+            ctx.cpus = 1;
+
+            std::vector<uint16_t> input;
+            std::vector<uint16_t> output;
+
+            for(uint64_t i=0; i < 256; i++)
+            {
+                uint16_t in = lcg(seed) % (65536 / 32);
+                uint16_t out = in * 16;
+
+                input.push_back(in);
+                output.push_back(out);
+            }
+
+            ctx.channel_to_input[0] = input;
+            ctx.channel_to_output[1] = output;
+        }
+
+        if(ctx.level == 2)
+        {
+            ctx.description = "Power - raise input 1 to the power of input 2\na^b is the same as a * a * a ... * a, done b times";
+            ctx.cpus = 1;
+
+            std::vector<uint16_t> input1;
+            std::vector<uint16_t> input2;
+            std::vector<uint16_t> output;
+
+            for(uint64_t i=0; i < 256; i++)
+            {
+                uint16_t in1 = lcg(seed) % 128;
+                uint16_t in2 = lcg(seed) % 16;
+                //uint16_t out = std::pow(in1, in2);
+
+                uint16_t res = 1;
+
+                for(int i=0; i < in2; i++)
+                {
+                    res = res * in1;
+                }
+
+                //for(int i=1; i < in2)
+
+                input1.push_back(in1);
+                input2.push_back(in2);
+                output.push_back(res);
+            }
+
+            input1.push_back(0);
+            input2.push_back(0);
+            output.push_back(1);
+
+            ctx.channel_to_input[0] = input1;
+            ctx.channel_to_input[1] = input2;
+            ctx.channel_to_output[2] = output;
         }
 
         return ctx;
@@ -216,14 +293,11 @@ namespace level
 
         stats rstat;
 
-        if(ctx.level == 0)
-        {
-            setup_validation(ctx, instance);
+        setup_validation(ctx, instance);
 
-            step_validation(ctx, instance, 1000000);
+        step_validation(ctx, instance, 1000000);
 
-            rstat.success = ctx.error_locs.size() == 0;
-        }
+        rstat.success = ctx.error_locs.size() == 0;
 
         return rstat;
     }
