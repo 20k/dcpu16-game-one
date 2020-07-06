@@ -198,6 +198,10 @@ namespace level
             ctx.channel_to_output[2] = output2;
         }
 
+        ///next up, conditionals
+        ///then conditional chaining?
+        ///then powr
+
         if(ctx.level_name == "POWR")
         {
             ctx.description = "Power - raise Ch:0 to the power of Ch:1\na^b is the same as a * a * a ... * a, done b times";
