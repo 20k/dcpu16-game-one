@@ -148,9 +148,9 @@ namespace level
             ctx.description = "Power - raise input 1 to the power of input 2\na^b is the same as a * a * a ... * a, done b times";
             ctx.cpus = 1;
 
-            std::vector<uint16_t> input1{15};
-            std::vector<uint16_t> input2{1};
-            std::vector<uint16_t> output{15};
+            std::vector<uint16_t> input1{15, 15};
+            std::vector<uint16_t> input2{1, 2};
+            std::vector<uint16_t> output{15, 225};
 
             for(uint64_t i=0; i < 256; i++)
             {
