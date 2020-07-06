@@ -85,26 +85,26 @@ uint16_t lcg(uint64_t& state)
 
 namespace level
 {
-    std::vector<int> get_available()
+    std::vector<std::string> get_available()
     {
-        return {0, 1, 2};
+        return {"INTRO", "AMPLIFY", "POWR"};
     }
 
-    level_context start(int level)
+    level_context start(const std::string& level_name)
     {
         level_context ctx;
-        ctx.level = level;
+        ctx.level_name = level_name;
 
-        uint64_t seed = level * 2 + 1;
+        uint64_t seed = std::hash<std::string>{}(level_name) * 2 + 1;
 
         for(int i=0; i < 128; i++)
         {
             lcg(seed);
         }
 
-        if(ctx.level == 0)
+        if(ctx.level_name == "INTRO")
         {
-            ctx.description = "Intro to the DCPU-16";
+            ctx.description = "Intro to the DCPU-16. Pass the input to the output";
             ctx.cpus = 1;
 
             std::vector<uint16_t> input;
@@ -120,7 +120,7 @@ namespace level
             ctx.channel_to_output[1] = output;
         }
 
-        if(ctx.level == 1)
+        if(ctx.level_name == "AMPLIFY")
         {
             ctx.description = "Amplify the input - Multiply by 16";
             ctx.cpus = 1;
@@ -141,7 +141,7 @@ namespace level
             ctx.channel_to_output[1] = output;
         }
 
-        if(ctx.level == 2)
+        if(ctx.level_name == "POWR")
         {
             ctx.description = "Power - raise input 1 to the power of input 2\na^b is the same as a * a * a ... * a, done b times";
             ctx.cpus = 1;

@@ -108,15 +108,15 @@ int main()
 
         ImGui::Begin("Levels", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
-        std::vector<int> lvl = level::get_available();
+        std::vector<std::string> lvl = level::get_available();
 
         for(int i=0; i < (int)lvl.size(); i++)
         {
-            if(ImGui::Button(("LVL: " + std::to_string(lvl[i])).c_str()))
+            if(ImGui::Button(("LVL: " + lvl[i]).c_str()))
             {
-                std::filesystem::create_directory("saves/" + std::to_string(lvl[i]));
+                std::filesystem::create_directory("saves/" + lvl[i]);
 
-                std::string full_filename = "saves/" + std::to_string(lvl[i]) + "/save.dcpu_project";
+                std::string full_filename = "saves/" + lvl[i] + "/save.dcpu_project";
 
                 std::cout << "DOOT " << current_project.editors.size() << " TWO " << current_project.proj.assembly_data.size() << std::endl;
 
@@ -134,7 +134,7 @@ int main()
                 else
                 {
                     current_project.proj.project_file = full_filename;
-                    current_project.proj.assembly_files = {"saves/" + std::to_string(lvl[i]) + "/cpu0.d16"};
+                    current_project.proj.assembly_files = {"saves/" + lvl[i] + "/cpu0.d16"};
                     current_project.proj.assembly_data = {""};
 
                     current_project.editors.emplace_back();
@@ -152,7 +152,7 @@ int main()
 
         ImGui::Text("Description %s", clevel.description.c_str());
 
-        ImGui::Text("Level %i", clevel.level);
+        ImGui::Text("Level %s", clevel.level_name.c_str());
 
         if(ImGui::Button("Validate"))
         {

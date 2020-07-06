@@ -20,7 +20,7 @@ struct level_context
 {
     //std::vector<dcpu::ide::editor> cpus;
     int cpus = 0;
-    int level = 0;
+    std::string level_name;
     std::string description;
 
     std::map<int, std::vector<uint16_t>> channel_to_input;
@@ -41,9 +41,9 @@ struct stats
 
 namespace level
 {
-    std::vector<int> get_available();
+    std::vector<std::string> get_available();
 
-    level_context start(int level);
+    level_context start(const std::string& name);
 
     void setup_validation(level_context& ctx, dcpu::ide::project_instance& instance);
     void step_validation(level_context& ctx, dcpu::ide::project_instance& instance, int cycles);
