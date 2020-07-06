@@ -87,7 +87,7 @@ namespace level
 {
     std::vector<std::string> get_available()
     {
-        return {"INTRO", "AMPLIFY", "SEVENS", "POWR"};
+        return {"INTRO", "AMPLIFY", "DIVISIONS", "POWR"};
     }
 
     level_context start(const std::string& level_name)
@@ -174,9 +174,9 @@ namespace level
             ctx.channel_to_output[3] = output2;
         }*/
 
-        if(ctx.level_name == "SEVENS")
+        if(ctx.level_name == "DIVISIONS")
         {
-            ctx.description = "Calculate Ch:0 * 7 and write it to Ch:1\nCalculate Ch:0 * 49 and write it to Ch:2";
+            ctx.description = "Calculate Ch:0 / 4 and write it to Ch:1\nCalculate Ch:0 / 32 and write it to Ch:2";
             ctx.cpus = 1;
 
             std::vector<uint16_t> input1;
@@ -189,8 +189,8 @@ namespace level
 
                 input1.push_back(in1);
 
-                output1.push_back(in1 * 7);
-                output2.push_back(in1 * 49);
+                output1.push_back(in1 / 4);
+                output2.push_back(in1 / 32);
             }
 
             ctx.channel_to_input[0] = input1;
