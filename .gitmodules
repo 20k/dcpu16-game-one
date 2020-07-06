@@ -22,3 +22,6 @@
 [submodule "deps/toml"]
 	path = deps/toml
 	url = https://github.com/ToruNiina/toml11
+[submodule "deps/imguicolortextedit"]
+	path = deps/imguicolortextedit
+	url = https://github.com/20k/ImGuiColorTextEdit
