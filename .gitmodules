@@ -19,9 +19,6 @@
 [submodule "deps/imgui"]
 	path = deps/imgui
 	url = https://github.com/20k/imgui-fork
-[submodule "deps/imguicolortextedit"]
-	path = deps/imguicolortextedit
-	url = https://github.com/BalazsJako/ImGuiColorTextEdit
 [submodule "deps/toml"]
 	path = deps/toml
 	url = https://github.com/ToruNiina/toml11

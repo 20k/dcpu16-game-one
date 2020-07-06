@@ -86,6 +86,7 @@ int main()
     render_settings sett;
     sett.width = 1200;
     sett.height = 800;
+    sett.viewports = true;
 
     render_window win(sett, "DCPU16-GAME-ONE");
 
