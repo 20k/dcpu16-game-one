@@ -104,7 +104,9 @@ namespace level
 
         if(ctx.level_name == "INTRO")
         {
-            ctx.description = "Intro to the DCPU-16. Pass the input to the output";
+            ctx.description = "Intro to the DCPU-16. Pass the input to the output\n"
+                              "Use RCV X, 0 to receive input on Ch 0, and SND X, 1 to send output on Ch 1\n"
+                              "Remember to make your program loop by using SET PC, 0";
             ctx.cpus = 1;
 
             std::vector<uint16_t> input;

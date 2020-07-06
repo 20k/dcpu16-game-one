@@ -44,7 +44,7 @@ void format_column(int channel, const std::vector<uint16_t>& values, int offset,
 {
     ImGui::BeginGroup();
 
-    ImGui::Text("C: %i\n", channel);
+    ImGui::Text("Ch: %i\n", channel);
 
     std::set<int> highlight_set;
 
@@ -150,7 +150,7 @@ int main()
 
         ImGui::Begin("Level", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
-        ImGui::Text("Description %s", clevel.description.c_str());
+        ImGui::Text("%s", clevel.description.c_str());
 
         ImGui::Text("Level %s", clevel.level_name.c_str());
 
