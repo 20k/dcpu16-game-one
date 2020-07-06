@@ -121,7 +121,9 @@ int main()
                 std::cout << "DOOT " << current_project.editors.size() << " TWO " << current_project.proj.assembly_data.size() << std::endl;
 
                 if(current_project.proj.project_file.size() > 0)
+                {
                     current_project.save();
+                }
 
                 current_project = dcpu::ide::project_instance();
 
