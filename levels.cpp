@@ -87,7 +87,7 @@ namespace level
 {
     std::vector<std::string> get_available()
     {
-        return {"INTRO", "AMPLIFY", "POWERS_OF_TWO", "POWR"};
+        return {"INTRO", "AMPLIFY", "SEVENS", "POWR"};
     }
 
     level_context start(const std::string& level_name)
@@ -146,7 +146,7 @@ namespace level
         ///can't figure out any way this puzzle can be different
         ///fundamental constraint: Needs 2 outputs, 1+ inputs
         ///with a reusable component
-        if(ctx.level_name == "DIFFS")
+        /*if(ctx.level_name == "DIFFS")
         {
             ctx.description = "Calculate Ch:0 - Ch:1 and write it to Ch:2\nCalculate Ch:1 - Ch:0 and write it to Ch:3";
             ctx.cpus = 1;
@@ -172,6 +172,30 @@ namespace level
             ctx.channel_to_input[1] = input2;
             ctx.channel_to_output[2] = output1;
             ctx.channel_to_output[3] = output2;
+        }*/
+
+        if(ctx.level_name == "SEVENS")
+        {
+            ctx.description = "Calculate Ch:0 * 7 and write it to Ch:1\nCalculate Ch:0 * 49 and write it to Ch:2";
+            ctx.cpus = 1;
+
+            std::vector<uint16_t> input1;
+            std::vector<uint16_t> output1;
+            std::vector<uint16_t> output2;
+
+            for(int i=0; i < 256; i++)
+            {
+                uint16_t in1 = lcg(seed);
+
+                input1.push_back(in1);
+
+                output1.push_back(in1 * 7);
+                output2.push_back(in1 * 49);
+            }
+
+            ctx.channel_to_input[0] = input1;
+            ctx.channel_to_output[1] = output1;
+            ctx.channel_to_output[2] = output2;
         }
 
         if(ctx.level_name == "POWR")
