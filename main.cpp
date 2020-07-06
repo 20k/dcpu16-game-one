@@ -19,7 +19,7 @@ SND X, 1
 SET PC, start
 */
 
-std::string to_hex(int val)
+std::string to_hex(uint16_t val)
 {
     std::stringstream str;
 
@@ -40,7 +40,7 @@ std::string format(int val, bool hex)
     return hex ? to_hex(val) : std::to_string(val);
 }
 
-void format_column(int channel, const std::vector<uint16_t>& values, int offset, int count, const std::vector<int>& highlight, bool is_hex)
+void format_column(int channel, const std::vector<uint16_t>& values, int offset, int count, const std::vector<int>& highlight, bool is_hex, bool use_signed)
 {
     ImGui::BeginGroup();
 
@@ -70,10 +70,12 @@ void format_column(int channel, const std::vector<uint16_t>& values, int offset,
         else
             ImGui::TextColored(ImVec4(255, 0, 0, 255), "%i", values[i]);*/
 
+        int32_t val = use_signed ? (int32_t)(int16_t)values[i] : (int32_t)values[i];
+
         if(highlight_set.find(i) == highlight_set.end())
-            formatted += format(values[i], is_hex) + "\n";
+            formatted += format(val, is_hex) + "\n";
         else
-            formatted += format(values[i], is_hex) + " <\n";
+            formatted += format(val, is_hex) + " <\n";
     }
 
     ImGui::Text(formatted.c_str());
@@ -100,6 +102,7 @@ int main()
     int step_amount = 0;
 
     bool is_hex = true;
+    bool use_signed = false;
 
     while(!win.should_close())
     {
@@ -182,6 +185,8 @@ int main()
         ImGui::Begin("Task", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
         ImGui::Checkbox("Hex", &is_hex);
+        ImGui::SameLine();
+        ImGui::Checkbox("Signed", &use_signed);
 
         ImGui::BeginGroup();
 
@@ -191,7 +196,7 @@ int main()
 
         for(auto& [channel, vals] : clevel.channel_to_input)
         {
-            format_column(channel, vals, start_error_line, 16, {}, is_hex);
+            format_column(channel, vals, start_error_line, 16, {}, is_hex, use_signed);
 
             ImGui::SameLine();
         }
@@ -206,7 +211,7 @@ int main()
 
         for(auto& [channel, vals] : clevel.channel_to_output)
         {
-            format_column(channel, vals, start_error_line, 16, {}, is_hex);
+            format_column(channel, vals, start_error_line, 16, {}, is_hex, use_signed);
 
             ImGui::SameLine();
         }
@@ -223,7 +228,7 @@ int main()
         {
             if(auto it = clevel.found_output.find(channel); it != clevel.found_output.end())
             {
-                format_column(channel, it->second, start_error_line, 16, clevel.error_locs, is_hex);
+                format_column(channel, it->second, start_error_line, 16, clevel.error_locs, is_hex, use_signed);
 
                 ImGui::SameLine();
             }
