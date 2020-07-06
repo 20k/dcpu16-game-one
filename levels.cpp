@@ -87,7 +87,7 @@ namespace level
 {
     std::vector<std::string> get_available()
     {
-        return {"INTRO", "AMPLIFY", "DIVISIONS", "POWR"};
+        return {"INTRO", "AMPLIFY", "DIVISIONS", "SPACESHIP_OPERATOR", "POWR"};
     }
 
     level_context start(const std::string& level_name)
@@ -201,6 +201,35 @@ namespace level
         ///next up, conditionals
         ///then conditional chaining?
         ///then powr
+
+        if(ctx.level_name == "SPACESHIP_OPERATOR")
+        {
+            ctx.description = "If Ch:0 < 0, write -1 to Ch:1\nIf Ch:0 == 0, write 0 to Ch:1\nIf Ch:0 > 0, write 1 to Ch:1\nMany instructions have signed equivalents for operating on negative values";
+            ctx.cpus = 1;
+
+            std::vector<uint16_t> input1{1, 0, 0xffff};
+            std::vector<uint16_t> output1{1, 0, 0xffff};
+
+            for(int i=0; i < 256; i++)
+            {
+                uint16_t in1 = lcg(seed);
+                int16_t as_int = (int16_t)in1;
+
+                int16_t res = 0;
+
+                if(as_int < 0)
+                    res = -1;
+
+                if(as_int > 0)
+                    res = 1;
+
+                input1.push_back(in1);
+                output1.push_back(res);
+            }
+
+            ctx.channel_to_input[0] = input1;
+            ctx.channel_to_output[1] = output1;
+        }
 
         if(ctx.level_name == "POWR")
         {
