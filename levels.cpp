@@ -87,7 +87,7 @@ namespace level
 {
     std::vector<std::string> get_available()
     {
-        return {"INTRO", "AMPLIFY", "POWR"};
+        return {"INTRO", "AMPLIFY", "POWERS_OF_TWO", "POWR"};
     }
 
     level_context start(const std::string& level_name)
@@ -105,7 +105,7 @@ namespace level
         if(ctx.level_name == "INTRO")
         {
             ctx.description = "Intro to the DCPU-16. Pass the input to the output\n"
-                              "Use RCV X, 0 to receive input on Ch 0, and SND X, 1 to send output on Ch 1\n"
+                              "Use RCV X, 0 to receive input on Ch:0, and SND X, 1 to send output on Ch:1\n"
                               "Remember to make your program loop by using SET PC, 0";
             ctx.cpus = 1;
 
@@ -130,7 +130,7 @@ namespace level
             std::vector<uint16_t> input;
             std::vector<uint16_t> output;
 
-            for(uint64_t i=0; i < 256; i++)
+            for(int i=0; i < 256; i++)
             {
                 uint16_t in = lcg(seed) % (65536 / 32);
                 uint16_t out = in * 16;
@@ -143,16 +143,47 @@ namespace level
             ctx.channel_to_output[1] = output;
         }
 
+        ///can't figure out any way this puzzle can be different
+        ///fundamental constraint: Needs 2 outputs, 1+ inputs
+        ///with a reusable component
+        if(ctx.level_name == "DIFFS")
+        {
+            ctx.description = "Calculate Ch:0 - Ch:1 and write it to Ch:2\nCalculate Ch:1 - Ch:0 and write it to Ch:3";
+            ctx.cpus = 1;
+
+            std::vector<uint16_t> input1;
+            std::vector<uint16_t> input2;
+            std::vector<uint16_t> output1;
+            std::vector<uint16_t> output2;
+
+            for(int i=0; i < 256; i++)
+            {
+                uint16_t in1 = lcg(seed);
+                uint16_t in2 = lcg(seed);
+
+                input1.push_back(in1);
+                input2.push_back(in2);
+
+                output1.push_back(in1 - in2);
+                output2.push_back(in2 - in1);
+            }
+
+            ctx.channel_to_input[0] = input1;
+            ctx.channel_to_input[1] = input2;
+            ctx.channel_to_output[2] = output1;
+            ctx.channel_to_output[3] = output2;
+        }
+
         if(ctx.level_name == "POWR")
         {
-            ctx.description = "Power - raise input 1 to the power of input 2\na^b is the same as a * a * a ... * a, done b times";
+            ctx.description = "Power - raise Ch:0 to the power of Ch:1\na^b is the same as a * a * a ... * a, done b times";
             ctx.cpus = 1;
 
             std::vector<uint16_t> input1{15, 15};
             std::vector<uint16_t> input2{1, 2};
             std::vector<uint16_t> output{15, 225};
 
-            for(uint64_t i=0; i < 256; i++)
+            for(int i=0; i < 256; i++)
             {
                 uint16_t in1 = lcg(seed) % 128;
                 uint16_t in2 = lcg(seed) % 16;
