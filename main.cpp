@@ -25,6 +25,9 @@ SET PC, start
 
 ///Need the dummy test data + real data separation
 
+///TODO:
+///Need real assembly error messages. Might need a constexpr string
+
 std::string to_hex(uint16_t val)
 {
     std::stringstream str;
