@@ -23,6 +23,8 @@ SET PC, start
 ///Need the ability to handle inputs and outputs of different respective sizes
 ///Need to highlight next value to read, and write. This may fix the above
 
+///Need the dummy test data + real data separation
+
 std::string to_hex(uint16_t val)
 {
     std::stringstream str;
