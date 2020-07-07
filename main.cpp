@@ -280,9 +280,10 @@ int main()
 
         ImGui::End();
 
-        for(auto& i : current_project.editors)
+        //for(auto& i : current_project.editors)
+        for(int i=0; i < (int)current_project.editors.size(); i++)
         {
-            i.render(current_project);
+            current_project.editors[i].render(current_project, i);
         }
 
         sf::sleep(sf::milliseconds(1));
