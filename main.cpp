@@ -164,6 +164,19 @@ int main()
 
         ImGui::Text("Level %s", clevel.level_name.c_str());
 
+        ImGui::Text("Validation Status:");
+
+        ImGui::SameLine();
+
+        if(!clevel.successful_validation)
+        {
+            ImGui::TextColored(ImVec4(255, 0, 0, 255), "Invalid");
+        }
+        else
+        {
+            ImGui::TextColored(ImVec4(0, 255, 0, 255), "Valid");
+        }
+
         if(ImGui::Button("Validate"))
         {
             stats s = level::validate(clevel, current_project);

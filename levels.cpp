@@ -338,6 +338,7 @@ namespace level
 
     void setup_validation(level_context& ctx, dcpu::ide::project_instance& instance)
     {
+        ctx.successful_validation = false;
         ctx.finished = false;
         ctx.found_output.clear();
         ctx.error_locs.clear();
@@ -368,7 +369,7 @@ namespace level
         }
     }
 
-    void step_validation(level_context& ctx, dcpu::ide::project_instance& instance, int cycles)
+    bool step_validation(level_context& ctx, dcpu::ide::project_instance& instance, int cycles)
     {
         ctx.found_output.clear();
         ctx.error_locs.clear();
@@ -387,7 +388,7 @@ namespace level
             {
                 printf("Error %s\n", err2.data());
 
-                return;
+                return true;
             }
 
             next.load(rinfo_opt2.value().mem, 0);
@@ -441,6 +442,8 @@ namespace level
 
             ctx.found_output[channel] = found;
         }
+
+        return false;
     }
 
     stats validate(level_context& ctx, dcpu::ide::project_instance& instance)
@@ -456,11 +459,12 @@ namespace level
 
         setup_validation(ctx, instance);
 
-        step_validation(ctx, instance, 1000000);
+        bool err = step_validation(ctx, instance, 1000000);
 
         ctx.finished = true;
 
-        rstat.success = ctx.error_locs.size() == 0;
+        rstat.success = ctx.error_locs.size() == 0 && !err;
+        ctx.successful_validation = rstat.success;
 
         return rstat;
     }

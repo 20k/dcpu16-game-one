@@ -22,6 +22,7 @@ struct validation_info
 struct level_context
 {
     //std::vector<dcpu::ide::editor> cpus;
+    bool successful_validation = false;
     bool finished = false;
     int cpus = 0;
     std::string level_name;
@@ -50,7 +51,7 @@ namespace level
     level_context start(const std::string& name, int answer_rough_count);
 
     void setup_validation(level_context& ctx, dcpu::ide::project_instance& instance);
-    void step_validation(level_context& ctx, dcpu::ide::project_instance& instance, int cycles);
+    bool step_validation(level_context& ctx, dcpu::ide::project_instance& instance, int cycles);
 
     stats validate(level_context& ctx, dcpu::ide::project_instance& instance);
 }
