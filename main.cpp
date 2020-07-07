@@ -269,7 +269,7 @@ int main()
 
         for(auto& i : current_project.editors)
         {
-            i.render();
+            i.render(current_project);
         }
 
         sf::sleep(sf::milliseconds(1));
