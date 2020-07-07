@@ -11,6 +11,9 @@ struct validation_info
 {
     std::map<int, dcpu::sim::CPU> input_cpus;
     std::map<int, dcpu::sim::CPU> output_cpus;
+    std::map<int, stack_vector<uint16_t, MEM_SIZE>> input_translation;
+    std::map<int, stack_vector<uint16_t, MEM_SIZE>> output_translation;
+
     dcpu::sim::fabric fab;
 
     int cycle = 0;

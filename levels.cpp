@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cmath>
 
-dcpu::sim::CPU sim_input(const std::vector<uint16_t>& input, int channel)
+dcpu::sim::CPU sim_input(const std::vector<uint16_t>& input, int channel, stack_vector<uint16_t, MEM_SIZE>& translation_map)
 {
     std::string vals;
 
@@ -20,12 +20,13 @@ dcpu::sim::CPU sim_input(const std::vector<uint16_t>& input, int channel)
         assert(rinfo_opt.has_value());
 
         inc.load(rinfo_opt.value().mem, 0);
+        translation_map = rinfo_opt.value().translation_map;
     }
 
     return inc;
 }
 
-dcpu::sim::CPU sim_output(int len, int channel)
+dcpu::sim::CPU sim_output(int len, int channel, stack_vector<uint16_t, MEM_SIZE>& translation_map)
 {
     std::string out_str;
 
@@ -46,6 +47,7 @@ dcpu::sim::CPU sim_output(int len, int channel)
         assert(rinfo_out.has_value());
 
         outc.load(rinfo_out.value().mem, 0);
+        translation_map = rinfo_out.value().translation_map;
     }
 
     return outc;
@@ -341,16 +343,19 @@ namespace level
         ctx.inf.input_cpus.clear();
         ctx.inf.output_cpus.clear();
 
+        ctx.inf.input_translation.clear();
+        ctx.inf.output_translation.clear();
+
         ctx.inf.cycle = 0;
 
         for(auto& [channel, vec] : ctx.channel_to_input)
         {
-            ctx.inf.input_cpus[channel] = sim_input(vec, channel);
+            ctx.inf.input_cpus[channel] = sim_input(vec, channel, ctx.inf.input_translation[channel]);
         }
 
         for(auto& [channel, vec] : ctx.channel_to_output)
         {
-            ctx.inf.output_cpus[channel] = sim_output(vec.size(), channel);
+            ctx.inf.output_cpus[channel] = sim_output(vec.size(), channel, ctx.inf.output_translation[channel]);
         }
 
         for(dcpu::ide::editor& edit : instance.editors)
@@ -433,8 +438,6 @@ namespace level
         }
     }
 
-    ///TODO: Step by step validation, dummy example and
-    ///then more comprehensive tests
     stats validate(level_context& ctx, dcpu::ide::project_instance& instance)
     {
         ctx.found_output.clear();
