@@ -87,7 +87,7 @@ namespace level
 {
     std::vector<std::string> get_available()
     {
-        return {"INTRO", "AMPLIFY", "DIVISIONS", "SPACESHIP_OPERATOR", "POWR"};
+        return {"INTRO", "AMPLIFY", "DIVISIONS", "SPACESHIP_OPERATOR", "CHECKSUM", "POWR"};
     }
 
     level_context start(const std::string& level_name)
@@ -229,6 +229,65 @@ namespace level
 
             ctx.channel_to_input[0] = input1;
             ctx.channel_to_output[1] = output1;
+        }
+
+        /*if(ctx.level_name == "SORT")
+        {
+            ctx.description = "Given Ch:0 and Ch:1, write the smaller (unsigned) value to Ch:2, and the larger (unsigned) to Ch:3";
+            ctx.cpus = 1;
+
+            std::vector<uint16_t> input1{1};
+            std::vector<uint16_t> input2{0};
+            std::vector<uint16_t> output1{0};
+            std::vector<uint16_t> output2{1};
+
+            for(int i=0; i < 256; i++)
+            {
+                uint16_t in1 = lcg(seed);
+                uint16_t in2 = lcg(seed);
+
+                uint16_t out1 = in1 < in2 ? in1 : in2;
+                uint16_t out2 = in1 < in2 ? in2 : in1;
+
+                output1.push_back(out1);
+                output2.push_back(out2);
+            }
+        }*/
+
+        if(ctx.level_name == "CHECKSUM")
+        {
+            ctx.description = "Read Ch:1 number of values from Ch:0, add them together, and write them to Ch:2\n"
+                              "Eg: Ch:0 = [7, 6, 5, 4, 9] and Ch:1 = [2, 3], Ch:2 <- (7 + 6), Ch:2 <- (5 + 4 + 9)\n\n"
+                              "Use :some_name to create a new label, and SET PC, some_name to jump to it";
+            ctx.cpus = 1;
+
+            std::vector<uint16_t> input1{1, 1};
+            std::vector<uint16_t> input2{2};
+            std::vector<uint16_t> output1{2};
+
+            for(int i=0; i < 256; i++)
+            {
+                uint16_t in2 = lcg(seed) % 6;
+
+                uint16_t accum = 0;
+
+                for(int kk=0; kk < in2; kk++)
+                {
+                    uint16_t val = lcg(seed);
+
+                    input1.push_back(val);
+
+                    accum += val;
+                }
+
+                input2.push_back(in2);
+
+                output1.push_back(accum);
+            }
+
+            ctx.channel_to_input[0] = input1;
+            ctx.channel_to_input[1] = input2;
+            ctx.channel_to_output[2] = output1;
         }
 
         if(ctx.level_name == "POWR")
