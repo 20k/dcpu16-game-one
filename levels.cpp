@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cmath>
 
-dcpu::sim::CPU sim_input(const std::vector<uint16_t>& input, int channel, stack_vector<uint16_t, MEM_SIZE>& translation_map)
+dcpu::sim::CPU sim_input(const std::vector<uint16_t>& input, int channel, stack_vector<uint16_t, MEM_SIZE>& line_map)
 {
     std::string vals;
 
@@ -20,13 +20,13 @@ dcpu::sim::CPU sim_input(const std::vector<uint16_t>& input, int channel, stack_
         assert(rinfo_opt.has_value());
 
         inc.load(rinfo_opt.value().mem, 0);
-        translation_map = rinfo_opt.value().translation_map;
+        line_map = rinfo_opt.value().pc_to_source_line;
     }
 
     return inc;
 }
 
-dcpu::sim::CPU sim_output(int len, int channel, stack_vector<uint16_t, MEM_SIZE>& translation_map)
+dcpu::sim::CPU sim_output(int len, int channel, stack_vector<uint16_t, MEM_SIZE>& line_map)
 {
     std::string out_str;
 
@@ -47,7 +47,7 @@ dcpu::sim::CPU sim_output(int len, int channel, stack_vector<uint16_t, MEM_SIZE>
         assert(rinfo_out.has_value());
 
         outc.load(rinfo_out.value().mem, 0);
-        translation_map = rinfo_out.value().translation_map;
+        line_map = rinfo_out.value().pc_to_source_line;
     }
 
     return outc;
@@ -92,7 +92,7 @@ namespace level
         return {"INTRO", "AMPLIFY", "DIVISIONS", "SPACESHIP_OPERATOR", "CHECKSUM", "POWR"};
     }
 
-    level_context start(const std::string& level_name)
+    level_context start(const std::string& level_name, int answer_rough_count)
     {
         level_context ctx;
         ctx.level_name = level_name;
@@ -114,7 +114,7 @@ namespace level
             std::vector<uint16_t> input;
             std::vector<uint16_t> output;
 
-            for(int i=0; i < 256; i++)
+            for(int i=0; i < answer_rough_count; i++)
             {
                 input.push_back(i);
                 output.push_back(i);
@@ -132,7 +132,7 @@ namespace level
             std::vector<uint16_t> input;
             std::vector<uint16_t> output;
 
-            for(int i=0; i < 256; i++)
+            for(int i=0; i < answer_rough_count; i++)
             {
                 uint16_t in = lcg(seed) % (65536 / 32);
                 uint16_t out = in * 16;
@@ -185,7 +185,7 @@ namespace level
             std::vector<uint16_t> output1;
             std::vector<uint16_t> output2;
 
-            for(int i=0; i < 256; i++)
+            for(int i=0; i < answer_rough_count; i++)
             {
                 uint16_t in1 = lcg(seed);
 
@@ -212,7 +212,7 @@ namespace level
             std::vector<uint16_t> input1{1, 0, 0xffff};
             std::vector<uint16_t> output1{1, 0, 0xffff};
 
-            for(int i=0; i < 256; i++)
+            for(int i=0; i < answer_rough_count; i++)
             {
                 uint16_t in1 = lcg(seed);
                 int16_t as_int = (int16_t)in1;
@@ -267,7 +267,7 @@ namespace level
             std::vector<uint16_t> input2{2};
             std::vector<uint16_t> output1{2};
 
-            for(int i=0; i < 256; i++)
+            for(int i=0; i < answer_rough_count; i++)
             {
                 uint16_t in2 = lcg(seed) % 6;
 
@@ -285,6 +285,9 @@ namespace level
                 input2.push_back(in2);
 
                 output1.push_back(accum);
+
+                if((int)input1.size() > answer_rough_count)
+                    break;
             }
 
             ctx.channel_to_input[0] = input1;
@@ -301,7 +304,7 @@ namespace level
             std::vector<uint16_t> input2{1, 2};
             std::vector<uint16_t> output{15, 225};
 
-            for(int i=0; i < 256; i++)
+            for(int i=0; i < answer_rough_count; i++)
             {
                 uint16_t in1 = lcg(seed) % 128;
                 uint16_t in2 = lcg(seed) % 16;
@@ -335,6 +338,7 @@ namespace level
 
     void setup_validation(level_context& ctx, dcpu::ide::project_instance& instance)
     {
+        ctx.finished = false;
         ctx.found_output.clear();
         ctx.error_locs.clear();
 
@@ -389,6 +393,7 @@ namespace level
             next.load(rinfo_opt2.value().mem, 0);
 
             edit.translation_map = rinfo_opt2.value().translation_map;
+            edit.pc_to_source_line = rinfo_opt2.value().pc_to_source_line;
         }
 
         stack_vector<dcpu::sim::CPU*, 64> cpus;
@@ -443,11 +448,17 @@ namespace level
         ctx.found_output.clear();
         ctx.error_locs.clear();
 
+        std::string name = ctx.level_name;
+
+        ctx = level::start(name, 256);
+
         stats rstat;
 
         setup_validation(ctx, instance);
 
         step_validation(ctx, instance, 1000000);
+
+        ctx.finished = true;
 
         rstat.success = ctx.error_locs.size() == 0;
 

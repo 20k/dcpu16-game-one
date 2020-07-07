@@ -150,7 +150,7 @@ int main()
                     current_project.editors.emplace_back();
                 }
 
-                clevel = level::start(lvl[i]);
+                clevel = level::start(lvl[i], 12);
 
                 level::setup_validation(clevel, current_project);
             }
@@ -202,7 +202,30 @@ int main()
 
         for(auto& [channel, vals] : clevel.channel_to_input)
         {
-            format_column(channel, vals, start_error_line, 16, {}, is_hex, use_signed);
+            int my_line = start_error_line;
+
+            ///the -1 requires some explaining
+            ///basically, the blocking multiprocessor instructions
+            ///block on the *next* instruction, not the current one
+            ///which makes sense logically, but results in bad debuggability
+            ///this is a hack
+            if(!clevel.finished)
+                my_line = clevel.inf.input_translation[channel][clevel.inf.input_cpus[channel].regs[PC_REG]] - 1;
+
+            if(my_line < 0)
+                my_line = 0;
+
+            std::vector<int> to_highlight;
+
+            if(!clevel.finished)
+                to_highlight.push_back(my_line);
+
+            int render_line = 0;
+
+            if(clevel.finished)
+                render_line = start_error_line;
+
+            format_column(channel, vals, render_line, 16, to_highlight, is_hex, use_signed);
 
             ImGui::SameLine();
         }
