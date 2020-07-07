@@ -173,6 +173,8 @@ int main()
 
         if(ImGui::Button("Reset"))
         {
+            clevel = level::start(clevel.level_name, 12);
+
             level::setup_validation(clevel, current_project);
         }
 
@@ -200,6 +202,9 @@ int main()
 
         int start_error_line = clevel.error_locs.size() > 0 ? (clevel.error_locs.front() - 8) : 0;
 
+        if(!clevel.finished)
+            start_error_line = 0;
+
         for(auto& [channel, vals] : clevel.channel_to_input)
         {
             int my_line = start_error_line;
@@ -220,12 +225,7 @@ int main()
             if(!clevel.finished)
                 to_highlight.push_back(my_line);
 
-            int render_line = 0;
-
-            if(clevel.finished)
-                render_line = start_error_line;
-
-            format_column(channel, vals, render_line, 16, to_highlight, is_hex, use_signed);
+            format_column(channel, vals, start_error_line, 16, to_highlight, is_hex, use_signed);
 
             ImGui::SameLine();
         }
