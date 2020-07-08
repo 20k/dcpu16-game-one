@@ -382,21 +382,8 @@ namespace level
 
             user.push_back(&next);
 
-            auto [rinfo_opt2, err2] = assemble_fwd(edit.get_text());
-
-            if(!rinfo_opt2.has_value())
-            {
-                std::string msg = dcpu::ide::format_error(err2);
-
-                printf("Error %s\n", msg.c_str());
-
+            if(edit.assemble())
                 return true;
-            }
-
-            next.load(rinfo_opt2.value().mem, 0);
-
-            edit.translation_map = rinfo_opt2.value().translation_map;
-            edit.pc_to_source_line = rinfo_opt2.value().pc_to_source_line;
         }
 
         stack_vector<dcpu::sim::CPU*, 64> cpus;
