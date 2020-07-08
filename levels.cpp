@@ -386,7 +386,9 @@ namespace level
 
             if(!rinfo_opt2.has_value())
             {
-                printf("Error %s\n", err2.data());
+                std::string msg = dcpu::ide::format_error(err2);
+
+                printf("Error %s\n", msg.c_str());
 
                 return true;
             }
