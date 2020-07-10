@@ -456,6 +456,12 @@ namespace level
             ctx.found_output[channel] = found;
         }
 
+        if(ctx.extra_validation != nullptr)
+        {
+            if(ctx.extra_validation(ctx))
+                return true;
+        }
+
         return false;
     }
 

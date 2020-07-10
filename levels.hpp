@@ -37,6 +37,8 @@ struct level_context
     std::vector<int> error_locs;
 
     validation_info inf;
+
+    bool(*extra_validation)(level_context&) = nullptr;
 };
 
 struct stats
