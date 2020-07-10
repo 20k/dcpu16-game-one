@@ -337,7 +337,8 @@ namespace level
         if(ctx.level_name == "HWENUMERATE")
         {
             ctx.description = "Hardware - Write the number of connected devices (HWI) to Ch:0\nSearch for the clock with hardware id 0x12d0b402\n"
-                              "Initialise the clock by sending an interrupt with HWI, with [A=0, B>0]\nConsult the manual for detailed specifications";
+                              "Initialise the clock by sending an interrupt with HWI, with [A=0, B>0]\nConsult the manual for detailed specifications\n"
+                              "See https://github.com/20k/dcpu16-specs/blob/master/clock.md for the full specification (this will be in the manual later)";
 
             ctx.cpus = 1;
 
