@@ -2,6 +2,7 @@
 #include <dcpu16-asm/base_asm.hpp>
 #include <iostream>
 #include <cmath>
+#include <dcpu16-sim/hardware_clock.hpp>
 
 dcpu::sim::CPU sim_input(const std::vector<uint16_t>& input, int channel, stack_vector<uint16_t, MEM_SIZE>& line_map)
 {
@@ -89,7 +90,7 @@ namespace level
 {
     std::vector<std::string> get_available()
     {
-        return {"INTRO", "AMPLIFY", "DIVISIONS", "SPACESHIP_OPERATOR", "CHECKSUM", "POWR"};
+        return {"INTRO", "AMPLIFY", "DIVISIONS", "SPACESHIP_OPERATOR", "CHECKSUM", "POWR", "HWENUMERATE"};
     }
 
     level_context start(const std::string& level_name, int answer_rough_count)
@@ -333,11 +334,33 @@ namespace level
             ctx.channel_to_output[2] = output;
         }
 
+        if(ctx.level_name == "HWENUMERATE")
+        {
+            ctx.description = "Hardware - Write the number of connected devices (HWI) to Ch:0\nSearch for the clock with hardware id 0x12d0b402\n"
+                              "Initialise the clock by sending an interrupt with HWI, with [A=0, B>0]\nConsult the manual for detailed specifications";
+
+            ctx.cpus = 1;
+
+            std::vector<uint16_t> output{1};
+
+            dcpu::sim::hardware* dummy = new dcpu::sim::hardware;
+            dummy->manufacturer_id = 0xDEADBEEF;
+            ctx.inf.hardware.push_back(dummy);
+            ctx.inf.hardware.push_back(new dcpu::sim::clock);
+
+            ctx.channel_to_output[0] = output;
+        }
+
         return ctx;
     }
 
     void setup_validation(level_context& ctx, dcpu::ide::project_instance& instance)
     {
+        for(auto& i : ctx.inf.hardware)
+        {
+            i->reset();
+        }
+
         ctx.successful_validation = false;
         ctx.finished = false;
         ctx.found_output.clear();

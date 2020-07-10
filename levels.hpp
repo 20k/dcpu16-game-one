@@ -6,6 +6,7 @@
 #include <map>
 #include <dcpu16-sim/base_sim.hpp>
 #include <dcpu16-ide/base_ide.hpp>
+#include <dcpu16-sim/base_hardware.hpp>
 
 struct validation_info
 {
@@ -13,6 +14,7 @@ struct validation_info
     std::map<int, dcpu::sim::CPU> output_cpus;
     std::map<int, stack_vector<uint16_t, MEM_SIZE>> input_translation;
     std::map<int, stack_vector<uint16_t, MEM_SIZE>> output_translation;
+    std::vector<dcpu::sim::hardware*> hardware;
 
     dcpu::sim::fabric fab;
 

@@ -65,7 +65,9 @@
 		<Unit filename="deps/dcpu16-asm/util.hpp" />
 		<Unit filename="deps/dcpu16-ide/base_ide.cpp" />
 		<Unit filename="deps/dcpu16-ide/base_ide.hpp" />
+		<Unit filename="deps/dcpu16-sim/base_hardware.hpp" />
 		<Unit filename="deps/dcpu16-sim/base_sim.hpp" />
+		<Unit filename="deps/dcpu16-sim/hardware_clock.hpp" />
 		<Unit filename="deps/imgui/examples/imgui_impl_glfw.cpp" />
 		<Unit filename="deps/imgui/examples/imgui_impl_opengl3.cpp" />
 		<Unit filename="deps/imgui/imgui.cpp" />
