@@ -349,6 +349,24 @@ namespace level
             ctx.inf.hardware.push_back(dummy);
             ctx.inf.hardware.push_back(new dcpu::sim::clock);
 
+            ///TODO: WORLD CONTEXT
+
+            ctx.extra_validation = [](level_context& ctx)
+            {
+                assert(ctx.inf.hardware.size() == 2);
+
+                dcpu::sim::hardware* my_clock = ctx.inf.hardware[1];
+
+                dcpu::sim::clock* as_clock = dynamic_cast<dcpu::sim::clock*>(my_clock);
+
+                assert(as_clock);
+
+                if(as_clock->on == false)
+                    return true;
+
+                return false;
+            };
+
             ctx.channel_to_output[0] = output;
         }
 
@@ -458,6 +476,7 @@ namespace level
 
         if(ctx.extra_validation != nullptr)
         {
+            ///todo: DEBUGGING
             if(ctx.extra_validation(ctx))
                 return true;
         }
