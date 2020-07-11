@@ -48,6 +48,16 @@ struct level_context
     bool(*extra_validation)(level_context&) = nullptr;
 };
 
+struct run_context
+{
+    uint64_t max_cycles = 0;
+    uint64_t current_cycles = 0;
+
+    uint64_t last_exec_at = 0;
+
+    level_context ctx;
+};
+
 struct stats
 {
     int cycles = 0;
@@ -58,6 +68,8 @@ struct stats
 namespace level
 {
     std::vector<std::string> get_available();
+
+    void set_up_run_for(run_context& ctx, uint64_t max_cycles);
 
     level_context start(const std::string& name, int answer_rough_count);
 

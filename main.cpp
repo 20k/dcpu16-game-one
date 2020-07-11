@@ -10,6 +10,7 @@
 #include <iostream>
 #include <filesystem>
 #include <set>
+#include <chrono>
 
 /*:start
 
@@ -98,7 +99,7 @@ int main()
 
     render_window win(sett, "DCPU16-GAME-ONE");
 
-    level_context clevel;
+    run_context ctx;
     dcpu::ide::project_instance current_project;
 
     std::filesystem::create_directory("saves/");
@@ -110,9 +111,18 @@ int main()
     bool is_hex = true;
     bool use_signed = false;
 
+    /*auto now = std::chrono::steady_clock::now();
+
+    double result = std::chrono::duration<double>(now - start).count();*/
+
+
+    auto start_time = std::chrono::steady_clock::now();
+
     while(!win.should_close())
     {
         win.poll();
+
+        //auto current_time = std::chrono::steady_clock::now();
 
         card.render();
 
@@ -150,9 +160,9 @@ int main()
                     current_project.editors.emplace_back();
                 }
 
-                clevel = level::start(lvl[i], 12);
+                ctx.ctx = level::start(lvl[i], 12);
 
-                level::setup_validation(clevel, current_project);
+                level::setup_validation(ctx.ctx, current_project);
             }
         }
 
@@ -160,15 +170,15 @@ int main()
 
         ImGui::Begin("Level", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
-        ImGui::Text("%s", clevel.description.c_str());
+        ImGui::Text("%s", ctx.ctx.description.c_str());
 
-        ImGui::Text("Level %s", clevel.level_name.c_str());
+        ImGui::Text("Level %s", ctx.ctx.level_name.c_str());
 
         ImGui::Text("Validation Status:");
 
         ImGui::SameLine();
 
-        if(!clevel.successful_validation)
+        if(!ctx.ctx.successful_validation)
         {
             ImGui::TextColored(ImVec4(255, 0, 0, 255), "Invalid");
         }
@@ -177,23 +187,69 @@ int main()
             ImGui::TextColored(ImVec4(0, 255, 0, 255), "Valid");
         }
 
-        if(ImGui::Button("Validate"))
+        /*if(ImGui::Button("Validate"))
         {
             stats s = level::validate(clevel, current_project);
 
             std::cout << "VALID? " << s.success << std::endl;
-        }
+        }*/
 
         if(ImGui::Button("Reset"))
         {
-            clevel = level::start(clevel.level_name, 12);
+            start_time = std::chrono::steady_clock::now();
 
-            level::setup_validation(clevel, current_project);
+            ctx.ctx = level::start(ctx.ctx.level_name, 12);
+
+            level::set_up_run_for(ctx, 0);
+            level::setup_validation(ctx.ctx, current_project);
+
+            ctx.last_exec_at = std::chrono::time_point_cast<std::chrono::milliseconds>(start_time).time_since_epoch().count();
         }
 
-        if(ImGui::Button("Step Puzzle"))
+        if(ImGui::Button("Step"))
         {
-            level::step_validation(clevel, current_project, step_amount);
+            start_time = std::chrono::steady_clock::now();
+
+            level::set_up_run_for(ctx, 1);
+            //level::step_validation(ctx.ctx, current_project, step_amount);
+
+            ctx.last_exec_at = std::chrono::time_point_cast<std::chrono::milliseconds>(start_time).time_since_epoch().count();
+        }
+
+        if(ImGui::Button("Run"))
+        {
+            start_time = std::chrono::steady_clock::now();
+
+            level::set_up_run_for(ctx, -1);
+
+            ctx.last_exec_at = std::chrono::time_point_cast<std::chrono::milliseconds>(start_time).time_since_epoch().count();
+        }
+
+        ///currently lossy, loses cycles
+        if(ctx.current_cycles != ctx.max_cycles)
+        {
+            double cycles_per_second = 1000;
+
+            auto now = std::chrono::steady_clock::now();
+
+            auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now).time_since_epoch().count();
+
+            ctx.ctx.real_world_context.time_ms = now_ms;
+
+            uint64_t diff_ms = now_ms - ctx.last_exec_at;
+
+            double cycles = diff_ms * (cycles_per_second / 1000.);
+
+            if(cycles > 0)
+            {
+                for(uint64_t c = ctx.current_cycles; c != ctx.current_cycles + (uint64_t)cycles; c++)
+                {
+                    level::step_validation(ctx.ctx, current_project, 1);
+                }
+
+                ctx.current_cycles += (uint64_t)cycles;
+                ctx.last_exec_at = now_ms;
+            }
         }
 
         ImGui::InputInt("Step Amount", &step_amount);
@@ -213,12 +269,12 @@ int main()
 
         ImGui::Text("In");
 
-        int start_error_line = clevel.error_locs.size() > 0 ? (clevel.error_locs.front() - 8) : 0;
+        int start_error_line = ctx.ctx.error_locs.size() > 0 ? (ctx.ctx.error_locs.front() - 8) : 0;
 
-        if(!clevel.finished)
+        if(!ctx.ctx.finished)
             start_error_line = 0;
 
-        for(auto& [channel, vals] : clevel.channel_to_input)
+        for(auto& [channel, vals] : ctx.ctx.channel_to_input)
         {
             int my_line = start_error_line;
 
@@ -227,15 +283,15 @@ int main()
             ///block on the *next* instruction, not the current one
             ///which makes sense logically, but results in bad debuggability
             ///this is a hack
-            if(!clevel.finished)
-                my_line = clevel.inf.input_translation[channel][clevel.inf.input_cpus[channel].regs[PC_REG]] - 1;
+            if(!ctx.ctx.finished)
+                my_line = ctx.ctx.inf.input_translation[channel][ctx.ctx.inf.input_cpus[channel].regs[PC_REG]] - 1;
 
             if(my_line < 0)
                 my_line = 0;
 
             std::vector<int> to_highlight;
 
-            if(!clevel.finished)
+            if(!ctx.ctx.finished)
                 to_highlight.push_back(my_line);
 
             format_column(channel, vals, start_error_line, 16, to_highlight, is_hex, use_signed);
@@ -251,7 +307,7 @@ int main()
 
         ImGui::Text("Out");
 
-        for(auto& [channel, vals] : clevel.channel_to_output)
+        for(auto& [channel, vals] : ctx.ctx.channel_to_output)
         {
             format_column(channel, vals, start_error_line, 16, {}, is_hex, use_signed);
 
@@ -266,11 +322,11 @@ int main()
 
         ImGui::Text("User");
 
-        for(auto& [channel, vals] : clevel.channel_to_output)
+        for(auto& [channel, vals] : ctx.ctx.channel_to_output)
         {
-            if(auto it = clevel.found_output.find(channel); it != clevel.found_output.end())
+            if(auto it = ctx.ctx.found_output.find(channel); it != ctx.ctx.found_output.end())
             {
-                format_column(channel, it->second, start_error_line, 16, clevel.error_locs, is_hex, use_signed);
+                format_column(channel, it->second, start_error_line, 16, ctx.ctx.error_locs, is_hex, use_signed);
 
                 ImGui::SameLine();
             }
