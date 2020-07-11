@@ -373,14 +373,14 @@ namespace level
         return ctx;
     }
 
-    void setup_validation(level_context& ctx, dcpu::ide::project_instance& instance)
+    bool setup_validation(level_context& ctx, dcpu::ide::project_instance& instance)
     {
         for(auto& i : ctx.inf.hardware)
         {
             i->reset();
         }
 
-        ctx.real_world_context = world_context();
+        //ctx.real_world_context = world_context();
 
         ctx.successful_validation = false;
         ctx.finished = false;
@@ -409,8 +409,11 @@ namespace level
 
         for(dcpu::ide::editor& edit : instance.editors)
         {
-            edit.c = dcpu::sim::CPU();
+            if(edit.assemble())
+                return true;
         }
+
+        return false;
     }
 
     bool step_validation(level_context& ctx, dcpu::ide::project_instance& instance, int cycles)
@@ -425,9 +428,6 @@ namespace level
             dcpu::sim::CPU& next = edit.c;
 
             user.push_back(&next);
-
-            if(edit.assemble())
-                return true;
         }
 
         stack_vector<dcpu::sim::CPU*, 64> cpus;
@@ -504,13 +504,13 @@ namespace level
 
         stats rstat;
 
-        setup_validation(ctx, instance);
+        bool err1 = setup_validation(ctx, instance);
 
-        bool err = step_validation(ctx, instance, 1000000);
+        bool err2 = step_validation(ctx, instance, 1000000);
 
         ctx.finished = true;
 
-        rstat.success = ctx.error_locs.size() == 0 && !err;
+        rstat.success = ctx.error_locs.size() == 0 && !err2 && !err1;
         ctx.successful_validation = rstat.success;
 
         return rstat;
