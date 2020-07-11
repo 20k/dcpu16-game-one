@@ -342,7 +342,7 @@ namespace level
 
             ctx.cpus = 1;
 
-            std::vector<uint16_t> output{1};
+            std::vector<uint16_t> output{2};
 
             dcpu::sim::hardware* dummy = new dcpu::sim::hardware;
             dummy->manufacturer_id = 0xDEADBEEF;
