@@ -7,6 +7,12 @@
 #include <dcpu16-sim/base_sim.hpp>
 #include <dcpu16-ide/base_ide.hpp>
 #include <dcpu16-sim/base_hardware.hpp>
+#include <dcpu16-sim/all_hardware.hpp>
+
+struct world_context : dcpu::sim::time_state, dcpu::sim::world_base
+{
+
+};
 
 struct validation_info
 {
@@ -37,6 +43,7 @@ struct level_context
     std::vector<int> error_locs;
 
     validation_info inf;
+    world_context real_world_context;
 
     bool(*extra_validation)(level_context&) = nullptr;
 };

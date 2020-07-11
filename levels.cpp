@@ -380,6 +380,8 @@ namespace level
             i->reset();
         }
 
+        ctx.real_world_context = world_context();
+
         ctx.successful_validation = false;
         ctx.finished = false;
         ctx.found_output.clear();
@@ -445,13 +447,20 @@ namespace level
             cpus.push_back(i);
         }
 
+        stack_vector<dcpu::sim::hardware*, 65536> all_hardware;
+
+        for(auto& i : ctx.inf.hardware)
+        {
+            all_hardware.push_back(i);
+        }
+
         int max_cycles = cycles;
 
         for(int i=0; i < max_cycles; i++)
         {
             for(int kk=0; kk < (int)cpus.size(); kk++)
             {
-                cpus[kk]->cycle_step(&ctx.inf.fab);
+                cpus[kk]->cycle_step(&ctx.inf.fab, &all_hardware, &ctx.real_world_context);
             }
 
             dcpu::sim::resolve_interprocessor_communication(cpus, ctx.inf.fab);
