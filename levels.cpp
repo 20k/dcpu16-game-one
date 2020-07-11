@@ -349,8 +349,6 @@ namespace level
             ctx.inf.hardware.push_back(dummy);
             ctx.inf.hardware.push_back(new dcpu::sim::clock);
 
-            ///TODO: WORLD CONTEXT
-
             ctx.extra_validation = [](level_context& ctx)
             {
                 assert(ctx.inf.hardware.size() == 2);
@@ -416,6 +414,7 @@ namespace level
         return false;
     }
 
+    ///TODO: Need to handle world time for clock
     bool step_validation(level_context& ctx, dcpu::ide::project_instance& instance, int cycles)
     {
         ctx.found_output.clear();
