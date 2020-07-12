@@ -115,6 +115,7 @@ int main()
 
     double result = std::chrono::duration<double>(now - start).count();*/
 
+    bool is_full_validation = false;
 
     auto start_time = std::chrono::steady_clock::now();
 
@@ -178,7 +179,7 @@ int main()
 
         ImGui::SameLine();
 
-        if(!ctx.ctx.successful_validation)
+        if(!ctx.ctx.successful_validation || !is_full_validation)
         {
             ImGui::TextColored(ImVec4(255, 0, 0, 255), "Invalid");
         }
@@ -194,11 +195,33 @@ int main()
             std::cout << "VALID? " << s.success << std::endl;
         }*/
 
-        if(ImGui::Button("Reset"))
+        bool force_reset = false;
+
+        ImGui::Text("Dataset:");
+
+        ImGui::SameLine();
+
+        if(ImGui::Button("Test"))
+        {
+            is_full_validation = false;
+            force_reset = true;
+        }
+
+        ImGui::SameLine();
+
+        if(ImGui::Button("Full"))
+        {
+            is_full_validation = true;
+            force_reset = true;
+        }
+
+        if(ImGui::Button("Reset") || force_reset)
         {
             start_time = std::chrono::steady_clock::now();
 
-            ctx.ctx = level::start(ctx.ctx.level_name, 12);
+            int test_count = is_full_validation ? 256 : 12;
+
+            ctx.ctx = level::start(ctx.ctx.level_name, test_count);
 
             level::set_up_run_for(ctx, 0);
             level::setup_validation(ctx.ctx, current_project);
@@ -211,7 +234,6 @@ int main()
             start_time = std::chrono::steady_clock::now();
 
             level::set_up_run_for(ctx, 1);
-            //level::step_validation(ctx.ctx, current_project, step_amount);
 
             ctx.last_exec_at = std::chrono::time_point_cast<std::chrono::milliseconds>(start_time).time_since_epoch().count();
         }

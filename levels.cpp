@@ -411,13 +411,17 @@ namespace level
             ctx.inf.output_cpus[channel] = sim_output(vec.size(), channel, ctx.inf.output_translation[channel]);
         }
 
+        bool has_error = false;
+
         for(dcpu::ide::editor& edit : instance.editors)
         {
             if(edit.assemble())
-                return true;
+                has_error = true;
         }
 
-        return false;
+        ctx.has_assembly_error = has_error;
+
+        return has_error;
     }
 
     ///TODO: Need to handle world time for clock
@@ -488,14 +492,22 @@ namespace level
             ctx.found_output[channel] = found;
         }
 
+        bool hardware_errors = false;
+
         if(ctx.extra_validation != nullptr)
         {
             ///todo: DEBUGGING
             if(ctx.extra_validation(ctx))
-                return true;
+            {
+                hardware_errors = true;
+            }
         }
 
-        return false;
+        bool any_errors_at_all = hardware_errors || ctx.error_locs.size() > 0 || ctx.has_assembly_error;
+
+        ctx.successful_validation = !any_errors_at_all;
+
+        return any_errors_at_all;
     }
 
     stats validate(level_context& ctx, dcpu::ide::project_instance& instance)

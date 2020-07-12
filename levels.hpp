@@ -41,6 +41,7 @@ struct level_context
 
     std::map<int, std::vector<uint16_t>> found_output;
     std::vector<int> error_locs;
+    bool has_assembly_error = false;
 
     validation_info inf;
     world_context real_world_context;
