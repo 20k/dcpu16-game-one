@@ -225,8 +225,13 @@ int main()
             ctx.last_exec_at = std::chrono::time_point_cast<std::chrono::milliseconds>(start_time).time_since_epoch().count();
         }
 
+        if(ImGui::Button("Pause"))
+        {
+            level::set_up_run_for(ctx, 0);
+        }
+
         ///currently lossy, loses cycles
-        if(ctx.current_cycles != ctx.max_cycles)
+        if(ctx.current_cycles < ctx.max_cycles)
         {
             double cycles_per_second = 1000;
 
