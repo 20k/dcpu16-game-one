@@ -93,12 +93,6 @@ namespace level
         return {"INTRO", "AMPLIFY", "DIVISIONS", "SPACESHIP_OPERATOR", "CHECKSUM", "POWR", "HWENUMERATE"};
     }
 
-    void set_up_run_for(run_context& ctx, uint64_t max_cycles)
-    {
-        ctx.max_cycles = max_cycles;
-        ctx.current_cycles = 0;
-    }
-
     level_context start(const std::string& level_name, int answer_rough_count)
     {
         level_context ctx;

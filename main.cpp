@@ -11,6 +11,7 @@
 #include <filesystem>
 #include <set>
 #include <chrono>
+#include "constant_time_exec.hpp"
 
 /*:start
 
@@ -195,6 +196,8 @@ int main()
             std::cout << "VALID? " << s.success << std::endl;
         }*/
 
+        uint64_t now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch().count();
+
         bool force_reset = false;
 
         ImGui::Text("Dataset:");
@@ -223,60 +226,39 @@ int main()
 
             ctx.ctx = level::start(ctx.ctx.level_name, test_count);
 
-            level::set_up_run_for(ctx, 0);
             level::setup_validation(ctx.ctx, current_project);
 
-            ctx.last_exec_at = std::chrono::time_point_cast<std::chrono::milliseconds>(start_time).time_since_epoch().count();
+            ctx.exec.init(0, now_ms);
         }
 
         if(ImGui::Button("Step"))
         {
             start_time = std::chrono::steady_clock::now();
 
-            level::set_up_run_for(ctx, 1);
-
-            ctx.last_exec_at = std::chrono::time_point_cast<std::chrono::milliseconds>(start_time).time_since_epoch().count();
+            ctx.exec.init(1, now_ms);
         }
 
         if(ImGui::Button("Run"))
         {
             start_time = std::chrono::steady_clock::now();
 
-            level::set_up_run_for(ctx, -1);
-
-            ctx.last_exec_at = std::chrono::time_point_cast<std::chrono::milliseconds>(start_time).time_since_epoch().count();
+            ctx.exec.init(-1, now_ms);
         }
 
         if(ImGui::Button("Pause"))
         {
-            level::set_up_run_for(ctx, 0);
+            ctx.exec.init(0, now_ms);
         }
 
-        ///currently lossy, loses cycles
-        if(ctx.current_cycles < ctx.max_cycles)
+        ctx.ctx.real_world_context.time_ms = now_ms;
+
+        uint64_t cycles = ctx.exec.exec_until(now_ms);
+
+        ctx.ctx.real_world_context.time_ms = now_ms;
+
+        for(uint64_t i=0; i < cycles; i++)
         {
-            double cycles_per_second = 1000;
-
-            auto now = std::chrono::steady_clock::now();
-
-            auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now).time_since_epoch().count();
-
-            ctx.ctx.real_world_context.time_ms = now_ms;
-
-            uint64_t diff_ms = now_ms - ctx.last_exec_at;
-
-            double cycles = diff_ms * (cycles_per_second / 1000.);
-
-            if(cycles > 0)
-            {
-                for(uint64_t c = ctx.current_cycles; c != ctx.current_cycles + (uint64_t)cycles; c++)
-                {
-                    level::step_validation(ctx.ctx, current_project, 1);
-                }
-
-                ctx.current_cycles += (uint64_t)cycles;
-                ctx.last_exec_at = now_ms;
-            }
+            level::step_validation(ctx.ctx, current_project, 1);
         }
 
         ImGui::InputInt("Step Amount", &step_amount);

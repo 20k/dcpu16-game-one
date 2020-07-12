@@ -8,6 +8,7 @@
 #include <dcpu16-ide/base_ide.hpp>
 #include <dcpu16-sim/base_hardware.hpp>
 #include <dcpu16-sim/all_hardware.hpp>
+#include "constant_time_exec.hpp"
 
 struct world_context : dcpu::sim::time_state, dcpu::sim::world_base
 {
@@ -51,10 +52,7 @@ struct level_context
 
 struct run_context
 {
-    uint64_t max_cycles = 0;
-    uint64_t current_cycles = 0;
-
-    uint64_t last_exec_at = 0;
+    constant_time_exec exec;
 
     level_context ctx;
 };
@@ -69,8 +67,6 @@ struct stats
 namespace level
 {
     std::vector<std::string> get_available();
-
-    void set_up_run_for(run_context& ctx, uint64_t max_cycles);
 
     level_context start(const std::string& name, int answer_rough_count);
 
