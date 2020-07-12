@@ -250,16 +250,11 @@ int main()
             ctx.exec.init(0, now_ms);
         }
 
-        ctx.ctx.real_world_context.time_ms = now_ms;
-
-        uint64_t cycles = ctx.exec.exec_until(now_ms);
-
-        ctx.ctx.real_world_context.time_ms = now_ms;
-
-        for(uint64_t i=0; i < cycles; i++)
+        ctx.exec.exec_until(now_ms, [&](uint64_t cycle_idx, uint64_t time_ms)
         {
+            ctx.ctx.real_world_context.time_ms = time_ms;
             level::step_validation(ctx.ctx, current_project, 1);
-        }
+        });
 
         ImGui::InputInt("Step Amount", &step_amount);
 

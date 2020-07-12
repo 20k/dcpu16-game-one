@@ -19,17 +19,20 @@ struct constant_time_exec
         last_time_ms = current_time_ms;
     }
 
-    ///gets the current number of cycles to execute
-    uint64_t exec_until(uint64_t current_time_ms)
+    ///executes a function repeatedly for however many cycles have elapsed
+    template<typename T>
+    void exec_until(uint64_t current_time_ms, T&& func)
     {
         if(max_cycles == current_cycles)
-            return 0;
+            return;
 
         uint64_t diff_ms = current_time_ms - last_time_ms;
 
         uint64_t cycles_to_exec = diff_ms * (double)cycles_per_s / 1000.;
 
         uint64_t simulated_next_time_ms = last_time_ms + cycles_to_exec * (double)cycles_per_s / 1000.;
+
+        uint64_t start_time_ms = last_time_ms;
 
         last_time_ms = simulated_next_time_ms;
 
@@ -42,7 +45,18 @@ struct constant_time_exec
 
         assert(current_cycles <= max_cycles);
 
-        return cycles_to_exec;
+        for(uint64_t i = 0; i < cycles_to_exec; i++)
+        {
+            double exec_frac = (double)i / cycles_to_exec;
+
+            double exec_diff_ms = (last_time_ms - start_time_ms) * exec_frac;
+
+            uint64_t real_time_ms = start_time_ms + exec_diff_ms;
+
+            func(i, real_time_ms);
+        }
+
+        //return cycles_to_exec;
     }
 };
 
