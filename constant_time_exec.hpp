@@ -2,13 +2,16 @@
 #define CONSTANT_TIME_EXEC_HPP_INCLUDED
 
 #include <stdint.h>
+#include <iostream>
 
 struct constant_time_exec
 {
     uint64_t last_time_ms = 0;
 
-    uint64_t max_cycles = 0;
     uint64_t current_cycles = 0;
+    uint64_t max_cycles = 0;
+
+    double cycle_budget_ms = 0;
 
     uint64_t cycles_per_s = 1000;
 
@@ -17,6 +20,7 @@ struct constant_time_exec
         current_cycles = 0;
         max_cycles = _max_cycles;
         last_time_ms = current_time_ms;
+        cycle_budget_ms = 0;
     }
 
     ///executes a function repeatedly for however many cycles have elapsed
@@ -26,15 +30,22 @@ struct constant_time_exec
         if(max_cycles == current_cycles)
             return;
 
+        if(cycles_per_s == 0)
+            return;
+
         uint64_t diff_ms = current_time_ms - last_time_ms;
 
-        uint64_t cycles_to_exec = diff_ms * (double)cycles_per_s / 1000.;
+        double cycles_per_ms = cycles_per_s / 1000.;
 
-        uint64_t simulated_next_time_ms = last_time_ms + cycles_to_exec * (double)cycles_per_s / 1000.;
+        cycle_budget_ms += diff_ms;
+
+        uint64_t cycles_to_exec = cycle_budget_ms * cycles_per_ms;
+
+        cycle_budget_ms -= cycles_to_exec / cycles_per_ms;
 
         uint64_t start_time_ms = last_time_ms;
 
-        last_time_ms = simulated_next_time_ms;
+        last_time_ms = current_time_ms;
 
         if((cycles_to_exec + current_cycles) > max_cycles)
         {

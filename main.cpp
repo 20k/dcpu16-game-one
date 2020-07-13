@@ -116,8 +116,6 @@ int main()
 
     double result = std::chrono::duration<double>(now - start).count();*/
 
-    bool is_full_validation = false;
-
     while(!win.should_close())
     {
         win.poll();
@@ -162,7 +160,7 @@ int main()
                     current_project.editors.emplace_back();
                 }
 
-                ctx.ctx = level::start(lvl[i], 12);
+                ctx.ctx = level::start(lvl[i], 256);
 
                 level::setup_validation(ctx.ctx, current_project);
             }
@@ -180,7 +178,7 @@ int main()
 
         ImGui::SameLine();
 
-        if(!ctx.ctx.successful_validation || !is_full_validation)
+        if(!ctx.ctx.successful_validation)
         {
             ImGui::TextColored(ImVec4(255, 0, 0, 255), "Invalid");
         }
@@ -198,7 +196,7 @@ int main()
 
         uint64_t now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch().count();
 
-        ImGui::Text("Dataset:");
+        /*ImGui::Text("Dataset:");
 
         ImGui::SameLine();
 
@@ -214,13 +212,11 @@ int main()
         {
             is_full_validation = true;
             force_reset = true;
-        }
+        }*/
 
         if(ImGui::Button("Reset/Assemble") || force_reset)
         {
-            int test_count = is_full_validation ? 256 : 12;
-
-            ctx.ctx = level::start(ctx.ctx.level_name, test_count);
+            ctx.ctx = level::start(ctx.ctx.level_name, 256);
 
             level::setup_validation(ctx.ctx, current_project);
 
@@ -236,6 +232,16 @@ int main()
         {
             ctx.exec.init(-1, now_ms);
         }
+
+        ImGui::SameLine();
+
+        int cycles_per_s = ctx.exec.cycles_per_s;
+
+        //ImGui::DragInt("Frequency", &cycles_per_s, 1, 0, 1000);
+
+        ImGui::SliderInt("Frequency", &cycles_per_s, 0, 1000);
+
+        ctx.exec.cycles_per_s = cycles_per_s;
 
         if(ImGui::Button("Pause"))
         {
