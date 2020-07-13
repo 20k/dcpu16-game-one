@@ -124,6 +124,8 @@ int main()
 
         card.render();
 
+        bool force_reset = false;
+
         ImGui::Begin("Levels", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
         std::vector<std::string> lvl = level::get_available();
@@ -132,6 +134,8 @@ int main()
         {
             if(ImGui::Button(("LVL: " + lvl[i]).c_str()))
             {
+                force_reset = true;
+
                 std::filesystem::create_directory("saves/" + lvl[i]);
 
                 std::string full_filename = "saves/" + lvl[i] + "/save.dcpu_project";
@@ -193,8 +197,6 @@ int main()
         }*/
 
         uint64_t now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch().count();
-
-        bool force_reset = false;
 
         ImGui::Text("Dataset:");
 
