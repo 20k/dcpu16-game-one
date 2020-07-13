@@ -187,32 +187,7 @@ int main()
             ImGui::TextColored(ImVec4(0, 255, 0, 255), "Valid");
         }
 
-        /*if(ImGui::Button("Validate"))
-        {
-            stats s = level::validate(clevel, current_project);
-
-            std::cout << "VALID? " << s.success << std::endl;
-        }*/
-
         uint64_t now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch().count();
-
-        /*ImGui::Text("Dataset:");
-
-        ImGui::SameLine();
-
-        if(ImGui::Button("Test"))
-        {
-            is_full_validation = false;
-            force_reset = true;
-        }
-
-        ImGui::SameLine();
-
-        if(ImGui::Button("Full"))
-        {
-            is_full_validation = true;
-            force_reset = true;
-        }*/
 
         if(ImGui::Button("Reset/Assemble") || force_reset)
         {
@@ -240,6 +215,11 @@ int main()
         //ImGui::DragInt("Frequency", &cycles_per_s, 1, 0, 1000);
 
         ImGui::SliderInt("Frequency", &cycles_per_s, 0, 1000);
+
+        if(ImGui::IsItemHovered())
+        {
+            ImGui::SetTooltip("Ctrl+Left click to edit");
+        }
 
         ctx.exec.cycles_per_s = cycles_per_s;
 
