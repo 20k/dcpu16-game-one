@@ -118,13 +118,9 @@ int main()
 
     bool is_full_validation = false;
 
-    auto start_time = std::chrono::steady_clock::now();
-
     while(!win.should_close())
     {
         win.poll();
-
-        //auto current_time = std::chrono::steady_clock::now();
 
         card.render();
 
@@ -220,8 +216,6 @@ int main()
 
         if(ImGui::Button("Reset") || force_reset)
         {
-            start_time = std::chrono::steady_clock::now();
-
             int test_count = is_full_validation ? 256 : 12;
 
             ctx.ctx = level::start(ctx.ctx.level_name, test_count);
@@ -233,15 +227,11 @@ int main()
 
         if(ImGui::Button("Step"))
         {
-            start_time = std::chrono::steady_clock::now();
-
             ctx.exec.init(1, now_ms);
         }
 
         if(ImGui::Button("Run"))
         {
-            start_time = std::chrono::steady_clock::now();
-
             ctx.exec.init(-1, now_ms);
         }
 
