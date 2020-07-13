@@ -198,34 +198,41 @@ int main()
             ctx.exec.init(0, now_ms);
         }
 
+        if(ImGui::Button("Pause"))
+        {
+            ctx.exec.init(0, now_ms);
+        }
+
+        ImGui::SameLine();
+
         if(ImGui::Button("Step"))
         {
             ctx.exec.init(1, now_ms);
         }
+
+        ImGui::SameLine();
 
         if(ImGui::Button("Run"))
         {
             ctx.exec.init(-1, now_ms);
         }
 
-        ImGui::SameLine();
+        //ImGui::SameLine();
 
-        int cycles_per_s = ctx.exec.cycles_per_s;
-
-        //ImGui::DragInt("Frequency", &cycles_per_s, 1, 0, 1000);
-
-        ImGui::SliderInt("Frequency", &cycles_per_s, 0, 1000);
-
-        if(ImGui::IsItemHovered())
         {
-            ImGui::SetTooltip("Ctrl+Left click to edit");
-        }
 
-        ctx.exec.cycles_per_s = cycles_per_s;
+            int cycles_per_s = ctx.exec.cycles_per_s;
 
-        if(ImGui::Button("Pause"))
-        {
-            ctx.exec.init(0, now_ms);
+            //ImGui::DragInt("Frequency", &cycles_per_s, 1, 0, 1000);
+
+            ImGui::SliderInt("Frequency", &cycles_per_s, 0, 1000);
+
+            if(ImGui::IsItemHovered())
+            {
+                ImGui::SetTooltip("Ctrl+Left click to edit");
+            }
+
+            ctx.exec.cycles_per_s = cycles_per_s;
         }
 
         ctx.exec.exec_until(now_ms, [&](uint64_t cycle_idx, uint64_t time_ms)
