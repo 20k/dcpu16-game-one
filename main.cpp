@@ -156,7 +156,7 @@ int main()
                 else
                 {
                     current_project.proj.project_file = full_filename;
-                    current_project.proj.assembly_files = {"saves/" + lvl[i] + "/cpu0.d16"};
+                    current_project.proj.assembly_files = {"cpu0.d16"};
                     current_project.proj.assembly_data = {""};
 
                     current_project.editors.emplace_back();
