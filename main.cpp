@@ -183,6 +183,10 @@ int main()
             ImGui::TextColored(ImVec4(0, 255, 0, 255), "Valid");
         }
 
+        ImGui::End();
+
+        ImGui::Begin("Controls", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+
         uint64_t now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch().count();
 
         if(ImGui::Button("Reset/Assemble") || force_reset)
