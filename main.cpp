@@ -112,10 +112,6 @@ int main()
     bool is_hex = true;
     bool use_signed = false;
 
-    /*auto now = std::chrono::steady_clock::now();
-
-    double result = std::chrono::duration<double>(now - start).count();*/
-
     while(!win.should_close())
     {
         win.poll();
