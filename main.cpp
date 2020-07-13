@@ -216,7 +216,7 @@ int main()
             force_reset = true;
         }
 
-        if(ImGui::Button("Reset") || force_reset)
+        if(ImGui::Button("Reset/Assemble") || force_reset)
         {
             int test_count = is_full_validation ? 256 : 12;
 
