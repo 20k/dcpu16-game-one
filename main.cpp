@@ -192,6 +192,7 @@ int main()
         bool any_wants_step = false;
         bool any_wants_assemble = false;
         bool any_wants_run = false;
+        bool any_wants_pause = false;
 
         for(dcpu::ide::editor& edit : current_project.editors)
         {
@@ -204,9 +205,15 @@ int main()
             if(edit.wants_run)
                 any_wants_run = true;
 
+            if(edit.wants_pause)
+                any_wants_pause = true;
+
+            edit.is_running = (ctx.exec.max_cycles == (uint64_t)-1);
+
             edit.wants_run = false;
             edit.wants_assemble = false;
             edit.wants_step = false;
+            edit.wants_pause = false;
         }
 
         if(ImGui::Button("Reset/Assemble") || force_reset || any_wants_assemble)
@@ -218,13 +225,12 @@ int main()
             ctx.exec.init(0, now_ms);
         }
 
-        if(ImGui::Button("Pause"))
+        if(ImGui::Button("Pause") || any_wants_pause)
         {
             ctx.exec.init(0, now_ms);
         }
 
         ImGui::SameLine();
-
 
         if(ImGui::Button("Step") || any_wants_step)
         {
