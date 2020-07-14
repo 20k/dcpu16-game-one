@@ -58,6 +58,7 @@
 			<Add option="-lwinmm" />
 			<Add option="-lgdi32" />
 		</Linker>
+		<Unit filename="constant_time_exec.hpp" />
 		<Unit filename="deps/dcpu16-asm/base_asm.cpp" />
 		<Unit filename="deps/dcpu16-asm/base_asm.hpp" />
 		<Unit filename="deps/dcpu16-asm/shared.hpp" />
