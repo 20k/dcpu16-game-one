@@ -189,7 +189,27 @@ int main()
 
         uint64_t now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch().count();
 
-        if(ImGui::Button("Reset/Assemble") || force_reset)
+        bool any_wants_step = false;
+        bool any_wants_assemble = false;
+        bool any_wants_run = false;
+
+        for(dcpu::ide::editor& edit : current_project.editors)
+        {
+            if(edit.wants_step)
+                any_wants_step = true;
+
+            if(edit.wants_assemble)
+                any_wants_assemble = true;
+
+            if(edit.wants_run)
+                any_wants_run = true;
+
+            edit.wants_run = false;
+            edit.wants_assemble = false;
+            edit.wants_step = false;
+        }
+
+        if(ImGui::Button("Reset/Assemble") || force_reset || any_wants_assemble)
         {
             ctx.ctx = level::start(ctx.ctx.level_name, 256);
 
@@ -205,14 +225,15 @@ int main()
 
         ImGui::SameLine();
 
-        if(ImGui::Button("Step"))
+
+        if(ImGui::Button("Step") || any_wants_step)
         {
             ctx.exec.init(1, now_ms);
         }
 
         ImGui::SameLine();
 
-        if(ImGui::Button("Run"))
+        if(ImGui::Button("Run") || any_wants_run)
         {
             ctx.exec.init(-1, now_ms);
         }
