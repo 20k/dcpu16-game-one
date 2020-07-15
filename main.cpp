@@ -107,8 +107,6 @@ int main()
 
     dcpu::ide::reference_card card;
 
-    int step_amount = 0;
-
     bool is_hex = true;
     bool use_signed = false;
 
@@ -185,95 +183,85 @@ int main()
 
         ImGui::End();
 
-        ImGui::Begin("Controls", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
-
-        uint64_t now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch().count();
-
-        bool any_wants_step = false;
-        bool any_wants_assemble = false;
-        bool any_wants_run = false;
-        bool any_wants_pause = false;
-
-        for(dcpu::ide::editor& edit : current_project.editors)
         {
-            if(edit.wants_step)
-                any_wants_step = true;
+            uint64_t now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch().count();
 
-            if(edit.wants_assemble)
-                any_wants_assemble = true;
+            bool any_wants_step = false;
+            bool any_wants_assemble = false;
+            bool any_wants_run = false;
+            bool any_wants_pause = false;
+            bool any_wants_reset = false;
 
-            if(edit.wants_run)
-                any_wants_run = true;
-
-            if(edit.wants_pause)
-                any_wants_pause = true;
-
-            edit.is_running = (ctx.exec.max_cycles == (uint64_t)-1);
-
-            edit.wants_run = false;
-            edit.wants_assemble = false;
-            edit.wants_step = false;
-            edit.wants_pause = false;
-        }
-
-        if(ImGui::Button("Reset/Assemble") || force_reset || any_wants_assemble)
-        {
-            ctx.ctx = level::start(ctx.ctx.level_name, 256);
-
-            level::setup_validation(ctx.ctx, current_project);
-
-            ctx.exec.init(0, now_ms);
-        }
-
-        if(ImGui::Button("Pause") || any_wants_pause)
-        {
-            ctx.exec.init(0, now_ms);
-        }
-
-        ImGui::SameLine();
-
-        if(ImGui::Button("Step") || any_wants_step)
-        {
-            ctx.exec.init(1, now_ms);
-        }
-
-        ImGui::SameLine();
-
-        if(ImGui::Button("Run") || any_wants_run)
-        {
-            ctx.exec.init(-1, now_ms);
-        }
-
-        //ImGui::SameLine();
-
-        {
-
-            int cycles_per_s = ctx.exec.cycles_per_s;
-
-            //ImGui::DragInt("Frequency", &cycles_per_s, 1, 0, 1000);
-
-            ImGui::SliderInt("Frequency", &cycles_per_s, 0, 1000);
-
-            if(ImGui::IsItemHovered())
+            for(dcpu::ide::editor& edit : current_project.editors)
             {
-                ImGui::SetTooltip("Ctrl+Left click to edit");
+                if(edit.wants_step)
+                    any_wants_step = true;
+
+                if(edit.wants_assemble)
+                    any_wants_assemble = true;
+
+                if(edit.wants_run)
+                    any_wants_run = true;
+
+                if(edit.wants_pause)
+                    any_wants_pause = true;
+
+                if(edit.wants_reset)
+                    any_wants_reset = true;
+
+                edit.is_running = (ctx.exec.max_cycles == (uint64_t)-1);
+
+                edit.wants_run = false;
+                edit.wants_assemble = false;
+                edit.wants_step = false;
+                edit.wants_pause = false;
+                edit.wants_reset = false;
             }
 
-            ctx.exec.cycles_per_s = cycles_per_s;
+            if(force_reset || any_wants_assemble || any_wants_reset)
+            {
+                ctx.ctx = level::start(ctx.ctx.level_name, 256);
+
+                level::setup_validation(ctx.ctx, current_project);
+
+                ctx.exec.init(0, now_ms);
+            }
+
+            if(any_wants_pause)
+            {
+                ctx.exec.init(0, now_ms);
+            }
+
+            if(any_wants_step)
+            {
+                ctx.exec.init(1, now_ms);
+            }
+
+            if(any_wants_run)
+            {
+                ctx.exec.init(-1, now_ms);
+            }
+
+            for(dcpu::ide::editor& edit : current_project.editors)
+            {
+                if(edit.dirty_frequency)
+                {
+                    edit.dirty_frequency = false;
+                    ctx.exec.cycles_per_s = edit.clock_hz;
+                }
+            }
+
+            for(dcpu::ide::editor& edit : current_project.editors)
+            {
+                edit.clock_hz = ctx.exec.cycles_per_s;
+            }
+
+            ctx.exec.exec_until(now_ms, [&](uint64_t cycle_idx, uint64_t time_ms)
+            {
+                ctx.ctx.real_world_context.time_ms = time_ms;
+                level::step_validation(ctx.ctx, current_project, 1);
+            });
         }
-
-        ctx.exec.exec_until(now_ms, [&](uint64_t cycle_idx, uint64_t time_ms)
-        {
-            ctx.ctx.real_world_context.time_ms = time_ms;
-            level::step_validation(ctx.ctx, current_project, 1);
-        });
-
-        ImGui::InputInt("Step Amount", &step_amount);
-
-        if(step_amount < 1)
-            step_amount = 1;
-
-        ImGui::End();
 
         ImGui::Begin("Task", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
