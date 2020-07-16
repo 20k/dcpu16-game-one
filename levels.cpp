@@ -3,6 +3,9 @@
 #include <iostream>
 #include <cmath>
 #include <dcpu16-sim/hardware_clock.hpp>
+#include <chrono>
+#include <filesystem>
+#include <toolkit/fs_helpers.hpp>
 
 dcpu::sim::CPU sim_input(const std::vector<uint16_t>& input, int channel, stack_vector<uint16_t, MEM_SIZE>& line_map)
 {
@@ -86,12 +89,59 @@ uint16_t lcg(uint64_t& state)
     return state >> (64-16);
 }
 
+void level::display_level_select(run_context& ctx, dcpu::ide::project_instance& instance)
+{
+    uint64_t now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch().count();
+
+    std::vector<std::string> levels = {"INTRO", "AMPLIFY", "DIVISIONS", "SPACESHIP_OPERATOR", "CHECKSUM", "POWR", "HWENUMERATE"};
+
+    ImGui::Begin("Levels", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+
+    for(int i=0; i < (int)levels.size(); i++)
+    {
+        if(ImGui::Button(("LVL: " + levels[i]).c_str()))
+        {
+            std::filesystem::create_directory("saves/" + levels[i]);
+
+            std::string full_filename = "saves/" + levels[i] + "/save.dcpu_project";
+
+            if(instance.proj.project_file.size() > 0)
+            {
+                instance.save();
+            }
+
+            instance = dcpu::ide::project_instance();
+
+            if(file::exists(full_filename))
+            {
+                instance.load(full_filename);
+            }
+            else
+            {
+                instance.proj.project_file = full_filename;
+                instance.proj.assembly_files = {"cpu0.d16"};
+                instance.proj.assembly_data = {""};
+
+                instance.editors.emplace_back();
+            }
+
+            ctx.ctx = level::start(levels[i], 256);
+
+            level::setup_validation(ctx.ctx, instance);
+
+            ctx.exec.init(0, now_ms);
+        }
+    }
+
+    ImGui::End();
+}
+
 namespace level
 {
-    std::vector<std::string> get_available()
+    /*std::vector<std::string> get_available()
     {
         return {"INTRO", "AMPLIFY", "DIVISIONS", "SPACESHIP_OPERATOR", "CHECKSUM", "POWR", "HWENUMERATE"};
-    }
+    }*/
 
     level_context start(const std::string& level_name, int answer_rough_count)
     {

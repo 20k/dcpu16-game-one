@@ -116,51 +116,7 @@ int main()
 
         card.render();
 
-        bool force_reset = false;
-
-        ImGui::Begin("Levels", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
-
-        std::vector<std::string> lvl = level::get_available();
-
-        for(int i=0; i < (int)lvl.size(); i++)
-        {
-            if(ImGui::Button(("LVL: " + lvl[i]).c_str()))
-            {
-                force_reset = true;
-
-                std::filesystem::create_directory("saves/" + lvl[i]);
-
-                std::string full_filename = "saves/" + lvl[i] + "/save.dcpu_project";
-
-                std::cout << "DOOT " << current_project.editors.size() << " TWO " << current_project.proj.assembly_data.size() << std::endl;
-
-                if(current_project.proj.project_file.size() > 0)
-                {
-                    current_project.save();
-                }
-
-                current_project = dcpu::ide::project_instance();
-
-                if(file::exists(full_filename))
-                {
-                    current_project.load(full_filename);
-                }
-                else
-                {
-                    current_project.proj.project_file = full_filename;
-                    current_project.proj.assembly_files = {"cpu0.d16"};
-                    current_project.proj.assembly_data = {""};
-
-                    current_project.editors.emplace_back();
-                }
-
-                ctx.ctx = level::start(lvl[i], 256);
-
-                level::setup_validation(ctx.ctx, current_project);
-            }
-        }
-
-        ImGui::End();
+        level::display_level_select(ctx, current_project);
 
         ImGui::Begin("Level", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
@@ -218,7 +174,7 @@ int main()
                 edit.wants_reset = false;
             }
 
-            if(force_reset || any_wants_assemble || any_wants_reset)
+            if(any_wants_assemble || any_wants_reset)
             {
                 ctx.ctx = level::start(ctx.ctx.level_name, 256);
 
