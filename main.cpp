@@ -12,6 +12,7 @@
 #include <set>
 #include <chrono>
 #include "constant_time_exec.hpp"
+#include <imgui/misc/freetype/imgui_freetype.h>
 
 /*:start
 
@@ -46,6 +47,14 @@ std::string to_hex(uint16_t val)
 std::string format(int val, bool hex)
 {
     return hex ? to_hex(val) : std::to_string(val);
+}
+
+void low_checkbox(const std::string& str, bool& val)
+{
+    std::string display = val ? "[x] " + str : "[ ] " + str;
+
+    if(ImGui::Selectable(display.c_str()))
+        val = !val;
 }
 
 void format_column(int channel, const std::vector<uint16_t>& values, int offset, int count, const std::vector<int>& highlight, bool is_hex, bool use_signed)
@@ -99,6 +108,33 @@ int main()
     sett.viewports = true;
 
     render_window win(sett, "DCPU16-GAME-ONE");
+
+    /*{
+        ImFontAtlas* atlas = ImGui::GetIO().Fonts;
+
+        ImFontConfig font_cfg;
+        font_cfg.GlyphExtraSpacing = ImVec2(0, 0);
+
+        ImGuiIO& io = ImGui::GetIO();
+
+        io.Fonts->Clear();
+        //io.Fonts->ClearFonts();
+
+        #ifndef __EMSCRIPTEN__
+        ///BASE
+        io.Fonts->AddFontFromFileTTF("VeraMono.ttf", 14, &font_cfg);
+        #endif // __EMSCRIPTEN__
+        ///TEXT_EDITOR
+        //io.Fonts->AddFontFromFileTTF("VeraMono.ttf", editor_font_size, &font_cfg);
+        ///DEFAULT
+        io.Fonts->AddFontDefault();
+
+        #ifdef __EMSCRIPTEN__
+        io.Fonts->AddFontDefault(); ///kinda hacky
+        #endif // __EMSCRIPTEN__
+
+        ImGuiFreeType::BuildFontAtlas(atlas, 0, 1);
+    }*/
 
     run_context ctx;
     dcpu::ide::project_instance current_project;
@@ -221,9 +257,9 @@ int main()
 
         ImGui::Begin("Task", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
-        ImGui::Checkbox("Hex", &is_hex);
-        ImGui::SameLine();
-        ImGui::Checkbox("Signed", &use_signed);
+        low_checkbox("Hex", is_hex);
+        //ImGui::SameLine();
+        low_checkbox("Signed", use_signed);
 
         ImGui::BeginGroup();
 
