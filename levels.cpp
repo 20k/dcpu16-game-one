@@ -93,43 +93,66 @@ void level::display_level_select(run_context& ctx, dcpu::ide::project_instance& 
 {
     uint64_t now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch().count();
 
-    std::vector<std::string> levels = {"INTRO", "AMPLIFY", "DIVISIONS", "SPACESHIP_OPERATOR", "CHECKSUM", "POWR", "HWENUMERATE"};
+    std::vector<std::string> intro_levels = {"INTRO", "AMPLIFY", "DIVISION", "SPACESHIP_OPERATOR", "CHECKSUM"};
+    std::vector<std::string> software_levels = {"POWR"};
+    std::vector<std::string> hardware_levels = {"HWENUMERATE"};
+
+    std::vector<std::pair<std::string, std::vector<std::string>>> all_levels =
+    {
+        {"TUTORIAL", intro_levels},
+        {"SOFTWARE", software_levels},
+        {"HARDWARE", hardware_levels},
+    };
 
     ImGui::Begin("Levels", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
-    for(int i=0; i < (int)levels.size(); i++)
+    for(int i=0; i < (int)all_levels.size(); i++)
     {
-        if(ImGui::Button(("LVL: " + levels[i]).c_str()))
+        if(ImGui::TreeNode(all_levels[i].first.c_str()))
         {
-            std::filesystem::create_directory("saves/" + levels[i]);
-
-            std::string full_filename = "saves/" + levels[i] + "/save.dcpu_project";
-
-            if(instance.proj.project_file.size() > 0)
+            for(int j = 0; j < (int)all_levels[i].second.size(); j++)
             {
-                instance.save();
+                const std::string& level_name = all_levels[i].second[j];
+
+                ImGui::Spacing();
+
+                ImGui::SameLine();
+
+                if(ImGui::Selectable(level_name.c_str()))
+                {
+                    std::filesystem::create_directory("saves/" + level_name);
+
+                    std::string full_filename = "saves/" + level_name + "/save.dcpu_project";
+
+                    if(instance.proj.project_file.size() > 0)
+                    {
+                        instance.save();
+                    }
+
+                    instance = dcpu::ide::project_instance();
+
+                    if(file::exists(full_filename))
+                    {
+                        instance.load(full_filename);
+                    }
+                    else
+                    {
+                        instance.proj.project_file = full_filename;
+                        instance.proj.assembly_files = {"cpu0.d16"};
+                        instance.proj.assembly_data = {""};
+
+                        instance.editors.emplace_back();
+                    }
+
+                    ctx.ctx = level::start(level_name, 256);
+
+                    level::setup_validation(ctx.ctx, instance);
+
+                    ctx.exec.init(0, now_ms);
+                }
             }
 
-            instance = dcpu::ide::project_instance();
-
-            if(file::exists(full_filename))
-            {
-                instance.load(full_filename);
-            }
-            else
-            {
-                instance.proj.project_file = full_filename;
-                instance.proj.assembly_files = {"cpu0.d16"};
-                instance.proj.assembly_data = {""};
-
-                instance.editors.emplace_back();
-            }
-
-            ctx.ctx = level::start(levels[i], 256);
-
-            level::setup_validation(ctx.ctx, instance);
-
-            ctx.exec.init(0, now_ms);
+            ImGui::TreePop();
         }
     }
 
