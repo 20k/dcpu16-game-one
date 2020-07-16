@@ -93,7 +93,7 @@ void level::display_level_select(run_context& ctx, dcpu::ide::project_instance& 
 {
     uint64_t now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch().count();
 
-    std::vector<std::string> intro_levels = {"INTRO", "AMPLIFY", "DIVISION", "SPACESHIP_OPERATOR", "CHECKSUM"};
+    std::vector<std::string> intro_levels = {"INTRO", "AMPLIFY", "DIVISIONS", "SPACESHIP_OPERATOR", "CHECKSUM"};
     std::vector<std::string> software_levels = {"POWR"};
     std::vector<std::string> hardware_levels = {"HWENUMERATE"};
 
