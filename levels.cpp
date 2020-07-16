@@ -99,9 +99,9 @@ void level::display_level_select(run_context& ctx, dcpu::ide::project_instance& 
 
     std::vector<std::pair<std::string, std::vector<std::string>>> all_levels =
     {
-        {"TUTORIAL", intro_levels},
-        {"SOFTWARE", software_levels},
-        {"HARDWARE", hardware_levels},
+        {"Tutorial", intro_levels},
+        {"Software", software_levels},
+        {"Hardware", hardware_levels},
     };
 
     ImGui::Begin("Levels", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
