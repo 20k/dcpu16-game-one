@@ -75,7 +75,7 @@ namespace style
         pos.x -= 1;
         pos.y -= size.y/2;
 
-        ImGui::GetForegroundDrawList()->AddText(pos, IM_COL32(0xCF, 0xCF, 0xCF, 0xFF), text.c_str());
+        ImGui::GetBackgroundDrawList()->AddText(pos, IM_COL32(0xCF, 0xCF, 0xCF, 0xFF), text.c_str());
 
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
