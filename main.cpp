@@ -116,6 +116,8 @@ int main()
 
     level_selector_state select;
 
+    //ImGui::GetStyle().ScaleAllSizes(2);
+
     /*{
         ImFontAtlas* atlas = ImGui::GetIO().Fonts;
 

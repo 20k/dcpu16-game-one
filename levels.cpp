@@ -132,12 +132,17 @@ void level::display_level_select(level_selector_state& select, run_context& ctx,
 
     std::vector<std::pair<std::string, std::vector<std::string>>> all_levels =
     {
-        {"Tutorial", intro_levels},
-        {"Software", software_levels},
-        {"Hardware", hardware_levels},
+        {"TUTORIAL", intro_levels},
+        {"SOFTWARE", software_levels},
+        {"HARDWARE", hardware_levels},
     };
 
-    ImGui::Begin("Levels", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
+    if(select.level_name.size() == 0)
+    {
+        select.level_name = "INTRO";
+    }
+
+    ImGui::Begin("Levels", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
 
     for(int i=0; i < (int)all_levels.size(); i++)
     {
@@ -149,17 +154,63 @@ void level::display_level_select(level_selector_state& select, run_context& ctx,
             {
                 const std::string& level_name = all_levels[i].second[j];
 
-                ImGui::Spacing();
+                std::string level_str = (level_name == select.level_name) ? ("[" + level_name + "]") : (" " + level_name + " ");
 
-                ImGui::SameLine();
+                //ImGui::Spacing();
 
-                if(ImGui::Selectable(level_name.c_str()))
+                ImGui::Text("    ");
+
+                ImGui::SameLine(0,0);
+
+                if(ImGui::Selectable(level_str.c_str()))
                 {
-                    switch_to_level(ctx, instance, level_name);
+                    //switch_to_level(ctx, instance, level_name);
+                    select.level_name = level_name;
                 }
             }
 
             //ImGui::TreePop();
+        }
+    }
+
+    //ImGui::NewLine();
+
+    if(select.level_name.size() > 0)
+    {
+        int width = ImGui::GetContentRegionAvailWidth();
+
+        int char_num =  width /  ImGui::CalcTextSize("-").x;
+
+        std::string spacer(char_num, '-');
+
+        ImGui::Text(spacer.c_str());
+
+        //ImGui::NewLine();
+
+        ImGui::Text("INFO");
+
+        ImGui::Indent();
+
+        ImGui::Text("NAME              : %s", select.level_name.c_str());
+        ImGui::Text("CYCLE COUNT       : 0");
+        ImGui::Text("INSTRUCTION COUNT : 0");
+        ImGui::Text("VALIDATION        : INVALID");
+
+        ImGui::NewLine();
+
+        ImGui::TextWrapped("%s\n", level::start(select.level_name, 256).short_description.c_str());
+
+        ImGui::Unindent();
+
+        //ImGui::NewLine();
+
+        ImGui::Text(spacer.c_str());
+
+        //ImGui::NewLine();
+
+        if(ImGui::Selectable("START"))
+        {
+            switch_to_level(ctx, instance, select.level_name);
         }
     }
 
@@ -190,6 +241,9 @@ namespace level
             ctx.description = "Intro to the DCPU-16. Pass the input to the output\n"
                               "Use RCV X, 0 to receive input on Ch:0, and SND X, 1 to send output on Ch:1\n"
                               "Remember to make your program loop by using SET PC, 0";
+
+            ctx.short_description = "PASS THE INPUT TO THE OUTPUT";
+
             ctx.cpus = 1;
 
             std::vector<uint16_t> input;
@@ -208,6 +262,7 @@ namespace level
         if(ctx.level_name == "AMPLIFY")
         {
             ctx.description = "Amplify the input - Multiply by 16";
+            ctx.short_description = "MULTIPLY THE INPUT BY 16";
             ctx.cpus = 1;
 
             std::vector<uint16_t> input;
@@ -260,6 +315,7 @@ namespace level
         if(ctx.level_name == "DIVISIONS")
         {
             ctx.description = "Calculate Ch:0 / 4 and write it to Ch:1\nCalculate Ch:0 / 32 and write it to Ch:2";
+            ctx.short_description = "PERFORM DIVISIONS IN SERIES";
             ctx.cpus = 1;
 
             std::vector<uint16_t> input1;
@@ -288,6 +344,7 @@ namespace level
         if(ctx.level_name == "SPACESHIP_OPERATOR")
         {
             ctx.description = "If Ch:0 < 0, write -1 to Ch:1\nIf Ch:0 == 0, write 0 to Ch:1\nIf Ch:0 > 0, write 1 to Ch:1\nMany instructions have signed equivalents for operating on negative values";
+            ctx.short_description = "IMPLEMENT THE <=> OPERATOR";
             ctx.cpus = 1;
 
             std::vector<uint16_t> input1{1, 0, 0xffff};
@@ -342,6 +399,7 @@ namespace level
             ctx.description = "Read Ch:1 number of values from Ch:0, add them together, and write them to Ch:2\n"
                               "Eg: Ch:0 = [7, 6, 5, 4, 9] and Ch:1 = [2, 3], Ch:2 <- (7 + 6), Ch:2 <- (5 + 4 + 9)\n\n"
                               "Use :some_name to create a new label, and SET PC, some_name to jump to it";
+            ctx.short_description = "IMPLEMENT THE CHECKSUM ALGORITHM";
             ctx.cpus = 1;
 
             std::vector<uint16_t> input1{1, 1};
@@ -379,6 +437,7 @@ namespace level
         if(ctx.level_name == "POWR")
         {
             ctx.description = "Power - raise Ch:0 to the power of Ch:1\na^b is the same as a * a * a ... * a, done b times";
+            ctx.short_description = "IMPLEMENT THE POWER ALGORITHM";
             ctx.cpus = 1;
 
             std::vector<uint16_t> input1{15, 15};
@@ -419,6 +478,7 @@ namespace level
             ctx.description = "Hardware - Write the number of connected devices (HWN) to Ch:0\nSearch for the clock with hardware id 0x12d0b402\n"
                               "Initialise the clock by sending an interrupt with HWI, with [A=0, B>0]\nConsult the manual for detailed specifications\n"
                               "See https://github.com/20k/dcpu16-specs/blob/master/clock.md for the full specification (this will be in the manual later)";
+            ctx.short_description = "ENUMERATE HARDWARE DEVICES AND INITIALISE THE CLOCK";
 
             ctx.cpus = 1;
 

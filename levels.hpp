@@ -36,6 +36,7 @@ struct level_context
     int cpus = 0;
     std::string level_name;
     std::string description;
+    std::string short_description;
 
     std::map<int, std::vector<uint16_t>> channel_to_input;
     std::map<int, std::vector<uint16_t>> channel_to_output;
