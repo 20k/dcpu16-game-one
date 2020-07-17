@@ -114,6 +114,8 @@ int main()
 
     render_window win(sett, "DCPU16-GAME-ONE");
 
+    ImGui::GetStyle().ItemSpacing.y = 0;
+
     level_selector_state select;
 
     //ImGui::GetStyle().ScaleAllSizes(2);
@@ -165,11 +167,24 @@ int main()
         }
         else
         {
-            ImGui::Begin("Level", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+            ImGui::Begin("Level", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove);
+
+            auto screen_size = win.get_window_size();
+
+            ImVec2 dim = ImGui::GetWindowSize();
+
+            ImVec2 offset = {0,0};
+
+            if(sett.viewports)
+            {
+                offset = {ImGui::GetMainViewport()->Pos.x, ImGui::GetMainViewport()->Pos.y};
+            }
+
+            ImGui::SetWindowPos(ImVec2(screen_size.x()/2 - dim.x/2 + offset.x, offset.y));
+
+            ImGui::Text("Level: %s", ctx.ctx.level_name.c_str());
 
             ImGui::Text("%s", ctx.ctx.description.c_str());
-
-            ImGui::Text("Level %s", ctx.ctx.level_name.c_str());
 
             ImGui::Text("Validation Status:");
 
@@ -266,7 +281,7 @@ int main()
                 });
             }
 
-            ImGui::Begin("Task", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+            ImGui::Begin("Task", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
 
             low_checkbox("Hex", is_hex);
             //ImGui::SameLine();
