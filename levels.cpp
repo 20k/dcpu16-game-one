@@ -89,10 +89,43 @@ uint16_t lcg(uint64_t& state)
     return state >> (64-16);
 }
 
-void level::display_level_select(run_context& ctx, dcpu::ide::project_instance& instance)
+void switch_to_level(run_context& ctx, dcpu::ide::project_instance& instance, const std::string& level_name)
 {
     uint64_t now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch().count();
 
+    std::filesystem::create_directory("saves/" + level_name);
+
+    std::string full_filename = "saves/" + level_name + "/save.dcpu_project";
+
+    if(instance.proj.project_file.size() > 0)
+    {
+        instance.save();
+    }
+
+    instance = dcpu::ide::project_instance();
+
+    if(file::exists(full_filename))
+    {
+        instance.load(full_filename);
+    }
+    else
+    {
+        instance.proj.project_file = full_filename;
+        instance.proj.assembly_files = {"cpu0.d16"};
+        instance.proj.assembly_data = {""};
+
+        instance.editors.emplace_back();
+    }
+
+    ctx.ctx = level::start(level_name, 256);
+
+    level::setup_validation(ctx.ctx, instance);
+
+    ctx.exec.init(0, now_ms);
+}
+
+void level::display_level_select(level_selector_state& select, run_context& ctx, dcpu::ide::project_instance& instance)
+{
     std::vector<std::string> intro_levels = {"INTRO", "AMPLIFY", "DIVISIONS", "SPACESHIP_OPERATOR", "CHECKSUM"};
     std::vector<std::string> software_levels = {"POWR"};
     std::vector<std::string> hardware_levels = {"HWENUMERATE"};
@@ -104,11 +137,13 @@ void level::display_level_select(run_context& ctx, dcpu::ide::project_instance& 
         {"Hardware", hardware_levels},
     };
 
-    ImGui::Begin("Levels", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::Begin("Levels", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
 
     for(int i=0; i < (int)all_levels.size(); i++)
     {
-        if(ImGui::TreeNode(all_levels[i].first.c_str()))
+        //if(ImGui::TreeNode(all_levels[i].first.c_str()))
+
+        ImGui::Selectable(all_levels[i].first.c_str());
         {
             for(int j = 0; j < (int)all_levels[i].second.size(); j++)
             {
@@ -120,39 +155,11 @@ void level::display_level_select(run_context& ctx, dcpu::ide::project_instance& 
 
                 if(ImGui::Selectable(level_name.c_str()))
                 {
-                    std::filesystem::create_directory("saves/" + level_name);
-
-                    std::string full_filename = "saves/" + level_name + "/save.dcpu_project";
-
-                    if(instance.proj.project_file.size() > 0)
-                    {
-                        instance.save();
-                    }
-
-                    instance = dcpu::ide::project_instance();
-
-                    if(file::exists(full_filename))
-                    {
-                        instance.load(full_filename);
-                    }
-                    else
-                    {
-                        instance.proj.project_file = full_filename;
-                        instance.proj.assembly_files = {"cpu0.d16"};
-                        instance.proj.assembly_data = {""};
-
-                        instance.editors.emplace_back();
-                    }
-
-                    ctx.ctx = level::start(level_name, 256);
-
-                    level::setup_validation(ctx.ctx, instance);
-
-                    ctx.exec.init(0, now_ms);
+                    switch_to_level(ctx, instance, level_name);
                 }
             }
 
-            ImGui::TreePop();
+            //ImGui::TreePop();
         }
     }
 

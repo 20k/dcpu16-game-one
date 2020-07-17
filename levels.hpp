@@ -57,6 +57,11 @@ struct run_context
     level_context ctx;
 };
 
+struct level_selector_state
+{
+    std::string level_name;
+};
+
 struct stats
 {
     int cycles = 0;
@@ -68,7 +73,7 @@ namespace level
 {
     //std::vector<std::string> get_available();
 
-    void display_level_select(run_context& ctx, dcpu::ide::project_instance& instance);
+    void display_level_select(level_selector_state& select, run_context& ctx, dcpu::ide::project_instance& instance);
 
     level_context start(const std::string& name, int answer_rough_count);
 
