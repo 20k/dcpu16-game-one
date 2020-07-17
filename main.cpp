@@ -13,6 +13,7 @@
 #include <chrono>
 #include "constant_time_exec.hpp"
 #include <imgui/misc/freetype/imgui_freetype.h>
+#include "style.hpp"
 
 /*:start
 
@@ -113,87 +114,6 @@ void main_menu(level_selector_state& select, run_context& ctx, dcpu::ide::projec
     ImGui::GetForegroundDrawList()->AddText(pos, 0xFFFFFFFF, "----");
 }*/
 
-void style_start_blank()
-{
-    auto dim = ImGui::GetWindowSize();
-    auto pos = ImGui::GetWindowPos();
-
-    std::string text = "";
-
-    auto size = ImGui::CalcTextSize("-");
-
-    pos.x -= size.x;
-    pos.y -= size.y;
-
-    dim.x += size.x * 2;
-    dim.y += size.y * 2;
-
-    int xcount = (dim.x + size.x) / size.x;
-    int ycount = (dim.y + size.y) / size.y;
-
-    ///find a way to do this with proper box characters
-    for(int j=0; j < ycount; j++)
-    {
-        for(int i=0; i < xcount; i++)
-        {
-            if(i == 0 && j == 0)
-            {
-                text += "\u2554";
-                continue;
-            }
-
-            if(i == 0 && j == (int)ycount - 1)
-            {
-                text += "\u255A";
-                continue;
-            }
-
-            if(i == (int)xcount - 1 && j == 0)
-            {
-                text += "\u2557";
-                continue;
-            }
-
-            if(i == (int)xcount - 1 && j == (int)ycount - 1)
-            {
-                text += "\u255D";
-                continue;
-            }
-
-            if(j == 0 || j == (int)ycount - 1)
-            {
-                text += "\u2550";
-                continue;
-            }
-
-            if(i == 0 || i == (int)xcount - 1)
-            {
-                text += "\u2551";
-                continue;
-            }
-
-            text += " ";
-        }
-
-        text += "\n";
-    }
-
-    //pos.x -= size.x/2;
-    pos.x -= 1;
-    pos.y -= size.y/2;
-
-    ImGui::GetForegroundDrawList()->AddText(pos, IM_COL32(0xCF, 0xCF, 0xCF, 0xFF), text.c_str());
-
-    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-    ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0);
-}
-
-void style_end_blank()
-{
-    ImGui::PopStyleVar(3);
-}
-
 //run the stinky poopoo program because
 //im a stinky
 int main()
@@ -269,6 +189,8 @@ int main()
         {
             ImGui::Begin("Level", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove);
 
+            style::start();
+
             auto screen_size = win.get_window_size();
 
             ImVec2 dim = ImGui::GetWindowSize();
@@ -279,6 +201,8 @@ int main()
             {
                 offset = {ImGui::GetMainViewport()->Pos.x, ImGui::GetMainViewport()->Pos.y};
             }
+
+            offset.y += ImGui::CalcTextSize("\n").y;
 
             ImGui::SetWindowPos(ImVec2(screen_size.x()/2 - dim.x/2 + offset.x, offset.y));
 
@@ -298,6 +222,8 @@ int main()
             {
                 ImGui::TextColored(ImVec4(0, 255, 0, 255), "Valid");
             }
+
+            style::finish();
 
             ImGui::End();
 
@@ -383,7 +309,7 @@ int main()
 
             ImGui::Begin("Task", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
 
-            style_start_blank();
+            style::start();
 
             low_checkbox("Hex", is_hex);
             //ImGui::SameLine();
@@ -466,7 +392,7 @@ int main()
 
             ImGui::EndGroup();
 
-            style_end_blank();
+            style::finish();
 
             ImGui::End();
 

@@ -97,6 +97,7 @@
 		<Unit filename="levels.cpp" />
 		<Unit filename="levels.hpp" />
 		<Unit filename="main.cpp" />
+		<Unit filename="style.hpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

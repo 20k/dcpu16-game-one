@@ -6,6 +6,7 @@
 #include <chrono>
 #include <filesystem>
 #include <toolkit/fs_helpers.hpp>
+#include "style.hpp"
 
 dcpu::sim::CPU sim_input(const std::vector<uint16_t>& input, int channel, stack_vector<uint16_t, MEM_SIZE>& line_map)
 {
@@ -144,6 +145,8 @@ void level::display_level_select(level_selector_state& select, run_context& ctx,
 
     ImGui::Begin("Levels", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
 
+    style::start();
+
     for(int i=0; i < (int)all_levels.size(); i++)
     {
         //if(ImGui::TreeNode(all_levels[i].first.c_str()))
@@ -213,6 +216,8 @@ void level::display_level_select(level_selector_state& select, run_context& ctx,
             switch_to_level(ctx, instance, select.level_name);
         }
     }
+
+    style::finish();
 
     ImGui::End();
 }
