@@ -402,7 +402,15 @@ int main()
                 current_project.editors[i].render(current_project, i);
             }
 
-            card.render();
+            ImGui::Begin("Reference", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
+
+            style::start();
+
+            card.render_inline();
+
+            style::finish();
+
+            ImGui::End();
         }
 
         sf::sleep(sf::milliseconds(1));
