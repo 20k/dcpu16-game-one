@@ -118,7 +118,7 @@ int main()
 
     //ImGui::GetStyle().ScaleAllSizes(2);
 
-    /*{
+    {
         ImFontAtlas* atlas = ImGui::GetIO().Fonts;
 
         ImFontConfig font_cfg;
@@ -131,7 +131,7 @@ int main()
 
         #ifndef __EMSCRIPTEN__
         ///BASE
-        io.Fonts->AddFontFromFileTTF("VeraMono.ttf", 14, &font_cfg);
+        io.Fonts->AddFontFromFileTTF("DosFont.ttf", 16, &font_cfg);
         #endif // __EMSCRIPTEN__
         ///TEXT_EDITOR
         //io.Fonts->AddFontFromFileTTF("VeraMono.ttf", editor_font_size, &font_cfg);
@@ -143,7 +143,7 @@ int main()
         #endif // __EMSCRIPTEN__
 
         ImGuiFreeType::BuildFontAtlas(atlas, 0, 1);
-    }*/
+    }
 
     run_context ctx;
     dcpu::ide::project_instance current_project;
