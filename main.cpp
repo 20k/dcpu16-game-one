@@ -105,6 +105,97 @@ void main_menu(level_selector_state& select, run_context& ctx, dcpu::ide::projec
     level::display_level_select(select, ctx, current_project);
 }
 
+/*void squarify()
+{
+    auto dim = ImGui::GetWindowSize();
+    auto pos = ImGui::GetWindowPos();
+
+    ImGui::GetForegroundDrawList()->AddText(pos, 0xFFFFFFFF, "----");
+}*/
+
+void style_start_blank()
+{
+    auto dim = ImGui::GetWindowSize();
+    auto pos = ImGui::GetWindowPos();
+
+    std::string text = "";
+
+    auto size = ImGui::CalcTextSize("-");
+
+    pos.x -= size.x;
+    pos.y -= size.y;
+
+    dim.x += size.x * 2;
+    dim.y += size.y * 2;
+
+    int xcount = (dim.x + size.x) / size.x;
+    int ycount = (dim.y + size.y) / size.y;
+
+    ///find a way to do this with proper box characters
+    for(int j=0; j < ycount; j++)
+    {
+        for(int i=0; i < xcount; i++)
+        {
+            if(i == 0 && j == 0)
+            {
+                text += "\u2554";
+                continue;
+            }
+
+            if(i == 0 && j == (int)ycount - 1)
+            {
+                text += "\u255A";
+                continue;
+            }
+
+            if(i == (int)xcount - 1 && j == 0)
+            {
+                text += "\u2557";
+                continue;
+            }
+
+            if(i == (int)xcount - 1 && j == (int)ycount - 1)
+            {
+                text += "\u255D";
+                continue;
+            }
+
+            if(j == 0 || j == (int)ycount - 1)
+            {
+                text += "\u2550";
+                continue;
+            }
+
+            if(i == 0 || i == (int)xcount - 1)
+            {
+                text += "\u2551";
+                continue;
+            }
+
+            text += " ";
+        }
+
+        text += "\n";
+    }
+
+    //pos.x -= size.x/2;
+    pos.x -= 1;
+    pos.y -= size.y/2;
+
+    ImGui::GetForegroundDrawList()->AddText(pos, IM_COL32(0xCF, 0xCF, 0xCF, 0xFF), text.c_str());
+
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0);
+}
+
+void style_end_blank()
+{
+    ImGui::PopStyleVar(3);
+}
+
+//run the stinky poopoo program because
+//im a stinky
 int main()
 {
     render_settings sett;
@@ -113,6 +204,8 @@ int main()
     sett.viewports = true;
 
     render_window win(sett, "DCPU16-GAME-ONE");
+
+    ImGui::PushSrgbStyleColor(ImGuiCol_Text, ImVec4(207/255.f, 207/255.f, 207/255.f, 255));
 
     ImGui::GetStyle().ItemSpacing.y = 0;
 
@@ -131,14 +224,21 @@ int main()
         io.Fonts->Clear();
         //io.Fonts->ClearFonts();
 
+        static const ImWchar range[] =
+        {
+            0x0020, 0x00FF, // Basic Latin + Latin Supplement
+            0x2500, 0x25EF, // Some extension characters for pipes etc
+            0,
+        };
+
         #ifndef __EMSCRIPTEN__
         ///BASE
-        io.Fonts->AddFontFromFileTTF("DosFont.ttf", 16, &font_cfg);
+        io.Fonts->AddFontFromFileTTF("DosFont.ttf", 16, &font_cfg, &range[0]);
         #endif // __EMSCRIPTEN__
         ///TEXT_EDITOR
         //io.Fonts->AddFontFromFileTTF("VeraMono.ttf", editor_font_size, &font_cfg);
         ///DEFAULT
-        io.Fonts->AddFontDefault();
+        //io.Fonts->AddFontDefault();
 
         #ifdef __EMSCRIPTEN__
         io.Fonts->AddFontDefault(); ///kinda hacky
@@ -283,6 +383,8 @@ int main()
 
             ImGui::Begin("Task", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
 
+            style_start_blank();
+
             low_checkbox("Hex", is_hex);
             //ImGui::SameLine();
             low_checkbox("Signed", use_signed);
@@ -325,6 +427,10 @@ int main()
 
             ImGui::SameLine();
 
+            ImGui::Text(" ");
+
+            ImGui::SameLine();
+
             ImGui::BeginGroup();
 
             ImGui::Text("Out");
@@ -337,6 +443,10 @@ int main()
             }
 
             ImGui::EndGroup();
+
+            ImGui::SameLine();
+
+            ImGui::Text(" ");
 
             ImGui::SameLine();
 
@@ -355,6 +465,8 @@ int main()
             }
 
             ImGui::EndGroup();
+
+            style_end_blank();
 
             ImGui::End();
 
