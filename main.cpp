@@ -323,47 +323,50 @@ int main()
             //ImGui::SameLine();
             low_checkbox("Signed", use_signed);
 
-            ImGui::BeginGroup();
-
-            ImGui::Text("In");
-
             int start_error_line = ctx.ctx.error_locs.size() > 0 ? (ctx.ctx.error_locs.front() - 8) : 0;
 
             if(!ctx.ctx.finished)
                 start_error_line = 0;
 
-            for(auto& [channel, vals] : ctx.ctx.channel_to_input)
+            if(ctx.ctx.channel_to_input.size() > 0)
             {
-                int my_line = start_error_line;
+                ImGui::BeginGroup();
 
-                ///the -1 requires some explaining
-                ///basically, the blocking multiprocessor instructions
-                ///block on the *next* instruction, not the current one
-                ///which makes sense logically, but results in bad debuggability
-                ///this is a hack
-                if(!ctx.ctx.finished)
-                    my_line = ctx.ctx.inf.input_translation[channel][ctx.ctx.inf.input_cpus[channel].regs[PC_REG]] - 1;
+                ImGui::Text("In");
 
-                if(my_line < 0)
-                    my_line = 0;
+                for(auto& [channel, vals] : ctx.ctx.channel_to_input)
+                {
+                    int my_line = start_error_line;
 
-                std::vector<int> to_highlight;
+                    ///the -1 requires some explaining
+                    ///basically, the blocking multiprocessor instructions
+                    ///block on the *next* instruction, not the current one
+                    ///which makes sense logically, but results in bad debuggability
+                    ///this is a hack
+                    if(!ctx.ctx.finished)
+                        my_line = ctx.ctx.inf.input_translation[channel][ctx.ctx.inf.input_cpus[channel].regs[PC_REG]] - 1;
 
-                if(!ctx.ctx.finished)
-                    to_highlight.push_back(my_line);
+                    if(my_line < 0)
+                        my_line = 0;
 
-                format_column(channel, vals, start_error_line, 16, to_highlight, is_hex, use_signed);
+                    std::vector<int> to_highlight;
+
+                    if(!ctx.ctx.finished)
+                        to_highlight.push_back(my_line);
+
+                    format_column(channel, vals, start_error_line, 16, to_highlight, is_hex, use_signed);
+
+                    ImGui::SameLine(0, ImGui::CalcTextSize(" ").x);
+                }
+
+                ImGui::EndGroup();
+
+                ImGui::SameLine();
+
+                ImGui::Text(" ");
 
                 ImGui::SameLine();
             }
-
-            ImGui::EndGroup();
-
-            ImGui::SameLine();
-
-            ImGui::Text(" ");
-
-            ImGui::SameLine();
 
             ImGui::BeginGroup();
 
