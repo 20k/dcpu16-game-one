@@ -14,6 +14,7 @@
 #include "constant_time_exec.hpp"
 #include <imgui/misc/freetype/imgui_freetype.h>
 #include "style.hpp"
+#include <imguicolortextedit/texteditor.h>
 
 /*:start
 
@@ -410,7 +411,41 @@ int main()
             //for(auto& i : current_project.editors)
             for(int i=0; i < (int)current_project.editors.size(); i++)
             {
-                current_project.editors[i].render(current_project, i);
+                std::string root_name = "IDE";
+
+                if(current_project.editors[i].unsaved)
+                    root_name += " (unsaved)";
+
+                ImGui::SetNextWindowSize(ImVec2(500, 500), ImGuiCond_Appearing);
+
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f);
+                ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0,0,0,0));
+                ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4(0,0,0,0));
+                ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(0,0,0,0));
+                ImGui::PushStyleColor(ImGuiCol_TitleBgCollapsed, ImVec4(0,0,0,0));
+                ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(0,0,0,0));
+                ImGui::PushStyleColor(ImGuiCol_PopupBg, ImVec4(0,0,0,1));
+
+                ImGui::Begin((root_name + "###IDE" + std::to_string(i)).c_str(), nullptr, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar);
+
+                style::start();
+
+                ImGui::PopStyleVar(3);
+
+                TextEditor::Palette pal = current_project.editors[i].edit->GetPalette();
+                pal[(int)TextEditor::PaletteIndex::Background] = IM_COL32(0,0,0,0);
+                current_project.editors[i].edit->SetPalette(pal);
+
+                current_project.editors[i].render_inline(current_project, i);
+
+                //style::finish();
+
+                ImGui::End();
+
+                ImGui::PopStyleColor(6);
+                ImGui::PopStyleVar();
+
+                //current_project.editors[i].render(current_project, i);
             }
 
             ImGui::Begin("Reference", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
