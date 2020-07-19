@@ -114,8 +114,6 @@ void main_menu(level_selector_state& select, run_context& ctx, dcpu::ide::projec
     ImGui::GetForegroundDrawList()->AddText(pos, 0xFFFFFFFF, "----");
 }*/
 
-//run the stinky poopoo program because
-//im a stinky
 int main()
 {
     render_settings sett;
