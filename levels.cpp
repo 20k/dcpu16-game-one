@@ -143,7 +143,15 @@ void level::display_level_select(level_selector_state& select, run_context& ctx,
         select.level_name = "INTRO";
     }
 
-    ImGui::Begin("Levels", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
+    ImGui::Begin("Levels", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove);
+
+    auto screen_dim = ImGui::GetIO().DisplaySize;
+    auto screen_pos = ImGui::GetMainViewport()->Pos;
+    auto window_dim = ImGui::GetWindowSize();
+
+    ImVec2 centre_pos = ImVec2(screen_pos.x + screen_dim.x/2 - window_dim.x/2, screen_pos.y + screen_dim.y/2 - window_dim.y/2);
+
+    ImGui::SetWindowPos(ImVec2(centre_pos.x, centre_pos.y));
 
     style::start();
 
@@ -180,9 +188,14 @@ void level::display_level_select(level_selector_state& select, run_context& ctx,
 
     if(select.level_name.size() > 0)
     {
-        int width = ImGui::GetContentRegionAvailWidth();
+        //int width = ImGui::GetContentRegionAvail().x;
 
-        int char_num =  width /  ImGui::CalcTextSize("-").x;
+        int width = ImGui::GetWindowSize().x - ImGui::GetStyle().FramePadding.x - ImGui::GetStyle().ItemSpacing.x - 10;
+
+        int char_num = width /  ImGui::CalcTextSize("-").x;
+
+        if(char_num < 0)
+            char_num = 0;
 
         std::string spacer(char_num, '-');
 
