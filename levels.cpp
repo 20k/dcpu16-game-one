@@ -172,7 +172,7 @@ void level::display_level_select(level_selector_state& select, run_context& ctx,
 
                 //ImGui::Spacing();
 
-                ImGui::Text("  ");
+                ImGui::Text(" ");
 
                 ImGui::SameLine(0,0);
 
