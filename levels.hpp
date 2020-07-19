@@ -74,6 +74,8 @@ namespace level
 {
     //std::vector<std::string> get_available();
 
+    void switch_to_level(run_context& ctx, dcpu::ide::project_instance& instance, const std::string& level_name);
+
     void display_level_select(level_selector_state& select, run_context& ctx, dcpu::ide::project_instance& instance);
 
     level_context start(const std::string& name, int answer_rough_count);

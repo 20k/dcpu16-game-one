@@ -90,7 +90,7 @@ uint16_t lcg(uint64_t& state)
     return state >> (64-16);
 }
 
-void switch_to_level(run_context& ctx, dcpu::ide::project_instance& instance, const std::string& level_name)
+void level::switch_to_level(run_context& ctx, dcpu::ide::project_instance& instance, const std::string& level_name)
 {
     uint64_t now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch().count();
 
