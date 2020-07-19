@@ -373,7 +373,7 @@ int main()
             {
                 format_column(channel, vals, start_error_line, 16, {}, is_hex, use_signed);
 
-                ImGui::SameLine();
+                ImGui::SameLine(0, ImGui::CalcTextSize(" ").x);
             }
 
             ImGui::EndGroup();
@@ -394,7 +394,7 @@ int main()
                 {
                     format_column(channel, it->second, start_error_line, 16, ctx.ctx.error_locs, is_hex, use_signed);
 
-                    ImGui::SameLine();
+                    ImGui::SameLine(0, ImGui::CalcTextSize(" ").x);
                 }
             }
 
