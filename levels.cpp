@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <toolkit/fs_helpers.hpp>
 #include "style.hpp"
+#include <imgui/imgui_internal.h>
 
 dcpu::sim::CPU sim_input(const std::vector<uint16_t>& input, int channel, stack_vector<uint16_t, MEM_SIZE>& line_map)
 {
@@ -143,6 +144,8 @@ void level::display_level_select(level_selector_state& select, run_context& ctx,
         select.level_name = "INTRO";
     }
 
+    ImGui::SetNextWindowSize(ImVec2(300, 0));
+
     ImGui::Begin("Levels", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove);
 
     auto screen_dim = ImGui::GetIO().DisplaySize;
@@ -169,7 +172,7 @@ void level::display_level_select(level_selector_state& select, run_context& ctx,
 
                 //ImGui::Spacing();
 
-                ImGui::Text("    ");
+                ImGui::Text("  ");
 
                 ImGui::SameLine(0,0);
 
@@ -199,28 +202,49 @@ void level::display_level_select(level_selector_state& select, run_context& ctx,
 
         std::string spacer(char_num, '-');
 
-        ImGui::Text(spacer.c_str());
+        //ImGui::Text(spacer.c_str());
 
-        //ImGui::NewLine();
+        auto cursor_pos = ImGui::GetCursorScreenPos();
+
+        ImGui::GetCurrentWindow()->DrawList->AddText(ImVec2(cursor_pos.x, cursor_pos.y), IM_COL32(0xCF, 0xCF, 0xCF, 0xFF), spacer.c_str());
+
+        ImGui::NewLine();
 
         ImGui::Text("INFO");
 
         ImGui::Indent();
 
-        ImGui::Text("NAME              : %s", select.level_name.c_str());
+        //ImGui::Text("NAME              : %s", select.level_name.c_str());
         ImGui::Text("CYCLE COUNT       : 0");
         ImGui::Text("INSTRUCTION COUNT : 0");
         ImGui::Text("VALIDATION        : INVALID");
 
         ImGui::NewLine();
 
-        ImGui::TextWrapped("%s\n", level::start(select.level_name, 256).short_description.c_str());
+        std::string description = level::start(select.level_name, 256).short_description;
+
+
+        float old_pos = ImGui::GetCursorScreenPos().y;
+
+        ImGui::TextWrapped("%s\n", description.c_str());
+
+        float new_pos = ImGui::GetCursorScreenPos().y;
+
+        float height = new_pos - old_pos;
+
+        int columns = ceilf(height / ImGui::CalcTextSize("\n").y);
+
+        for(int i=columns; i < 4; i++)
+        {
+            ImGui::NewLine();
+        }
 
         ImGui::Unindent();
 
-        //ImGui::NewLine();
+        ImGui::GetCurrentWindow()->DrawList->AddText(ImVec2(cursor_pos.x, cursor_pos.y), IM_COL32(0xCF, 0xCF, 0xCF, 0xFF), spacer.c_str());
+        ImGui::NewLine();
 
-        ImGui::Text(spacer.c_str());
+        //ImGui::Text(spacer.c_str());
 
         //ImGui::NewLine();
 
