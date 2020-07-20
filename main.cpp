@@ -425,6 +425,9 @@ int main()
                 ImGui::PushStyleColor(ImGuiCol_TitleBgCollapsed, ImVec4(0,0,0,0));
                 ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(0,0,0,0));
                 ImGui::PushStyleColor(ImGuiCol_PopupBg, ImVec4(0,0,0,1));
+                ImGui::PushStyleColor(ImGuiCol_ResizeGrip, ImVec4(0xCF/255.f,0xCF/255.f,0xCF/255.f,1));
+                ImGui::PushStyleColor(ImGuiCol_ResizeGripActive, ImVec4(1,1,1,1));
+                ImGui::PushStyleColor(ImGuiCol_ResizeGripHovered, ImVec4(1,1,1,1));
 
                 ImGui::Begin((root_name + "###IDE" + std::to_string(i)).c_str(), nullptr, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar);
 
@@ -442,7 +445,7 @@ int main()
 
                 ImGui::End();
 
-                ImGui::PopStyleColor(6);
+                ImGui::PopStyleColor(9);
                 ImGui::PopStyleVar();
 
                 //current_project.editors[i].render(current_project, i);

@@ -23,7 +23,7 @@ namespace style
         //dim.x += size.x;
         //dim.y += size.y * 2;
 
-        dim.y -= size.y/2;
+        dim.y -= size.y/4;
 
         int xcount = (dim.x + size.x) / size.x;
         int ycount = (dim.y + size.y) / size.y;
