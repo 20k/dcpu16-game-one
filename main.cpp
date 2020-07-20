@@ -429,7 +429,7 @@ int main()
                 ImGui::PushStyleColor(ImGuiCol_ResizeGripActive, ImVec4(1,1,1,1));
                 ImGui::PushStyleColor(ImGuiCol_ResizeGripHovered, ImVec4(1,1,1,1));
 
-                ImGui::Begin((root_name + "###IDE" + std::to_string(i)).c_str(), nullptr, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar);
+                ImGui::Begin((root_name + "###IDE" + std::to_string(i)).c_str(), nullptr, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
 
                 style::start();
 
