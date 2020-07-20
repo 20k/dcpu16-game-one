@@ -11,6 +11,8 @@ namespace style
         auto dim = ImGui::GetWindowSize();
         auto pos = ImGui::GetWindowPos();
 
+        auto window_pos = pos;
+
         std::string text = "";
 
         auto size = ImGui::CalcTextSize("-");
@@ -23,11 +25,12 @@ namespace style
 
         int xcount = (dim.x + size.x) / size.x;
         int ycount = (dim.y + size.y) / size.y;
+        //ycount++;
 
         ///find a way to do this with proper box characters
-        for(int j=0; j < ycount; j++)
+        for(int j=0; j < ycount - 1; j++)
         {
-            for(int i=0; i < xcount; i++)
+            for(int i=0; i < xcount - 1; i++)
             {
                 ///top left
                 if(i == 0 && j == 0)
@@ -87,11 +90,40 @@ namespace style
             text += "\n";
         }
 
+        std::string bottom_line = "\u2514";
+
+        ///render bottom line
+        for(int i=1; i < (int)xcount - 1; i++)
+        {
+            bottom_line += "\u2550";
+        }
+
+        std::string right_line = "\u2556\n";
+
+        for(int i=1; i < (int)ycount - 1; i++)
+        {
+            right_line += "\u2551\n";
+        }
+
+        std::string bottom_right = "\u255D";
+
         //pos.x -= size.x/2;
         pos.x -= 1;
         pos.y -= size.y/2;
 
         ImGui::GetBackgroundDrawList()->AddText(pos, IM_COL32(0xCF, 0xCF, 0xCF, 0xFF), text.c_str());
+
+        ImVec2 bottom_pos = ImVec2(window_pos.x - size.x - 1, window_pos.y + dim.y);
+
+        ImGui::GetBackgroundDrawList()->AddText(bottom_pos, IM_COL32(0xCF, 0xCF, 0xCF, 0xFF), bottom_line.c_str());
+
+        ImVec2 right_pos = ImVec2(window_pos.x - 1 + dim.x, window_pos.y - size.y/2);
+
+        ImGui::GetBackgroundDrawList()->AddText(right_pos, IM_COL32(0xCF, 0xCF, 0xCF, 0xFF), right_line.c_str());
+
+        ImVec2 bottom_right_pos = ImVec2(window_pos.x - 1 + dim.x, window_pos.y + dim.y);
+
+        ImGui::GetBackgroundDrawList()->AddText(bottom_right_pos, IM_COL32(0xCF, 0xCF, 0xCF,0xFF), bottom_right.c_str());
 
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
