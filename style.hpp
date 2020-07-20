@@ -20,7 +20,7 @@ namespace style
         pos.x -= size.x;
         //pos.y -= size.y;
 
-        dim.x += size.x * 2;
+        //dim.x += size.x;
         //dim.y += size.y * 2;
 
         int xcount = (dim.x + size.x) / size.x;
@@ -38,25 +38,25 @@ namespace style
                     continue;
                 }
 
-                if(i == 0 && j == (int)ycount - 1)
+                /*if(i == 0 && j == (int)ycount - 1)
                 {
                     text += "\u2514";
                     continue;
-                }
+                }*/
 
                 ///top right
-                if(i == (int)xcount - 1 && j == 0)
+                /*if(i == (int)xcount - 1 && j == 0)
                 {
                     text += "\u2556";
                     continue;
-                }
+                }*/
 
                 ///bottom right
-                if(i == (int)xcount - 1 && j == (int)ycount - 1)
+                /*if(i == (int)xcount - 1 && j == (int)ycount - 1)
                 {
                     text += "\u255D";
                     continue;
-                }
+                }*/
 
                 if(j == 0)
                 {
