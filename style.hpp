@@ -32,19 +32,9 @@ namespace style
                 ///top left
                 if(i == 0 && j == 0)
                 {
-                    //text += "\u2554";
-                    //text += "\u2552";
                     text += "\u250C";
                     continue;
                 }
-
-                ///bottom left
-                /*if(i == 0 && j == (int)ycount - 1)
-                {
-                    //text += "\u255A";
-                    text += "\u2558";
-                    continue;
-                }*/
 
                 if(i == 0 && j == (int)ycount - 1)
                 {
@@ -52,43 +42,20 @@ namespace style
                     continue;
                 }
 
-                if(i == 1 && j == (int)ycount - 1)
-                {
-                    //text += "\u2558";
-                    text += "\u2550";
-                    continue;
-                }
-
                 ///top right
                 if(i == (int)xcount - 1 && j == 0)
                 {
-                    //text += "\u2557";
-                    //text += "\u2555";
                     text += "\u2556";
                     continue;
                 }
 
-                /*if(i == (int)xcount - 1 && j == 0)
-                {
-                    text += "\u2510";
-                    continue;
-                }*/
 
                 ///bottom right
                 if(i == (int)xcount - 1 && j == (int)ycount - 1)
                 {
-                    //text += "\u255D";
-                    //text += "\u255B";
                     text += "\u255D";
                     continue;
                 }
-
-                ///horizontal pipe
-                /*if(j == 0 || j == (int)ycount - 1)
-                {
-                    text += "\u2550";
-                    continue;
-                }*/
 
                 if(j == 0)
                 {
@@ -101,14 +68,6 @@ namespace style
                     text += "\u2550";
                     continue;
                 }
-
-                ///vertical pipe
-                /*if(i == 0 || i == (int)xcount - 1)
-                {
-                    text += "\u2502";
-                    //text += "\u2551";
-                    continue;
-                }*/
 
                 if(i == 0)
                 {
