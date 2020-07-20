@@ -88,16 +88,20 @@ namespace style
             text += "\n";
         }
 
+        //pos.x -= size.x/2;
+        pos.x -= 1;
+        pos.y -= size.y/2;
+
         auto col = IM_COL32(0xCF, 0xCF, 0xCF, 0xFF);
 
-        float character_y_end = (ycount - 1) * size.y + pos.y - size.y/2;
+        float character_y_end = (ycount - 1) * size.y + pos.y;
         float floating_y_end = window_pos.y + dim.y;
 
-        float character_x_end = (xcount - 1) * size.x + pos.x - 1;
-        float floating_x_end = window_pos.x - 1 + dim.x;
+        float character_x_end = (xcount - 1) * size.x + pos.x;
+        float floating_x_end = window_pos.x + dim.x - 1;
 
-        ImGui::GetBackgroundDrawList()->AddText(ImVec2(pos.x - 1, character_y_end), col, "\u2502");
-        ImGui::GetBackgroundDrawList()->AddText(ImVec2(pos.x - 1, floating_y_end - size.y), col, "\u2502");
+        ImGui::GetBackgroundDrawList()->AddText(ImVec2(pos.x, character_y_end), col, "\u2502");
+        ImGui::GetBackgroundDrawList()->AddText(ImVec2(pos.x, floating_y_end - size.y), col, "\u2502");
 
         ImGui::GetBackgroundDrawList()->AddText(ImVec2(character_x_end, floating_y_end), col, "\u2550");
         ImGui::GetBackgroundDrawList()->AddText(ImVec2(floating_x_end - size.x, floating_y_end), col, "\u2550");
@@ -105,8 +109,8 @@ namespace style
         ImGui::GetBackgroundDrawList()->AddText(ImVec2(floating_x_end, character_y_end), col, "\u2551");
         ImGui::GetBackgroundDrawList()->AddText(ImVec2(floating_x_end, floating_y_end - size.y), col, "\u2551");
 
-        ImGui::GetBackgroundDrawList()->AddText(ImVec2(character_x_end, pos.y - size.y/2), col, "\u2500");
-        ImGui::GetBackgroundDrawList()->AddText(ImVec2(floating_x_end - size.x, pos.y - size.y/2), col, "\u2500");
+        ImGui::GetBackgroundDrawList()->AddText(ImVec2(character_x_end, pos.y), col, "\u2500");
+        ImGui::GetBackgroundDrawList()->AddText(ImVec2(floating_x_end - size.x, pos.y), col, "\u2500");
 
         std::string bottom_line = "\u2514";
 
@@ -124,10 +128,6 @@ namespace style
         }
 
         std::string bottom_right = "\u255D";
-
-        //pos.x -= size.x/2;
-        pos.x -= 1;
-        pos.y -= size.y/2;
 
         ImGui::GetBackgroundDrawList()->AddText(pos, IM_COL32(0xCF, 0xCF, 0xCF, 0xFF), text.c_str());
 
