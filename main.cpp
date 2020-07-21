@@ -30,11 +30,14 @@ SET PC, start
 
 ///Need the dummy test data + real data separation
 
-std::string to_hex(uint16_t val)
+static std::string format_hex(uint16_t val, bool is_sign)
 {
     std::stringstream str;
 
-    str << std::hex << val;
+    if(!is_sign)
+        str << std::uppercase << std::hex << val;
+    else
+        str << std::uppercase << std::hex << (int16_t)val;
 
     std::string rval = str.str();
 
@@ -46,9 +49,27 @@ std::string to_hex(uint16_t val)
     return "0x" + rval;
 }
 
-std::string format(int val, bool hex)
+///formatted to same width as format_hex
+static std::string format_dec(uint16_t val, bool is_sign)
 {
-    return hex ? to_hex(val) : std::to_string(val);
+    std::string out;
+
+    if(!is_sign)
+        out = std::to_string(val);
+    else
+        out = std::to_string((int16_t)val);
+
+    for(int i=(int)out.size(); i < 6; i++)
+    {
+        out = out + " ";
+    }
+
+    return out;
+}
+
+static std::string format_hex_or_dec(uint16_t val, bool hex, bool is_sign)
+{
+    return hex ? format_hex(val, is_sign) : format_dec(val, is_sign);
 }
 
 void low_checkbox(const std::string& str, bool& val)
@@ -92,9 +113,9 @@ void format_column(int channel, const std::vector<uint16_t>& values, int offset,
         int32_t val = use_signed ? (int32_t)(int16_t)values[i] : (int32_t)values[i];
 
         if(highlight_set.find(i) == highlight_set.end())
-            formatted += format(val, is_hex) + "\n";
+            formatted += format_hex_or_dec(val, is_hex, use_signed) + "\n";
         else
-            formatted += format(val, is_hex) + " <\n";
+            formatted += format_hex_or_dec(val, is_hex, use_signed) + " <\n";
     }
 
     ImGui::Text(formatted.c_str());
@@ -186,7 +207,11 @@ int main()
         }
         else
         {
+            int level_window_bottom = 20;
+
             ImGui::Begin("Level", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove);
+
+            level_window_bottom = ImGui::GetWindowSize().y + ImGui::GetWindowPos().y;
 
             style::start();
 
@@ -316,7 +341,16 @@ int main()
                 });
             }
 
-            ImGui::Begin("Task", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
+            //ImGui::SetNextWindowPos(ImVec2(level_window_right + ImGui::CalcTextSize(" ").x, level_window_bottom + ImGui::CalcTextSize(" ").y), ImGuiCond_Always);
+
+            ImGui::Begin("Task", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove);
+
+            int my_width = ImGui::GetWindowSize().x;
+
+            if(my_width < 20)
+                my_width = 20;
+
+            ImGui::SetWindowPos(ImVec2(win.get_window_size().x() + ImGui::GetMainViewport()->Pos.x - my_width - 1 - ImGui::CalcTextSize(" ").x * 2, level_window_bottom + ImGui::CalcTextSize(" ").y));
 
             style::start();
 
@@ -452,6 +486,8 @@ int main()
 
                 //current_project.editors[i].render(current_project, i);
             }
+
+            ImGui::SetNextWindowPos(ImVec2(20 + ImGui::GetMainViewport()->Pos.x, ImGui::CalcTextSize("\n").y + ImGui::GetMainViewport()->Pos.y), ImGuiCond_Always);
 
             ImGui::Begin("Reference", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
 
