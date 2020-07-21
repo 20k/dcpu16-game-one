@@ -435,6 +435,8 @@ int main()
 
                 ImGui::PopStyleVar(3);
 
+                style::separator();
+
                 TextEditor::Palette pal = current_project.editors[i].edit->GetPalette();
                 pal[(int)TextEditor::PaletteIndex::Background] = IM_COL32(0,0,0,0);
                 current_project.editors[i].edit->SetPalette(pal);

@@ -2,6 +2,7 @@
 #define STYLE_HPP_INCLUDED
 
 #include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
 
 namespace style
 {
@@ -148,6 +149,27 @@ namespace style
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0);
+    }
+
+    inline
+    void separator()
+    {
+        auto window_dim = ImGui::GetWindowSize();
+
+        int char_num = (window_dim.x - ImGui::GetStyle().FramePadding.x*2) / ImGui::CalcTextSize(" ").x;
+
+        char_num -= 1;
+
+        if(char_num <= 0)
+            char_num = 0;
+
+        std::string spacer(char_num, '-');
+
+        auto cursor_pos = ImGui::GetCursorScreenPos();
+
+        ImGui::GetCurrentWindow()->DrawList->AddText(ImVec2(cursor_pos.x, cursor_pos.y - ImGui::CalcTextSize(" ").y/2), IM_COL32(0xCF, 0xCF, 0xCF, 0xFF), spacer.c_str());
+
+        ImGui::NewLine();
     }
 
     inline
