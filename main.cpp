@@ -99,13 +99,6 @@ void format_column(int channel, const std::vector<uint16_t>& values, int offset,
         error_set.insert(i);
     }*/
 
-    //std::string formatted;
-
-    /*for(auto v : values)
-    {
-        formatted += std::to_string(v) + "\n";
-    }*/
-
     if(offset < 0)
         offset = 0;
 
@@ -133,8 +126,6 @@ void format_column(int channel, const std::vector<uint16_t>& values, int offset,
         else
             ImGui::TextUnformatted((base_str + " <").c_str());
     }
-
-    //ImGui::Text(formatted.c_str());
 
     ImGui::EndGroup();
 }
