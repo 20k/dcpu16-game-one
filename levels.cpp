@@ -268,29 +268,23 @@ namespace level
 
     void simple_page_mapping(level_context& ctx)
     {
-        int page_length = 16;
-
-        /*for(auto& [channel, vec] : ctx.channel_to_input)
-        {
-            for(int i=0; i < (int)vec.size(); i++)
-            {
-                //int page = i / page_length;
-
-                //ctx.channel_to_line_to_page[channel].push_back(page);
-
-                ctx.output_to_input_start[channel].push_back(i);
-            }
-        }*/
-
         for(auto& [channel, vec] : ctx.channel_to_output)
         {
             for(auto& [chan2, _] : ctx.channel_to_input)
             {
                 for(int i=0; i < (int)vec.size(); i++)
                 {
-                //int page = i / page_length;
+                    ctx.output_to_input_start[channel][chan2].push_back(i);
+                }
+            }
 
-                //ctx.channel_to_line_to_page[channel].push_back(page);
+            for(auto& [chan2, _] : ctx.channel_to_output)
+            {
+                if(chan2 == channel)
+                    continue;
+
+                for(int i=0; i < (int)vec.size(); i++)
+                {
                     ctx.output_to_input_start[channel][chan2].push_back(i);
                 }
             }

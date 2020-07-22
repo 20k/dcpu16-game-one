@@ -371,27 +371,6 @@ int main()
                     run_is_finished = false;
             }
 
-            /*int render_page = 0;
-
-            if(!run_is_finished)
-            {
-                int min_page = INT_MAX;
-
-                for(auto& [channel, vals] : ctx.ctx.channel_to_output)
-                {
-                    int current_entry = ctx.ctx.inf.output_translation[channel][ctx.ctx.inf.input_cpus[channel].regs[PC_REG]] - 1;
-
-                    int which_page = current_entry < (int)ctx.ctx.channel_to_line_to_page[channel].size() ? ctx.ctx.channel_to_line_to_page[channel][current_entry] : ctx.ctx.channel_to_line_to_page[channel].back();
-
-                    min_page = std::min(min_page, which_page);
-                }
-            }*/
-
-            int start_error_line = ctx.ctx.error_locs.size() > 0 ? (ctx.ctx.error_locs.front() - 8) : 0;
-
-            if(!ctx.ctx.finished)
-                start_error_line = 0;
-
             if(ctx.ctx.channel_to_input.size() > 0)
             {
                 ImGui::BeginGroup();
@@ -400,18 +379,14 @@ int main()
 
                 for(auto& [channel, vals] : ctx.ctx.channel_to_input)
                 {
-                    int my_line = start_error_line;
-
                     ///the -1 requires some explaining
                     ///basically, the blocking multiprocessor instructions
                     ///block on the *next* instruction, not the current one
                     ///which makes sense logically, but results in bad debuggability
                     ///this is a hack
-                    if(!ctx.ctx.finished)
-                        my_line = ctx.ctx.inf.input_translation[channel][ctx.ctx.inf.input_cpus[channel].regs[PC_REG]] - 1;
+                    int my_line = ctx.ctx.inf.input_translation[channel][ctx.ctx.inf.input_cpus[channel].regs[PC_REG]] - 1;
 
-                    if(my_line < 0)
-                        my_line = 0;
+                    my_line = std::max(my_line, 0);
 
                     int offset = my_line - 8;
 
