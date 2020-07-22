@@ -80,20 +80,26 @@ void low_checkbox(const std::string& str, bool& val)
         val = !val;
 }
 
-void format_column(int channel, const std::vector<uint16_t>& values, int offset, int count, const std::vector<int>& highlight, bool is_hex, bool use_signed)
+void format_column(int channel, const std::vector<uint16_t>& values, int offset, int count, const std::vector<int>& highlight, const std::vector<int>& errors, bool is_hex, bool use_signed)
 {
     ImGui::BeginGroup();
 
     ImGui::Text("Ch: %i\n", channel);
 
     std::set<int> highlight_set;
+    //std::set<int> error_set;
 
     for(auto i : highlight)
     {
         highlight_set.insert(i);
     }
 
-    std::string formatted;
+    /*for(auto i : errors)
+    {
+        error_set.insert(i);
+    }*/
+
+    //std::string formatted;
 
     /*for(auto v : values)
     {
@@ -105,20 +111,30 @@ void format_column(int channel, const std::vector<uint16_t>& values, int offset,
 
     for(int i=offset; i < (int)values.size() && i < (offset + count); i++)
     {
-        /*if(i != highlight)
-            ImGui::Text("%i", values[i]);
-        else
-            ImGui::TextColored(ImVec4(255, 0, 0, 255), "%i", values[i]);*/
-
         int32_t val = use_signed ? (int32_t)(int16_t)values[i] : (int32_t)values[i];
 
+        std::string base_str = format_hex_or_dec(val, is_hex, use_signed);
+
+        /*bool is_err = error_set.find(i) != error_set.end();
+
+        if(is_err)
+        {
+            auto pos = ImGui::GetCursorScreenPos();
+
+            pos.x += ImGui::CalcTextSize((base_str + " ").c_str()).x;
+
+            auto dim = ImGui::CalcTextSize("<");
+
+            ImGui::GetCurrentWindow()->DrawList->AddRectFilled(ImVec2(pos.x, pos.y), ImVec2(pos.x + dim.x, pos.y + dim.y), IM_COL32(255, 128, 128, 255));
+        }*/
+
         if(highlight_set.find(i) == highlight_set.end())
-            formatted += format_hex_or_dec(val, is_hex, use_signed) + "\n";
+            ImGui::TextUnformatted(base_str.c_str());
         else
-            formatted += format_hex_or_dec(val, is_hex, use_signed) + " <\n";
+            ImGui::TextUnformatted((base_str + " <").c_str());
     }
 
-    ImGui::Text(formatted.c_str());
+    //ImGui::Text(formatted.c_str());
 
     ImGui::EndGroup();
 }
@@ -407,7 +423,7 @@ int main()
                         }
                     }
 
-                    format_column(channel, vals, page_round(offset), 32, to_highlight, is_hex, use_signed);
+                    format_column(channel, vals, page_round(offset), 32, to_highlight, {}, is_hex, use_signed);
 
                     ImGui::SameLine(0, ImGui::CalcTextSize(" ").x);
                 }
@@ -452,7 +468,7 @@ int main()
                     }
                 }
 
-                format_column(channel, vals, page_round(offset), 32, to_highlight, is_hex, use_signed);
+                format_column(channel, vals, page_round(offset), 32, to_highlight, {}, is_hex, use_signed);
 
                 ImGui::SameLine(0, ImGui::CalcTextSize(" ").x);
             }
@@ -496,7 +512,7 @@ int main()
                         offset = my_line - 8;
                     }
 
-                    format_column(channel, it->second, page_round(offset), 32, ctx.ctx.error_locs, is_hex, use_signed);
+                    format_column(channel, it->second, page_round(offset), 32, ctx.ctx.error_locs, ctx.ctx.error_locs, is_hex, use_signed);
 
                     ImGui::SameLine(0, ImGui::CalcTextSize(" ").x);
                 }
