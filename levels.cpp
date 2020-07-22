@@ -266,6 +266,37 @@ namespace level
         return {"INTRO", "AMPLIFY", "DIVISIONS", "SPACESHIP_OPERATOR", "CHECKSUM", "POWR", "HWENUMERATE"};
     }*/
 
+    void simple_page_mapping(level_context& ctx)
+    {
+        int page_length = 16;
+
+        /*for(auto& [channel, vec] : ctx.channel_to_input)
+        {
+            for(int i=0; i < (int)vec.size(); i++)
+            {
+                //int page = i / page_length;
+
+                //ctx.channel_to_line_to_page[channel].push_back(page);
+
+                ctx.output_to_input_start[channel].push_back(i);
+            }
+        }*/
+
+        for(auto& [channel, vec] : ctx.channel_to_output)
+        {
+            for(auto& [chan2, _] : ctx.channel_to_input)
+            {
+                for(int i=0; i < (int)vec.size(); i++)
+                {
+                //int page = i / page_length;
+
+                //ctx.channel_to_line_to_page[channel].push_back(page);
+                    ctx.output_to_input_start[channel][chan2].push_back(i);
+                }
+            }
+        }
+    }
+
     level_context start(const std::string& level_name, int answer_rough_count)
     {
         level_context ctx;
@@ -299,6 +330,8 @@ namespace level
 
             ctx.channel_to_input[0] = input;
             ctx.channel_to_output[1] = output;
+
+            simple_page_mapping(ctx);
         }
 
         if(ctx.level_name == "AMPLIFY")
@@ -321,6 +354,8 @@ namespace level
 
             ctx.channel_to_input[0] = input;
             ctx.channel_to_output[1] = output;
+
+            simple_page_mapping(ctx);
         }
 
         ///can't figure out any way this puzzle can be different
@@ -377,6 +412,8 @@ namespace level
             ctx.channel_to_input[0] = input1;
             ctx.channel_to_output[1] = output1;
             ctx.channel_to_output[2] = output2;
+
+            simple_page_mapping(ctx);
         }
 
         ///next up, conditionals
@@ -411,6 +448,8 @@ namespace level
 
             ctx.channel_to_input[0] = input1;
             ctx.channel_to_output[1] = output1;
+
+            simple_page_mapping(ctx);
         }
 
         /*if(ctx.level_name == "SORT")
@@ -448,11 +487,23 @@ namespace level
             std::vector<uint16_t> input2{2};
             std::vector<uint16_t> output1{2};
 
+            //ctx.output_to_input_start[0].push_back(0);
+            //ctx.output_to_input_start[0].push_back(0);
+
+            //ctx.output_to_input_start[1].push_back(0);
+            ctx.output_to_input_start[2][0].push_back(0);
+            ctx.output_to_input_start[2][1].push_back(0);
+
+            int current_page = 1;
+
             for(int i=0; i < answer_rough_count; i++)
             {
-                uint16_t in2 = lcg(seed) % 64;
+                uint16_t in2 = lcg(seed) % 15;
 
                 uint16_t accum = 0;
+
+                int start1 = input1.size();
+                int start2 = input2.size();
 
                 for(int kk=0; kk < in2; kk++)
                 {
@@ -460,12 +511,21 @@ namespace level
 
                     input1.push_back(val);
 
+                    //ctx.channel_to_line_to_page[0].push_back(current_page);
+
                     accum += val;
                 }
 
                 input2.push_back(in2);
-
                 output1.push_back(accum);
+
+                //ctx.channel_to_line_to_page[1].push_back(current_page);
+                //ctx.channel_to_line_to_page[2].push_back(current_page);
+
+                ctx.output_to_input_start[2][0].push_back(start1);
+                ctx.output_to_input_start[2][1].push_back(start2);
+
+                current_page++;
 
                 if((int)input1.size() > answer_rough_count)
                     break;
@@ -513,6 +573,8 @@ namespace level
             ctx.channel_to_input[0] = input1;
             ctx.channel_to_input[1] = input2;
             ctx.channel_to_output[2] = output;
+
+            simple_page_mapping(ctx);
         }
 
         if(ctx.level_name == "HWENUMERATE")
@@ -548,6 +610,8 @@ namespace level
             };
 
             ctx.channel_to_output[0] = output;
+
+            simple_page_mapping(ctx);
         }
 
         return ctx;
@@ -566,6 +630,7 @@ namespace level
         ctx.finished = false;
         ctx.found_output.clear();
         ctx.error_locs.clear();
+        ctx.error_channels.clear();
 
         ctx.inf.fab = dcpu::sim::fabric();
 
@@ -605,6 +670,7 @@ namespace level
     {
         ctx.found_output.clear();
         ctx.error_locs.clear();
+        ctx.error_channels.clear();
 
         std::vector<dcpu::sim::CPU*> user;
 
@@ -662,7 +728,10 @@ namespace level
             for(int i=0; i < (int)found.size() && i < (int)output_val.size(); i++)
             {
                 if(found[i] != output_val[i])
+                {
                     ctx.error_locs.push_back(i);
+                    ctx.error_channels.push_back(channel);
+                }
             }
 
             ctx.found_output[channel] = found;
@@ -690,6 +759,7 @@ namespace level
     {
         ctx.found_output.clear();
         ctx.error_locs.clear();
+        ctx.error_channels.clear();
 
         std::string name = ctx.level_name;
 

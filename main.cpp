@@ -136,6 +136,11 @@ void main_menu(level_selector_state& select, run_context& ctx, dcpu::ide::projec
     ImGui::GetForegroundDrawList()->AddText(pos, 0xFFFFFFFF, "----");
 }*/
 
+int page_round(int in)
+{
+    return (in/16) * 16;
+}
+
 int main()
 {
     render_settings sett;
@@ -358,6 +363,30 @@ int main()
             //ImGui::SameLine();
             low_checkbox("Signed", use_signed);
 
+            bool run_is_finished = true;
+
+            for(auto& [channel, vals] : ctx.ctx.channel_to_output)
+            {
+                if(ctx.ctx.inf.output_cpus[channel].regs[PC_REG] < (int)ctx.ctx.inf.output_translation[channel].size())
+                    run_is_finished = false;
+            }
+
+            /*int render_page = 0;
+
+            if(!run_is_finished)
+            {
+                int min_page = INT_MAX;
+
+                for(auto& [channel, vals] : ctx.ctx.channel_to_output)
+                {
+                    int current_entry = ctx.ctx.inf.output_translation[channel][ctx.ctx.inf.input_cpus[channel].regs[PC_REG]] - 1;
+
+                    int which_page = current_entry < (int)ctx.ctx.channel_to_line_to_page[channel].size() ? ctx.ctx.channel_to_line_to_page[channel][current_entry] : ctx.ctx.channel_to_line_to_page[channel].back();
+
+                    min_page = std::min(min_page, which_page);
+                }
+            }*/
+
             int start_error_line = ctx.ctx.error_locs.size() > 0 ? (ctx.ctx.error_locs.front() - 8) : 0;
 
             if(!ctx.ctx.finished)
@@ -384,12 +413,29 @@ int main()
                     if(my_line < 0)
                         my_line = 0;
 
+                    int offset = my_line - 8;
+
                     std::vector<int> to_highlight;
 
                     if(!ctx.ctx.finished)
                         to_highlight.push_back(my_line);
 
-                    format_column(channel, vals, start_error_line, 16, to_highlight, is_hex, use_signed);
+                    if(run_is_finished && ctx.ctx.error_locs.size() > 0)
+                    {
+                        int which_error_line = ctx.ctx.error_locs.front();
+                        int which_channel = ctx.ctx.error_channels.front();
+
+                        if(which_error_line >= 0 && which_error_line < (int)ctx.ctx.output_to_input_start[which_channel][channel].size())
+                        {
+                            int translated_line = ctx.ctx.output_to_input_start[which_channel][channel][which_error_line];
+
+                            to_highlight.push_back(translated_line);
+
+                            offset = translated_line - 8;
+                        }
+                    }
+
+                    format_column(channel, vals, page_round(offset), 32, to_highlight, is_hex, use_signed);
 
                     ImGui::SameLine(0, ImGui::CalcTextSize(" ").x);
                 }
@@ -409,7 +455,35 @@ int main()
 
             for(auto& [channel, vals] : ctx.ctx.channel_to_output)
             {
-                format_column(channel, vals, start_error_line, 16, {}, is_hex, use_signed);
+                int my_line = ctx.ctx.inf.output_translation[channel][ctx.ctx.inf.output_cpus[channel].regs[PC_REG]] - 1;
+
+                if(my_line < 0)
+                    my_line = 0;
+
+                std::vector<int> to_highlight;
+
+                if(!ctx.ctx.finished)
+                    to_highlight.push_back(my_line);
+
+                int offset = my_line - 8;
+
+                if(run_is_finished && ctx.ctx.error_locs.size() > 0)
+                {
+                    int which_error_line = ctx.ctx.error_locs.front();
+                    int which_channel = ctx.ctx.error_channels.front();
+
+                    if(which_channel == channel)
+                    {
+                        offset = which_error_line - 8;
+                    }
+
+                    else if(which_error_line >= 0 && which_error_line < (int)ctx.ctx.output_to_input_start[which_channel][channel].size())
+                    {
+                        offset = ctx.ctx.output_to_input_start[which_channel][channel][which_error_line] - 8;
+                    }
+                }
+
+                format_column(channel, vals, page_round(offset), 32, to_highlight, is_hex, use_signed);
 
                 ImGui::SameLine(0, ImGui::CalcTextSize(" ").x);
             }
@@ -430,7 +504,30 @@ int main()
             {
                 if(auto it = ctx.ctx.found_output.find(channel); it != ctx.ctx.found_output.end())
                 {
-                    format_column(channel, it->second, start_error_line, 16, ctx.ctx.error_locs, is_hex, use_signed);
+                    int my_line = ctx.ctx.inf.output_translation[channel][ctx.ctx.inf.output_cpus[channel].regs[PC_REG]] - 1;
+
+                    if(my_line < 0)
+                        my_line = 0;
+
+                    int offset = 0;
+
+                    if(run_is_finished)
+                    {
+                        if(ctx.ctx.error_locs.size() > 0)
+                        {
+                            offset = ctx.ctx.error_locs.front() - 8;
+                        }
+                        else
+                        {
+                            offset = my_line - 8;
+                        }
+                    }
+                    else
+                    {
+                        offset = my_line - 8;
+                    }
+
+                    format_column(channel, it->second, page_round(offset), 32, ctx.ctx.error_locs, is_hex, use_signed);
 
                     ImGui::SameLine(0, ImGui::CalcTextSize(" ").x);
                 }

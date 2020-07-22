@@ -40,9 +40,11 @@ struct level_context
 
     std::map<int, std::vector<uint16_t>> channel_to_input;
     std::map<int, std::vector<uint16_t>> channel_to_output;
+    std::map<int, std::map<int, std::vector<int>>> output_to_input_start;
 
     std::map<int, std::vector<uint16_t>> found_output;
     std::vector<int> error_locs;
+    std::vector<int> error_channels;
     bool has_assembly_error = false;
 
     validation_info inf;
