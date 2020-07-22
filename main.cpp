@@ -390,10 +390,7 @@ int main()
 
                     int offset = my_line - 8;
 
-                    std::vector<int> to_highlight;
-
-                    if(!ctx.ctx.finished)
-                        to_highlight.push_back(my_line);
+                    std::vector<int> to_highlight{my_line};
 
                     if(run_is_finished && ctx.ctx.error_locs.size() > 0)
                     {
@@ -435,10 +432,7 @@ int main()
                 if(my_line < 0)
                     my_line = 0;
 
-                std::vector<int> to_highlight;
-
-                if(!ctx.ctx.finished)
-                    to_highlight.push_back(my_line);
+                std::vector<int> to_highlight{my_line};
 
                 int offset = my_line - 8;
 
