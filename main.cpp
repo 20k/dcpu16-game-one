@@ -367,7 +367,7 @@ int main()
             {
                 ImGui::BeginGroup();
 
-                ImGui::Text("In");
+                ImGui::Text("In      ");
 
                 for(auto& [channel, vals] : ctx.ctx.channel_to_input)
                 {
@@ -405,7 +405,7 @@ int main()
 
             ImGui::BeginGroup();
 
-            ImGui::Text("Out");
+            ImGui::Text("Out     ");
 
             for(auto& [channel, vals] : ctx.ctx.channel_to_output)
             {
@@ -424,7 +424,7 @@ int main()
 
             ImGui::BeginGroup();
 
-            ImGui::Text("User");
+            ImGui::Text("User    ");
 
             for(auto& [channel, vals] : ctx.ctx.channel_to_output)
             {
