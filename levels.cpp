@@ -492,7 +492,7 @@ namespace level
 
             for(int i=0; i < answer_rough_count; i++)
             {
-                uint16_t in2 = lcg(seed) % 15;
+                uint16_t in2 = lcg(seed) % 64;
 
                 uint16_t accum = 0;
 

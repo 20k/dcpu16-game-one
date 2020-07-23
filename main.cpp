@@ -397,7 +397,7 @@ int main()
 
                     int offset = my_line - 8;
 
-                    std::vector<int> to_highlight{my_line};
+                    std::vector<int> to_highlight;
 
                     if(run_is_finished && ctx.ctx.error_locs.size() > 0)
                     {
@@ -413,6 +413,9 @@ int main()
                             offset = translated_line - 8;
                         }
                     }
+
+                    if(to_highlight.size() == 0)
+                        to_highlight = {my_line};
 
                     format_column(channel, vals, page_round(offset), 32, to_highlight, {}, is_hex, use_signed);
 
@@ -439,7 +442,7 @@ int main()
                 if(my_line < 0)
                     my_line = 0;
 
-                std::vector<int> to_highlight{my_line};
+                std::vector<int> to_highlight;
 
                 int offset = my_line - 8;
 
@@ -458,6 +461,9 @@ int main()
                         offset = ctx.ctx.output_to_input_start[which_channel][channel][which_error_line] - 8;
                     }
                 }
+
+                if(to_highlight.size() == 0)
+                    to_highlight = {my_line};
 
                 format_column(channel, vals, page_round(offset), 32, to_highlight, {}, is_hex, use_signed);
 
