@@ -621,6 +621,7 @@ namespace level
 
             dcpu::sim::hardware* LEM = new dcpu::sim::LEM1802;
             ctx.inf.hardware.push_back(LEM);
+            ctx.real_world_context.memory.push_back({});
 
             ctx.extra_validation = [](level_context& ctx, dcpu::ide::project_instance& instance)
             {
