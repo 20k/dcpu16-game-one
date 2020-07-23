@@ -762,6 +762,32 @@ namespace level
             dcpu::sim::resolve_interprocessor_communication(cpus, ctx.inf.fab);
         }
 
+        {
+            assert(user.size() >= 1);
+
+            int screen_idx = 0;
+
+            for(int i=0; i < (int)ctx.inf.hardware.size(); i++)
+            {
+                dcpu::sim::hardware* hw = ctx.inf.hardware[i];
+
+                bool is_lem = hw->hardware_id == 0x7349f615;
+
+                if(!is_lem)
+                    continue;
+
+                auto& rendering = ctx.real_world_context.memory.at(screen_idx);
+
+                dcpu::sim::LEM1802* as_lem = dynamic_cast<dcpu::sim::LEM1802*>(hw);
+
+                assert(as_lem);
+
+                as_lem->render(&ctx.real_world_context, *user.front(), rendering);
+
+                screen_idx++;
+            }
+        }
+
         for(auto& [channel, sim] : ctx.inf.output_cpus)
         {
             const std::vector<uint16_t>& output_val = ctx.channel_to_output[channel];
