@@ -577,6 +577,45 @@ int main()
             style::finish();
 
             ImGui::End();
+
+            {
+                int screen_idx = 0;
+
+                for(auto& buffer : ctx.ctx.real_world_context.memory)
+                {
+                    ImGui::SetNextWindowSize(ImVec2(128, 96), ImGuiCond_Always);
+
+                    ImGui::Begin((std::string("LEM##") + std::to_string(screen_idx)).c_str(), nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);
+                    style::start();
+
+                    auto cursor_pos = ImGui::GetCursorScreenPos();
+
+                    for(int y=0; y < 96; y++)
+                    {
+                        for(int x=0; x < 128; x++)
+                        {
+                            int linear = y * 128 + x;
+
+                            uint32_t col = buffer.at(linear);
+
+                            auto tl = ImVec2(cursor_pos.x + x, cursor_pos.y + y);
+                            auto br = ImVec2(cursor_pos.x + x + 1, cursor_pos.y + y + 1);
+
+                            uint8_t r = col >> 24;
+                            uint8_t g = col >> 16;
+                            uint8_t b = col >> 8;
+
+                            ImGui::GetCurrentWindow()->DrawList->AddRectFilled(tl, br, IM_COL32(r, g, b, 255));
+                        }
+                    }
+
+                    style::finish();
+                    ImGui::End();
+
+                    screen_idx++;
+
+                }
+            }
         }
 
         sf::sleep(sf::milliseconds(1));
