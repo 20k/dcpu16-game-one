@@ -10,7 +10,7 @@
 #include <dcpu16-sim/all_hardware.hpp>
 #include "constant_time_exec.hpp"
 
-struct world_context : dcpu::sim::time_state, dcpu::sim::world_base
+struct world_context : dcpu::sim::time_state, dcpu::sim::lem1802_screens_state, dcpu::sim::world_base
 {
 
 };
@@ -50,7 +50,7 @@ struct level_context
     validation_info inf;
     world_context real_world_context;
 
-    bool(*extra_validation)(level_context&) = nullptr;
+    bool(*extra_validation)(level_context&, dcpu::ide::project_instance& instance) = nullptr;
 };
 
 struct run_context

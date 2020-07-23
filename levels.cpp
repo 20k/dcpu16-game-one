@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cmath>
 #include <dcpu16-sim/hardware_clock.hpp>
+#include <dcpu16-sim/hardware_lem1802.hpp>
 #include <chrono>
 #include <filesystem>
 #include <toolkit/fs_helpers.hpp>
@@ -130,7 +131,7 @@ void level::display_level_select(level_selector_state& select, run_context& ctx,
 {
     std::vector<std::string> intro_levels = {"INTRO", "AMPLIFY", "DIVISIONS", "SPACESHIP_OPERATOR", "CHECKSUM"};
     std::vector<std::string> software_levels = {"POWR"};
-    std::vector<std::string> hardware_levels = {"HWENUMERATE"};
+    std::vector<std::string> hardware_levels = {"HWENUMERATE", "CONSOLE"};
 
     std::vector<std::pair<std::string, std::vector<std::string>>> all_levels =
     {
@@ -587,7 +588,7 @@ namespace level
             ctx.inf.hardware.push_back(dummy);
             ctx.inf.hardware.push_back(new dcpu::sim::clock);
 
-            ctx.extra_validation = [](level_context& ctx)
+            ctx.extra_validation = [](level_context& ctx, dcpu::ide::project_instance& instance)
             {
                 assert(ctx.inf.hardware.size() == 2);
 
@@ -604,6 +605,55 @@ namespace level
             };
 
             ctx.channel_to_output[0] = output;
+
+            simple_page_mapping(ctx);
+        }
+
+        if(ctx.level_name == "CONSOLE")
+        {
+            ctx.description = "Search for the LEM1802 display with hardware id 0x7349f615\n"
+                              "Initialise the console by sending an interrupt with HWI, with [A=0, B=0x8000]\n"
+                              "Write the exact string \"Hello World!\", in ascii, in any colour other than black\n"
+                              "Consult (TODO: SPEC) for more details";
+            ctx.short_description = "INITIALISE THE CONSOLE AND DISPLAY HELLO WORLD";
+
+            ctx.cpus = 1;
+
+            dcpu::sim::hardware* LEM = new dcpu::sim::LEM1802;
+            ctx.inf.hardware.push_back(LEM);
+
+            ctx.extra_validation = [](level_context& ctx, dcpu::ide::project_instance& instance)
+            {
+                if(instance.editors.size() == 0)
+                    return true;
+
+                dcpu::sim::hardware* my_screen = ctx.inf.hardware[0];
+
+                dcpu::sim::LEM1802* as_lem = dynamic_cast<dcpu::sim::LEM1802*>(my_screen);
+
+                assert(as_lem);
+
+                if(as_lem->vram_map == 0)
+                    return true;
+
+                bool correctly_set = true;
+
+                std::string target = "Hello World!";
+
+                uint16_t len = target.size();
+
+                for(uint16_t idx = 0; idx < len; idx++)
+                {
+                    uint16_t addr = idx + as_lem->vram_map;
+
+                    uint8_t c = instance.editors[0].c.mem[addr] & 0b1111111;
+
+                    if(c != target[idx])
+                        correctly_set = false;
+                }
+
+                return !correctly_set;
+            };
 
             simple_page_mapping(ctx);
         }
@@ -736,7 +786,7 @@ namespace level
         if(ctx.extra_validation != nullptr)
         {
             ///todo: DEBUGGING
-            if(ctx.extra_validation(ctx))
+            if(ctx.extra_validation(ctx, instance))
             {
                 hardware_errors = true;
             }
