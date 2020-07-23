@@ -414,7 +414,7 @@ int main()
                         }
                     }
 
-                    if(to_highlight.size() == 0)
+                    if(!run_is_finished)
                         to_highlight = {my_line};
 
                     format_column(channel, vals, page_round(offset), 32, to_highlight, {}, is_hex, use_signed);
@@ -462,7 +462,7 @@ int main()
                     }
                 }
 
-                if(to_highlight.size() == 0)
+                if(!run_is_finished)
                     to_highlight = {my_line};
 
                 format_column(channel, vals, page_round(offset), 32, to_highlight, {}, is_hex, use_signed);
