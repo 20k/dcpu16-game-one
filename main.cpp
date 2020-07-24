@@ -2,7 +2,7 @@
 #include <toolkit/render_window.hpp>
 #include <vec/vec.hpp>
 #include <dcpu16-sim/base_sim.hpp>
-#include <dcpu16-asm/base_asm.hpp>
+#include <dcpu16-asm/base_asm_fwd.hpp>
 #include <dcpu16-ide/base_ide.hpp>
 #include <SFML/System.hpp>
 #include <toolkit/fs_helpers.hpp>

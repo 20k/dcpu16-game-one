@@ -1,5 +1,5 @@
 #include "levels.hpp"
-#include <dcpu16-asm/base_asm.hpp>
+#include <dcpu16-asm/base_asm_fwd.hpp>
 #include <iostream>
 #include <cmath>
 #include <dcpu16-sim/hardware_clock.hpp>

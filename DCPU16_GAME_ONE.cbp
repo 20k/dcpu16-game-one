@@ -79,6 +79,7 @@
 		<Unit filename="constant_time_exec.hpp" />
 		<Unit filename="deps/dcpu16-asm/base_asm.cpp" />
 		<Unit filename="deps/dcpu16-asm/base_asm.hpp" />
+		<Unit filename="deps/dcpu16-asm/base_asm_fwd.hpp" />
 		<Unit filename="deps/dcpu16-asm/shared.hpp" />
 		<Unit filename="deps/dcpu16-asm/stack_vector.hpp" />
 		<Unit filename="deps/dcpu16-asm/util.hpp" />
