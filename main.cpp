@@ -581,9 +581,11 @@ int main()
             {
                 int screen_idx = 0;
 
+                int mult = 2;
+
                 for(auto& buffer : ctx.ctx.real_world_context.memory)
                 {
-                    ImGui::SetNextWindowSize(ImVec2(128, 96), ImGuiCond_Always);
+                    ImGui::SetNextWindowSize(ImVec2(128 * mult, 96 * mult), ImGuiCond_Always);
 
                     ImGui::Begin((std::string("LEM##") + std::to_string(screen_idx)).c_str(), nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);
                     style::start();
@@ -598,8 +600,8 @@ int main()
 
                             uint32_t col = buffer.at(linear);
 
-                            auto tl = ImVec2(cursor_pos.x + x, cursor_pos.y + y);
-                            auto br = ImVec2(cursor_pos.x + x + 1, cursor_pos.y + y + 1);
+                            auto tl = ImVec2(cursor_pos.x + x * mult, cursor_pos.y + y * mult);
+                            auto br = ImVec2(cursor_pos.x + x * mult + mult, cursor_pos.y + y * mult + mult);
 
                             uint8_t r = col >> 24;
                             uint8_t g = col >> 16;
