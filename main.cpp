@@ -15,6 +15,7 @@
 #include <imgui/misc/freetype/imgui_freetype.h>
 #include "style.hpp"
 #include <imguicolortextedit/texteditor.h>
+//#include <dcpu16-asm/base_asm.hpp>
 
 /*:start
 
@@ -150,6 +151,18 @@ int page_round(int in)
 
 int main()
 {
+    //symbol_table sym;
+
+    /*std::optional<expression_result> res = parse_expression(sym, "A + 2 + 3 * 4");
+
+    assert(res.has_value());
+
+    assert(res->which_register.has_value());
+    assert(res->op.has_value());
+    assert(res->word.has_value());
+
+    std::cout << res->which_register.value() << " " << res->op.value() << " " << res->word.value() << std::endl;*/
+
     render_settings sett;
     sett.width = 1200;
     sett.height = 800;
