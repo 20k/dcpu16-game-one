@@ -614,7 +614,7 @@ namespace level
             ctx.description = "Search for the LEM1802 display with hardware id 0x7349f615\n"
                               "Initialise the console by sending an interrupt with HWI, with [A=0, B=0x8000]\n"
                               "Write the exact string \"Hello World!\", in ascii, in any colour other than black\n"
-                              "Consult (TODO: SPEC) for more details";
+                              "Consult https://github.com/20k/dcpu16-specs/blob/master/lem1802.md for more details";
             ctx.short_description = "INITIALISE THE CONSOLE AND DISPLAY HELLO WORLD";
 
             ctx.cpus = 1;
