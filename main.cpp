@@ -598,7 +598,7 @@ int main()
 
                 for(auto& buffer : ctx.ctx.real_world_context.memory)
                 {
-                    ImGui::SetNextWindowSize(ImVec2(128 * mult, 96 * mult), ImGuiCond_Always);
+                    ImGui::SetNextWindowSize(ImVec2(128 * mult + ImGui::CalcTextSize(" ").x*2, 96 * mult + ImGui::CalcTextSize(" ").y*2), ImGuiCond_Always);
 
                     ImGui::Begin((std::string("LEM##") + std::to_string(screen_idx)).c_str(), nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);
                     style::start();
@@ -636,6 +636,11 @@ int main()
         sf::sleep(sf::milliseconds(1));
 
         win.display();
+    }
+
+    if(current_project.editors.size() > 0)
+    {
+        current_project.save();
     }
 
     return 0;
