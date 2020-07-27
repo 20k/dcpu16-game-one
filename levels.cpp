@@ -131,7 +131,7 @@ void level::display_level_select(level_selector_state& select, run_context& ctx,
 {
     std::vector<std::string> intro_levels = {"INTRO", "AMPLIFY", "DIVISIONS", "SPACESHIP_OPERATOR", "CHECKSUM"};
     std::vector<std::string> software_levels = {"POWR"};
-    std::vector<std::string> hardware_levels = {"HWENUMERATE", "CONSOLE"};
+    std::vector<std::string> hardware_levels = {"HWENUMERATE", "CONSOLE", "SANDBOX"};
 
     std::vector<std::pair<std::string, std::vector<std::string>>> all_levels =
     {
@@ -655,6 +655,23 @@ namespace level
 
                 return !correctly_set;
             };
+
+            simple_page_mapping(ctx);
+        }
+
+        if(ctx.level_name == "SANDBOX")
+        {
+            ctx.description = "You've got a clock and a LEM1802 to play about with";
+            ctx.short_description = "CLOCK AND LEM SANDBOX";
+
+            ctx.cpus = 1;
+
+            dcpu::sim::hardware* LEM = new dcpu::sim::LEM1802;
+            ctx.inf.hardware.push_back(LEM);
+            dcpu::sim::hardware* clock = new dcpu::sim::clock;
+            ctx.inf.hardware.push_back(clock);
+
+            ctx.real_world_context.memory.push_back({});
 
             simple_page_mapping(ctx);
         }
