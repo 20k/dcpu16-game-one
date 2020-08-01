@@ -294,6 +294,7 @@ int main()
                 bool any_wants_run = false;
                 bool any_wants_pause = false;
                 bool any_wants_reset = false;
+                bool any_halted = false;
 
                 for(dcpu::ide::editor& edit : current_project.editors)
                 {
@@ -312,6 +313,9 @@ int main()
                     if(edit.wants_reset)
                         any_wants_reset = true;
 
+                    if(edit.halted)
+                        any_halted = true;
+
                     edit.is_running = (ctx.exec.max_cycles == (uint64_t)-1);
 
                     edit.wants_run = false;
@@ -319,6 +323,20 @@ int main()
                     edit.wants_step = false;
                     edit.wants_pause = false;
                     edit.wants_reset = false;
+                }
+
+                for(dcpu::ide::editor& edit : current_project.editors)
+                {
+                    if(any_wants_run || any_wants_assemble || any_wants_step || any_wants_reset)
+                    {
+                        edit.halted = false;
+                        any_halted = false;
+                    }
+
+                    if(any_halted)
+                    {
+                        edit.is_running = false;
+                    }
                 }
 
                 if(any_wants_assemble || any_wants_reset)
@@ -361,6 +379,9 @@ int main()
 
                 ctx.exec.exec_until(now_ms, [&](uint64_t cycle_idx, uint64_t time_ms)
                 {
+                    if(any_halted)
+                        return;
+
                     ctx.ctx.real_world_context.time_ms = time_ms;
                     level::step_validation(ctx.ctx, current_project, 1);
                 });

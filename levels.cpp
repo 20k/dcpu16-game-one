@@ -745,6 +745,12 @@ namespace level
 
         stack_vector<dcpu::sim::CPU*, 64> cpus;
 
+        ///this must come first
+        for(auto& i : user)
+        {
+            cpus.push_back(i);
+        }
+
         for(auto& [channel, sim] : ctx.inf.input_cpus)
         {
             cpus.push_back(&sim);
@@ -753,11 +759,6 @@ namespace level
         for(auto& [channel, sim] : ctx.inf.output_cpus)
         {
             cpus.push_back(&sim);
-        }
-
-        for(auto& i : user)
-        {
-            cpus.push_back(i);
         }
 
         stack_vector<dcpu::sim::hardware*, 65536> all_hardware;
@@ -773,7 +774,15 @@ namespace level
         {
             for(int kk=0; kk < (int)cpus.size(); kk++)
             {
-                cpus[kk]->cycle_step(&ctx.inf.fab, &all_hardware, &ctx.real_world_context);
+                if(kk < (int)user.size())
+                {
+                    instance.editors[kk].halted = instance.editors[kk].halted || cpus[kk]->cycle_step(&ctx.inf.fab, &all_hardware, &ctx.real_world_context);
+                }
+                else
+                {
+                    cpus[kk]->cycle_step(&ctx.inf.fab, &all_hardware, &ctx.real_world_context);
+                }
+
             }
 
             dcpu::sim::resolve_interprocessor_communication(cpus, ctx.inf.fab);
