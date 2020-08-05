@@ -95,6 +95,7 @@
 		<Unit filename="deps/imgui/imgui_draw.cpp" />
 		<Unit filename="deps/imgui/imgui_widgets.cpp" />
 		<Unit filename="deps/imgui/misc/freetype/imgui_freetype.cpp" />
+		<Unit filename="deps/imgui_club/imgui_memory_editor/imgui_memory_editor.h" />
 		<Unit filename="deps/imguicolortextedit/TextEditor.cpp" />
 		<Unit filename="deps/toolkit/base_serialisables.cpp" />
 		<Unit filename="deps/toolkit/base_serialisables.hpp" />

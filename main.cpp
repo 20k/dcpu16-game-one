@@ -164,7 +164,7 @@ int main()
     std::cout << res->which_register.value() << " " << res->op.value() << " " << res->word.value() << std::endl;*/
 
     render_settings sett;
-    sett.width = 1200;
+    sett.width = 1300;
     sett.height = 800;
     sett.viewports = false;
 
@@ -594,10 +594,25 @@ int main()
 
                 ImGui::End();
 
+                if(current_project.editors[i].is_rendering_mem_editor)
+                {
+                    ImGui::Begin(("MEMEDIT##" + std::to_string(i)).c_str(), nullptr, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar);
+
+                    style::start();
+
+                    ImGui::PopStyleVar(3);
+
+                    style::separator();
+
+                    current_project.editors[i].render_memory_editor_inline(current_project, i);
+
+                    //style::finish();
+
+                    ImGui::End();
+                }
+
                 ImGui::PopStyleColor(9);
                 ImGui::PopStyleVar();
-
-                //current_project.editors[i].render(current_project, i);
             }
 
             ImGui::SetNextWindowPos(ImVec2(20 + ImGui::GetMainViewport()->Pos.x, ImGui::CalcTextSize("\n").y + ImGui::GetMainViewport()->Pos.y), ImGuiCond_Always);
