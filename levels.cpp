@@ -847,12 +847,34 @@ namespace level
 
         bool any_errors_at_all = hardware_errors || ctx.error_locs.size() > 0 || ctx.has_assembly_error;
 
+        ///just succeeded
+        if(!ctx.successful_validation && !any_errors_at_all)
+        {
+            int total_cycles = 0;
+            int total_assembly = 0;
+
+            for(dcpu::ide::editor& edit : instance.editors)
+            {
+                dcpu::sim::CPU& next = edit.c;
+
+                total_cycles += next.cycle_count;
+                total_assembly += edit.translation_map.size();
+            }
+
+            validation_stats rstat;
+            rstat.cycles = total_cycles;
+            rstat.assembly_length = total_assembly;
+            rstat.success = true;
+
+            ctx.valid_stats = rstat;
+        }
+
         ctx.successful_validation = !any_errors_at_all;
 
         return any_errors_at_all;
     }
 
-    stats validate(level_context& ctx, dcpu::ide::project_instance& instance)
+    validation_stats validate(level_context& ctx, dcpu::ide::project_instance& instance)
     {
         ctx.found_output.clear();
         ctx.error_locs.clear();
@@ -862,7 +884,7 @@ namespace level
 
         ctx = level::start(name, 256);
 
-        stats rstat;
+        validation_stats rstat;
 
         bool err1 = setup_validation(ctx, instance);
 

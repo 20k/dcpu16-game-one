@@ -28,9 +28,17 @@ struct validation_info
     int cycle = 0;
 };
 
+struct validation_stats
+{
+    int cycles = 0;
+    int assembly_length = 0;
+    bool success = false;
+};
+
 struct level_context
 {
     //std::vector<dcpu::ide::editor> cpus;
+    std::optional<validation_stats> valid_stats;
     bool successful_validation = false;
     bool finished = false;
     int cpus = 0;
@@ -65,12 +73,6 @@ struct level_selector_state
     std::string level_name;
 };
 
-struct stats
-{
-    int cycles = 0;
-    int assembly_length = 0;
-    bool success = false;
-};
 
 namespace level
 {
@@ -85,7 +87,7 @@ namespace level
     bool setup_validation(level_context& ctx, dcpu::ide::project_instance& instance);
     bool step_validation(level_context& ctx, dcpu::ide::project_instance& instance, int cycles);
 
-    stats validate(level_context& ctx, dcpu::ide::project_instance& instance);
+    validation_stats validate(level_context& ctx, dcpu::ide::project_instance& instance);
 }
 
 #endif // LEVELS_HPP_INCLUDED

@@ -239,6 +239,7 @@ int main()
             level_window_bottom = ImGui::GetWindowSize().y + ImGui::GetWindowPos().y;
 
             style::start();
+            style::push_styles();
 
             auto screen_size = win.get_window_size();
 
@@ -282,6 +283,7 @@ int main()
                 ctx.ctx.level_name = "";
             }
 
+            style::pop_styles();
             style::finish();
 
             ImGui::End();
@@ -399,6 +401,7 @@ int main()
             ImGui::SetWindowPos(ImVec2(win.get_window_size().x() + ImGui::GetMainViewport()->Pos.x - my_width - 1 - ImGui::CalcTextSize(" ").x * 2, level_window_bottom + ImGui::CalcTextSize(" ").y));
 
             style::start();
+            style::push_styles();
 
             low_checkbox("Hex", is_hex);
             //ImGui::SameLine();
@@ -551,6 +554,7 @@ int main()
 
             ImGui::EndGroup();
 
+            style::pop_styles();
             style::finish();
 
             ImGui::End();
@@ -580,8 +584,6 @@ int main()
 
                 style::start();
 
-                ImGui::PopStyleVar(3);
-
                 style::separator();
 
                 TextEditor::Palette pal = current_project.editors[i].edit->GetPalette();
@@ -590,7 +592,7 @@ int main()
 
                 current_project.editors[i].render_inline(current_project, i);
 
-                //style::finish();
+                style::finish();
 
                 ImGui::End();
 
@@ -600,13 +602,11 @@ int main()
 
                     style::start();
 
-                    ImGui::PopStyleVar(3);
-
                     style::separator();
 
                     current_project.editors[i].render_memory_editor_inline(current_project, i);
 
-                    //style::finish();
+                    style::finish();
 
                     ImGui::End();
                 }
@@ -620,9 +620,11 @@ int main()
             ImGui::Begin("Reference", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
 
             style::start();
+            style::push_styles();
 
             card.render_inline();
 
+            style::pop_styles();
             style::finish();
 
             ImGui::End();
@@ -638,6 +640,7 @@ int main()
 
                     ImGui::Begin((std::string("LEM##") + std::to_string(screen_idx)).c_str(), nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);
                     style::start();
+                    style::push_styles();
 
                     auto cursor_pos = ImGui::GetCursorScreenPos();
 
@@ -660,6 +663,7 @@ int main()
                         }
                     }
 
+                    style::pop_styles();
                     style::finish();
                     ImGui::End();
 

@@ -145,10 +145,26 @@ namespace style
         ImVec2 bottom_right_pos = ImVec2(window_pos.x - 1 + dim.x, window_pos.y + dim.y);
 
         ImGui::GetBackgroundDrawList()->AddText(bottom_right_pos, IM_COL32(0xCF, 0xCF, 0xCF,0xFF), bottom_right.c_str());
+    }
 
+    inline
+    void finish()
+    {
+
+    }
+
+    inline
+    void push_styles()
+    {
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0);
+    }
+
+    inline
+    void pop_styles()
+    {
+        ImGui::PopStyleVar(3);
     }
 
     inline
@@ -170,12 +186,6 @@ namespace style
         ImGui::GetCurrentWindow()->DrawList->AddText(ImVec2(cursor_pos.x, cursor_pos.y - ImGui::CalcTextSize(" ").y/2), IM_COL32(0xCF, 0xCF, 0xCF, 0xFF), spacer.c_str());
 
         ImGui::NewLine();
-    }
-
-    inline
-    void finish()
-    {
-        ImGui::PopStyleVar(3);
     }
 }
 
