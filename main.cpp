@@ -171,6 +171,7 @@ int main()
     render_window win(sett, "DCPU16-GAME-ONE");
 
     ImGui::PushSrgbStyleColor(ImGuiCol_Text, ImVec4(207/255.f, 207/255.f, 207/255.f, 255));
+    ImGui::PushStyleColor(ImGuiCol_ModalWindowDarkening, ImVec4(1,1,1,0));
 
     ImGui::GetStyle().ItemSpacing.y = 0;
 
@@ -389,6 +390,55 @@ int main()
                 });
             }
 
+            if(!ctx.ctx.displayed_level_over && ctx.ctx.valid_stats.has_value())
+            {
+                ctx.ctx.displayed_level_over = true;
+
+                ImGui::OpenPopup("LevelFinish");
+            }
+
+            //style::push_resizablewindow_style();
+            style::push_styles();
+
+            if(ctx.ctx.valid_stats.has_value() && ImGui::BeginPopupModal("LevelFinish", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove))
+            {
+                style::start();
+
+                ImGui::Text("Success");
+
+                style::text_separator();
+
+                validation_stats& end_stats = ctx.ctx.valid_stats.value();
+
+                ImGui::Text("Cycles: %i\n", end_stats.cycles);
+                ImGui::Text("Program Size: %i\n", end_stats.assembly_length);
+
+                style::text_separator();
+
+                if(ImGui::Selectable("> Menu"))
+                {
+                    level::switch_to_level(ctx, current_project, ctx.ctx.level_name);
+                    ctx.ctx.level_name = "";
+
+                    ImGui::CloseCurrentPopup();
+                }
+
+                if(ImGui::Selectable("> Continue"))
+                {
+                    ctx.ctx.valid_stats = std::nullopt;
+                    ctx.ctx.displayed_level_over = false;
+
+                    ImGui::CloseCurrentPopup();
+                }
+
+                style::finish();
+
+                ImGui::EndPopup();
+            }
+
+            style::pop_styles();
+            //style::pop_resizablewindow_style();
+
             //ImGui::SetNextWindowPos(ImVec2(level_window_right + ImGui::CalcTextSize(" ").x, level_window_bottom + ImGui::CalcTextSize(" ").y), ImGuiCond_Always);
 
             ImGui::Begin("Task", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove);
@@ -569,22 +619,13 @@ int main()
 
                 ImGui::SetNextWindowSize(ImVec2(500, 500), ImGuiCond_Appearing);
 
-                ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f);
-                ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0,0,0,0));
-                ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4(0,0,0,0));
-                ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(0,0,0,0));
-                ImGui::PushStyleColor(ImGuiCol_TitleBgCollapsed, ImVec4(0,0,0,0));
-                ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(0,0,0,0));
-                ImGui::PushStyleColor(ImGuiCol_PopupBg, ImVec4(0,0,0,1));
-                ImGui::PushStyleColor(ImGuiCol_ResizeGrip, ImVec4(0xCF/255.f,0xCF/255.f,0xCF/255.f,1));
-                ImGui::PushStyleColor(ImGuiCol_ResizeGripActive, ImVec4(1,1,1,1));
-                ImGui::PushStyleColor(ImGuiCol_ResizeGripHovered, ImVec4(1,1,1,1));
+                style::push_resizablewindow_style();
 
                 ImGui::Begin((root_name + "###IDE" + std::to_string(i)).c_str(), nullptr, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
 
                 style::start();
 
-                style::separator();
+                style::title_separator();
 
                 TextEditor::Palette pal = current_project.editors[i].edit->GetPalette();
                 pal[(int)TextEditor::PaletteIndex::Background] = IM_COL32(0,0,0,0);
@@ -602,7 +643,7 @@ int main()
 
                     style::start();
 
-                    style::separator();
+                    style::title_separator();
 
                     current_project.editors[i].render_memory_editor_inline(current_project, i);
 
@@ -611,8 +652,7 @@ int main()
                     ImGui::End();
                 }
 
-                ImGui::PopStyleColor(9);
-                ImGui::PopStyleVar();
+                style::pop_resizablewindow_style();
             }
 
             ImGui::SetNextWindowPos(ImVec2(20 + ImGui::GetMainViewport()->Pos.x, ImGui::CalcTextSize("\n").y + ImGui::GetMainViewport()->Pos.y), ImGuiCond_Always);

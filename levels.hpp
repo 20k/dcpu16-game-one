@@ -15,7 +15,7 @@ struct world_context : dcpu::sim::time_state, dcpu::sim::lem1802_screens_state, 
 
 };
 
-struct validation_info
+struct hardware_data
 {
     std::map<int, dcpu::sim::CPU> input_cpus;
     std::map<int, dcpu::sim::CPU> output_cpus;
@@ -39,6 +39,8 @@ struct level_context
 {
     //std::vector<dcpu::ide::editor> cpus;
     std::optional<validation_stats> valid_stats;
+    bool displayed_level_over = false;
+
     bool successful_validation = false;
     bool finished = false;
     int cpus = 0;
@@ -55,7 +57,7 @@ struct level_context
     std::vector<int> error_channels;
     bool has_assembly_error = false;
 
-    validation_info inf;
+    hardware_data inf;
     world_context real_world_context;
 
     bool(*extra_validation)(level_context&, dcpu::ide::project_instance& instance) = nullptr;

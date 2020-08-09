@@ -688,6 +688,9 @@ namespace level
 
         //ctx.real_world_context = world_context();
 
+        ctx.valid_stats = std::nullopt;
+        ctx.displayed_level_over = false;
+
         ctx.successful_validation = false;
         ctx.finished = false;
         ctx.found_output.clear();
