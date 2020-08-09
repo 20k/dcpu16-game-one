@@ -217,7 +217,7 @@ void level::display_level_select(level_selector_state& select, run_context& ctx,
 
         //ImGui::Text("NAME              : %s", select.level_name.c_str());
         ImGui::Text("CYCLE COUNT       : 0");
-        ImGui::Text("INSTRUCTION COUNT : 0");
+        ImGui::Text("INSTRUCTION SIZE  : 0");
         ImGui::Text("VALIDATION        : INVALID");
 
         ImGui::NewLine();

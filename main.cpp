@@ -404,14 +404,11 @@ int main()
             {
                 style::start();
 
-                ImGui::Text("Success");
-
-                style::text_separator();
-
                 validation_stats& end_stats = ctx.ctx.valid_stats.value();
 
-                ImGui::Text("Cycles: %i\n", end_stats.cycles);
-                ImGui::Text("Program Size: %i\n", end_stats.assembly_length);
+                ImGui::Text("CYCLE COUNT       : %i\n", end_stats.cycles);
+                ImGui::Text("INSTRUCTION SIZE  : %i\n", end_stats.assembly_length);
+                ImGui::Text("VALIDATION        : VALID\n");
 
                 style::text_separator();
 
