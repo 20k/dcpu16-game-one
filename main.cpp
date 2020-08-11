@@ -660,6 +660,10 @@ int main()
             style::start();
             style::push_styles();
 
+            ImGui::Text("Instructions");
+
+            style::text_separator();
+
             card.render_inline();
 
             style::pop_styles();
