@@ -680,6 +680,8 @@ namespace level
 
             ctx.real_world_context.memory.push_back({});
 
+            ctx.extra_validation = [](level_context& ctx, dcpu::ide::project_instance& instance){return true;};
+
             simple_page_mapping(ctx);
         }
 
