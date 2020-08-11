@@ -390,7 +390,7 @@ int main()
                 });
             }
 
-            if(!ctx.ctx.displayed_level_over && ctx.ctx.valid_stats.has_value())
+            if(!ctx.ctx.displayed_level_over && ctx.ctx.current_stats.has_value())
             {
                 ctx.ctx.displayed_level_over = true;
 
@@ -400,11 +400,11 @@ int main()
             //style::push_resizablewindow_style();
             style::push_styles();
 
-            if(ctx.ctx.valid_stats.has_value() && ImGui::BeginPopupModal("LevelFinish", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove))
+            if(ctx.ctx.current_stats.has_value() && ImGui::BeginPopupModal("LevelFinish", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove))
             {
                 style::start();
 
-                validation_stats& end_stats = ctx.ctx.valid_stats.value();
+                level_stats::info& end_stats = ctx.ctx.current_stats.value();
 
                 ImGui::Text("CYCLE COUNT       : %i\n", end_stats.cycles);
                 ImGui::Text("INSTRUCTION SIZE  : %i\n", end_stats.assembly_length);
@@ -422,7 +422,7 @@ int main()
 
                 if(ImGui::Selectable("> Continue"))
                 {
-                    ctx.ctx.valid_stats = std::nullopt;
+                    ctx.ctx.current_stats = std::nullopt;
                     ctx.ctx.displayed_level_over = false;
 
                     ImGui::CloseCurrentPopup();

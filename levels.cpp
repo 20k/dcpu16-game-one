@@ -688,7 +688,7 @@ namespace level
 
         //ctx.real_world_context = world_context();
 
-        ctx.valid_stats = std::nullopt;
+        ctx.current_stats = std::nullopt;
         ctx.displayed_level_over = false;
 
         ctx.successful_validation = false;
@@ -864,40 +864,15 @@ namespace level
                 total_assembly += edit.translation_map.size();
             }
 
-            validation_stats rstat;
+            level_stats::info rstat;
             rstat.cycles = total_cycles;
             rstat.assembly_length = total_assembly;
-            rstat.success = true;
 
-            ctx.valid_stats = rstat;
+            ctx.current_stats = rstat;
         }
 
         ctx.successful_validation = !any_errors_at_all;
 
         return any_errors_at_all;
-    }
-
-    validation_stats validate(level_context& ctx, dcpu::ide::project_instance& instance)
-    {
-        ctx.found_output.clear();
-        ctx.error_locs.clear();
-        ctx.error_channels.clear();
-
-        std::string name = ctx.level_name;
-
-        ctx = level::start(name, 256);
-
-        validation_stats rstat;
-
-        bool err1 = setup_validation(ctx, instance);
-
-        bool err2 = step_validation(ctx, instance, 1000000);
-
-        ctx.finished = true;
-
-        rstat.success = ctx.error_locs.size() == 0 && !err2 && !err1;
-        ctx.successful_validation = rstat.success;
-
-        return rstat;
     }
 }

@@ -9,6 +9,7 @@
 #include <dcpu16-sim/base_hardware.hpp>
 #include <dcpu16-sim/all_hardware.hpp>
 #include "constant_time_exec.hpp"
+#include "level_stats.hpp"
 
 struct world_context : dcpu::sim::time_state, dcpu::sim::lem1802_screens_state, dcpu::sim::world_base
 {
@@ -28,22 +29,15 @@ struct hardware_data
     int cycle = 0;
 };
 
-struct validation_stats
-{
-    int cycles = 0;
-    int assembly_length = 0;
-    bool success = false;
-};
-
 struct level_context
 {
-    //std::vector<dcpu::ide::editor> cpus;
-    std::optional<validation_stats> valid_stats;
+    std::optional<level_stats::info> current_stats;
     bool displayed_level_over = false;
 
     bool successful_validation = false;
     bool finished = false;
     int cpus = 0;
+
     std::string level_name;
     std::string description;
     std::string short_description;
@@ -75,7 +69,6 @@ struct level_selector_state
     std::string level_name;
 };
 
-
 namespace level
 {
     //std::vector<std::string> get_available();
@@ -88,8 +81,6 @@ namespace level
 
     bool setup_validation(level_context& ctx, dcpu::ide::project_instance& instance);
     bool step_validation(level_context& ctx, dcpu::ide::project_instance& instance, int cycles);
-
-    validation_stats validate(level_context& ctx, dcpu::ide::project_instance& instance);
 }
 
 #endif // LEVELS_HPP_INCLUDED
