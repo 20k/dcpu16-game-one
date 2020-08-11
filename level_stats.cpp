@@ -21,6 +21,7 @@ std::optional<level_stats::info> level_stats::load_best(const std::string& level
         level_stats::info ret;
         ret.assembly_length = toml::get<int>(val["assembly_length"]);
         ret.cycles = toml::get<int>(val["cycles"]);
+        ret.valid = toml::get<bool>(val["valid"]);
 
         return ret;
     }
@@ -41,6 +42,7 @@ void level_stats::save_best(const std::string& level_name, const level_stats::in
     toml::value val;
     val["assembly_length"] = inf.assembly_length;
     val["cycles"] = inf.cycles;
+    val["valid"] = inf.valid;
 
     std::string as_str = toml::format(val);
 

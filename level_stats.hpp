@@ -10,6 +10,7 @@ namespace level_stats
     {
         int cycles = 0;
         int assembly_length = 0;
+        bool valid = false;
     };
 
     std::optional<level_stats::info> load_best(const std::string& level_name);

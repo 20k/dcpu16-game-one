@@ -127,6 +127,13 @@ void level::switch_to_level(run_context& ctx, dcpu::ide::project_instance& insta
     ctx.exec.init(0, now_ms);
 }
 
+void level_selector_state::set_level_name(const std::string& _level_name)
+{
+    level_name = _level_name;
+
+    stats = level_stats::load_best(level_name).value_or(level_stats::info());
+}
+
 void level::display_level_select(level_selector_state& select, run_context& ctx, dcpu::ide::project_instance& instance)
 {
     std::vector<std::string> intro_levels = {"INTRO", "AMPLIFY", "DIVISIONS", "SPACESHIP_OPERATOR", "CHECKSUM"};
@@ -142,7 +149,7 @@ void level::display_level_select(level_selector_state& select, run_context& ctx,
 
     if(select.level_name.size() == 0)
     {
-        select.level_name = "INTRO";
+        select.set_level_name("INTRO");
     }
 
     ImGui::SetNextWindowSize(ImVec2(300, 0));
@@ -161,9 +168,8 @@ void level::display_level_select(level_selector_state& select, run_context& ctx,
 
     for(int i=0; i < (int)all_levels.size(); i++)
     {
-        //if(ImGui::TreeNode(all_levels[i].first.c_str()))
-
         ImGui::Selectable(all_levels[i].first.c_str());
+
         {
             for(int j = 0; j < (int)all_levels[i].second.size(); j++)
             {
@@ -179,8 +185,7 @@ void level::display_level_select(level_selector_state& select, run_context& ctx,
 
                 if(ImGui::Selectable(level_str.c_str()))
                 {
-                    //switch_to_level(ctx, instance, level_name);
-                    select.level_name = level_name;
+                    select.set_level_name(level_name);
                 }
             }
 
@@ -215,10 +220,12 @@ void level::display_level_select(level_selector_state& select, run_context& ctx,
 
         ImGui::Indent();
 
+        std::string validation_string = select.stats.valid ? "VALID" : "INVALID";
+
         //ImGui::Text("NAME              : %s", select.level_name.c_str());
-        ImGui::Text("CYCLE COUNT       : 0");
-        ImGui::Text("INSTRUCTION SIZE  : 0");
-        ImGui::Text("VALIDATION        : INVALID");
+        ImGui::Text("CYCLE COUNT       : %i", select.stats.cycles);
+        ImGui::Text("INSTRUCTION SIZE  : %i", select.stats.assembly_length);
+        ImGui::Text("VALIDATION        : %s", validation_string.c_str());
 
         ImGui::NewLine();
 
@@ -867,6 +874,24 @@ namespace level
             level_stats::info rstat;
             rstat.cycles = total_cycles;
             rstat.assembly_length = total_assembly;
+            rstat.valid = true;
+
+            {
+                auto best_stats_opt = level_stats::load_best(ctx.level_name);
+
+                level_stats::info best;
+                best.assembly_length = INT_MAX;
+                best.cycles = INT_MAX;
+
+                if(best_stats_opt.has_value())
+                    best = best_stats_opt.value();
+
+                best.cycles = std::min(best.cycles, rstat.cycles);
+                best.assembly_length = std::min(best.assembly_length, rstat.assembly_length);
+                best.valid = true;
+
+                level_stats::save_best(ctx.level_name, best);
+            }
 
             ctx.current_stats = rstat;
         }
