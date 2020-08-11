@@ -614,6 +614,7 @@ int main()
                 if(current_project.editors[i].unsaved)
                     root_name += " (unsaved)";
 
+                ImGui::SetNextWindowPos(ImVec2(300, 200), ImGuiCond_Appearing);
                 ImGui::SetNextWindowSize(ImVec2(500, 500), ImGuiCond_Appearing);
 
                 style::push_resizablewindow_style();
