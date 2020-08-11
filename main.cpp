@@ -176,6 +176,7 @@ int main()
     ImGui::GetStyle().ItemSpacing.y = 0;
 
     level_selector_state select;
+    level_over_state level_over;
 
     //ImGui::GetStyle().ScaleAllSizes(2);
 
@@ -394,21 +395,41 @@ int main()
             {
                 ctx.ctx.displayed_level_over = true;
 
+                level_over.best_stats = level_stats::load_best(ctx.ctx.level_name).value_or(level_stats::info());
+                level_over.current_stats = ctx.ctx.current_stats.value();
+
+                for(dcpu::ide::editor& e : current_project.editors)
+                {
+                    e.wants_pause = true;
+                }
+
                 ImGui::OpenPopup("LevelFinish");
             }
 
             //style::push_resizablewindow_style();
             style::push_styles();
 
-            if(ctx.ctx.current_stats.has_value() && ImGui::BeginPopupModal("LevelFinish", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove))
+            if(ImGui::BeginPopupModal("LevelFinish", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove))
             {
                 style::start();
 
-                level_stats::info& end_stats = ctx.ctx.current_stats.value();
+                level_stats::info& end_stats = level_over.current_stats;
 
+                ImGui::Text("Result:");
                 ImGui::Text("CYCLE COUNT       : %i\n", end_stats.cycles);
                 ImGui::Text("INSTRUCTION SIZE  : %i\n", end_stats.assembly_length);
                 ImGui::Text("VALIDATION        : VALID\n");
+
+                style::text_separator();
+
+                level_stats::info& best_stats = level_over.best_stats;
+
+                std::string end_valid_str = best_stats.valid ? "VALID" : "INVALID";
+
+                ImGui::Text("Best:");
+                ImGui::Text("CYCLE COUNT       : %i\n", best_stats.cycles);
+                ImGui::Text("INSTRUCTION SIZE  : %i\n", best_stats.assembly_length);
+                ImGui::Text("VALIDATION        : %s\n", end_valid_str.c_str());
 
                 style::text_separator();
 

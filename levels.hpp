@@ -72,6 +72,12 @@ struct level_selector_state
     void set_level_name(const std::string& level_name);
 };
 
+struct level_over_state
+{
+    level_stats::info best_stats;
+    level_stats::info current_stats;
+};
+
 namespace level
 {
     //std::vector<std::string> get_available();
