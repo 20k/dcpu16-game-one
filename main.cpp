@@ -258,25 +258,11 @@ int main()
 
             ImGui::SetWindowPos(ImVec2(screen_size.x()/2 - dim.x/2 + offset.x, offset.y));
 
-
             ImGui::Text("Level: %s", ctx.ctx.level_name.c_str());
 
             ImGui::PushTextWrapPos(800);
             ImGui::Text("%s", ctx.ctx.description.c_str());
             ImGui::PopTextWrapPos();
-
-            ImGui::Text("Validation Status:");
-
-            ImGui::SameLine();
-
-            if(!ctx.ctx.successful_validation)
-            {
-                ImGui::TextColored(ImVec4(255, 0, 0, 255), "Invalid");
-            }
-            else
-            {
-                ImGui::TextColored(ImVec4(0, 255, 0, 255), "Valid");
-            }
 
             if(ImGui::Selectable("> Back"))
             {
