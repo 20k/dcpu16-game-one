@@ -658,6 +658,8 @@ int main()
 
                 if(current_project.editors[i].is_rendering_mem_editor)
                 {
+                    ImGui::SetNextWindowSize(ImVec2(400, 400), ImGuiCond_Appearing);
+
                     ImGui::Begin(("MEMEDIT##" + std::to_string(i)).c_str(), nullptr, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar);
 
                     style::start();
