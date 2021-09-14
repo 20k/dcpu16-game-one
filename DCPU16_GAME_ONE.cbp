@@ -75,11 +75,13 @@
 			<Add option="-l:libbrotlidec-static.a" />
 			<Add option="-l:libbrotlienc-static.a" />
 			<Add option="-l:libbrotlicommon-static.a" />
+			<Add option="-ldwrite" />
 		</Linker>
 		<Unit filename="constant_time_exec.hpp" />
 		<Unit filename="deps/dcpu16-asm/base_asm.cpp" />
 		<Unit filename="deps/dcpu16-asm/base_asm.hpp" />
 		<Unit filename="deps/dcpu16-asm/base_asm_fwd.hpp" />
+		<Unit filename="deps/dcpu16-asm/heap_vector.hpp" />
 		<Unit filename="deps/dcpu16-asm/shared.hpp" />
 		<Unit filename="deps/dcpu16-asm/stack_vector.hpp" />
 		<Unit filename="deps/dcpu16-asm/util.hpp" />
@@ -122,10 +124,6 @@
 		<Unit filename="main.cpp" />
 		<Unit filename="style.hpp" />
 		<Extensions>
-			<code_completion />
-			<envvars />
-			<debugger />
-			<fortran_project />
 			<lib_finder disable_auto="1" />
 		</Extensions>
 	</Project>
