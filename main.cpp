@@ -399,12 +399,15 @@ int main()
             {
                 style::start();
 
+                ImGui::Text("Success");
+
+                style::text_separator();
+
                 level_stats::info& end_stats = level_over.current_stats;
 
                 ImGui::Text("Result:");
                 ImGui::Text("CYCLE COUNT       : %i\n", end_stats.cycles);
                 ImGui::Text("INSTRUCTION SIZE  : %i\n", end_stats.assembly_length);
-                ImGui::Text("VALIDATION        : VALID\n");
 
                 style::text_separator();
 
@@ -415,7 +418,7 @@ int main()
                 ImGui::Text("Best:");
                 ImGui::Text("CYCLE COUNT       : %i\n", best_stats.cycles);
                 ImGui::Text("INSTRUCTION SIZE  : %i\n", best_stats.assembly_length);
-                ImGui::Text("VALIDATION        : %s\n", end_valid_str.c_str());
+                //ImGui::Text("VALIDATION        : %s\n", end_valid_str.c_str()); //? is it possible for this to be invalid?
 
                 style::text_separator();
 
