@@ -170,7 +170,7 @@ int main()
 
     render_window win(sett, "DCPU16-GAME-ONE");
 
-    ImGui::PushSrgbStyleColor(ImGuiCol_Text, ImVec4(207/255.f, 207/255.f, 207/255.f, 255));
+    ImGui::PushSrgbStyleColor(ImGuiCol_Text, ImVec4(207/255.f, 207/255.f, 207/255.f, 1.f));
     ImGui::PushStyleColor(ImGuiCol_ModalWindowDarkening, ImVec4(0,0,0,0.5));
 
     ImGui::GetStyle().ItemSpacing.y = 0;
