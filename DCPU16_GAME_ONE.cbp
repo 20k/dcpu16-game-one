@@ -117,6 +117,8 @@
 		<Unit filename="deps/toolkit/texture.cpp" />
 		<Unit filename="deps/toolkit/texture.hpp" />
 		<Unit filename="deps/toolkit/vertex.hpp" />
+		<Unit filename="level_data.cpp" />
+		<Unit filename="level_data.hpp" />
 		<Unit filename="level_hardware.hpp" />
 		<Unit filename="level_stats.cpp" />
 		<Unit filename="level_stats.hpp" />
