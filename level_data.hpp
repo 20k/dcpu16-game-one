@@ -57,6 +57,8 @@ struct level_runtime_data
 
 struct all_level_data
 {
+    std::vector<level_data> all_levels;
+
     void load(const std::string& folder = "./levels");
 };
 

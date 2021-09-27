@@ -60,6 +60,7 @@ void all_level_data::load(const std::string& folder)
         {
             level_data next = load_level(current_file);
 
+            all_levels.push_back(next);
         }
     }
 }
