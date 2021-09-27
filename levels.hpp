@@ -10,24 +10,8 @@
 #include <dcpu16-sim/all_hardware.hpp>
 #include "constant_time_exec.hpp"
 #include "level_stats.hpp"
-
-struct world_context : dcpu::sim::time_state, dcpu::sim::lem1802_screens_state, dcpu::sim::world_base
-{
-
-};
-
-struct hardware_data
-{
-    std::map<int, dcpu::sim::CPU> input_cpus;
-    std::map<int, dcpu::sim::CPU> output_cpus;
-    std::map<int, stack_vector<uint16_t, MEM_SIZE>> input_translation;
-    std::map<int, stack_vector<uint16_t, MEM_SIZE>> output_translation;
-    std::vector<dcpu::sim::hardware*> hardware;
-
-    dcpu::sim::fabric fab;
-
-    int cycle = 0;
-};
+#include "level_hardware.hpp"
+#include "world_state.hpp"
 
 struct level_context
 {
@@ -51,8 +35,8 @@ struct level_context
     std::vector<int> error_channels;
     bool has_assembly_error = false;
 
-    hardware_data inf;
-    world_context real_world_context;
+    level_hardware inf;
+    world_state real_world_state;
 
     bool(*extra_validation)(level_context&, dcpu::ide::project_instance& instance) = nullptr;
 };

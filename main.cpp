@@ -372,7 +372,7 @@ int main()
                     if(any_halted)
                         return;
 
-                    ctx.ctx.real_world_context.time_ms = time_ms;
+                    ctx.ctx.real_world_state.time_ms = time_ms;
                     level::step_validation(ctx.ctx, current_project, 1);
                 });
             }
@@ -688,7 +688,7 @@ int main()
 
                 int mult = 2;
 
-                for(auto& buffer : ctx.ctx.real_world_context.memory)
+                for(auto& buffer : ctx.ctx.real_world_state.memory)
                 {
                     ImGui::SetNextWindowSize(ImVec2(128 * mult + ImGui::CalcTextSize(" ").x*2, 96 * mult + ImGui::CalcTextSize(" ").y*2), ImGuiCond_Always);
 
