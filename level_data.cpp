@@ -1,7 +1,7 @@
 #include "level_data.hpp"
 #include <filesystem>
 #include <toolkit/fs_helpers.hpp>
-#include <nlohmann/json.hpp>
+#include <toml/toml.hpp>
 #include <dcpu16-asm/base_asm.hpp>
 #include <dcpu16-sim/hardware_clock.hpp>
 #include <dcpu16-sim/hardware_lem1802.hpp>
@@ -32,17 +32,19 @@ level_data load_level(const std::filesystem::path& path_to_info)
 {
     level_data ret;
 
-    std::string description_json = file::read(path_to_info.string(), file::mode::TEXT);
+    std::string description_toml = file::read(path_to_info.string(), file::mode::TEXT);
 
-    nlohmann::json parsed;
+    toml::value parsed;
 
     try
     {
-        parsed = nlohmann::json::parse(description_json);
+        std::istringstream is(description_toml, std::ios_base::binary | std::ios_base::in);
+
+        parsed = toml::parse(is, path_to_info.string());
     }
     catch(std::exception& e)
     {
-        std::cout << "caught exception in load_level from file " << description_json << " " << e.what() << std::endl;
+        std::cout << "caught exception in load_level from file " << description_toml << " " << e.what() << std::endl;
         return level_data();
     }
 
@@ -65,13 +67,13 @@ level_data load_level(const std::filesystem::path& path_to_info)
         ret.dynamic_validation_program = file::read(validation_path.string(), file::mode::TEXT);
     }
 
-    ret.name = parsed["name"];
-    ret.description = parsed["description"];
-    ret.short_description = parsed["short_description"];
-    ret.hardware_names = parsed["hardware"].get<std::vector<std::string>>();
+    ret.name = toml::get<std::string>(parsed["name"]);
+    ret.description = toml::get<std::string>(parsed["description"]);
+    ret.short_description = toml::get<std::string>(parsed["short_description"]);
+    ret.hardware_names = toml::get<std::vector<std::string>>(parsed["hardware"]);
 
-    ret.input_channels = parsed["input_channels"].get<std::vector<int>>();
-    ret.output_channels = parsed["output_channels"].get<std::vector<int>>();
+    ret.input_channels = toml::get<std::vector<int>>(parsed["input_channels"]);
+    ret.output_channels = toml::get<std::vector<int>>(parsed["output_channels"]);
 
     return ret;
 }
@@ -84,7 +86,7 @@ void all_level_data::load(const std::string& folder)
 
         std::string filename = current_file.filename().string();
 
-        if(filename == "info.json")
+        if(filename == "info.toml")
         {
             level_data next = load_level(current_file);
 
