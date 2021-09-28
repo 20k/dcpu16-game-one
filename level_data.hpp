@@ -55,6 +55,8 @@ struct assembler_state
 
 struct level_runtime_data
 {
+    void build_from(const level_runtime_parameters& params);
+
     world_state real_world_state;
 
     std::optional<dcpu::sim::CPU> dynamic_validation_cpu;

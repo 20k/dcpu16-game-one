@@ -226,7 +226,22 @@ void level_runtime_parameters::build_from(const level_data& data)
     generate_io(data);
 }
 
+void level_runtime_data::build_from(const level_runtime_parameters& params)
+{
+    dynamic_validation_cpu = params.dynamic_validation_cpu;
+
+    for(dcpu::sim::hardware* hw : params.hardware)
+    {
+        hardware.push_back(hw->clone());
+    }
+}
+
 level_instance all_level_data::make_instance(const level_data& data)
 {
-    //level_instance
+    level_instance inst;
+    inst.data = data;
+    inst.constructed_data.build_from(inst.data);
+    inst.runtime_data.build_from(inst.constructed_data);
+
+    return inst;
 }
