@@ -22,10 +22,18 @@ struct level_data
     std::optional<std::string> io_program;
     std::optional<std::string> dynamic_validation_program;
     std::vector<std::string> hardware_names;
+
+    std::vector<int> input_channels;
+    std::vector<int> output_channels;
+
+    bool is_input_channel(int c) const;
+    bool is_output_channel(int c) const;
 };
 
 struct level_runtime_parameters
 {
+    void build_from(const level_data& data);
+
     std::map<int, std::vector<uint16_t>> channel_to_input;
     std::map<int, std::vector<uint16_t>> channel_to_output;
     std::map<int, std::map<int, std::vector<int>>> output_to_input_start;
@@ -33,6 +41,9 @@ struct level_runtime_parameters
     std::optional<dcpu::sim::CPU> io_cpu;
     std::optional<dcpu::sim::CPU> dynamic_validation_cpu;
     std::vector<dcpu::sim::hardware*> hardware;
+
+private:
+    void generate_io(const level_data& data);
 };
 
 struct assembler_state
@@ -55,11 +66,21 @@ struct level_runtime_data
     std::map<int, std::vector<uint16_t>> found_output;
 };
 
+struct level_instance
+{
+    level_data data;
+    level_runtime_parameters constructed_data;
+    level_runtime_data runtime_data;
+    assembler_state ass_state;
+};
+
 struct all_level_data
 {
     std::vector<level_data> all_levels;
 
     void load(const std::string& folder = "./levels");
+
+    level_instance make_instance(const level_data& data);
 };
 
 #endif // LEVEL_DATA_HPP_INCLUDED
