@@ -75,6 +75,8 @@ level_data load_level(const std::filesystem::path& path_to_info)
     ret.input_channels = toml::get<std::vector<int>>(parsed["input_channels"]);
     ret.output_channels = toml::get<std::vector<int>>(parsed["output_channels"]);
 
+    ret.my_best_stats = level_stats::load_best(ret.name);
+
     return ret;
 }
 
