@@ -12,3 +12,5 @@ hardware = []
 
 input_channels = [0]
 output_channels = [1]
+
+section = "TUTORIAL"

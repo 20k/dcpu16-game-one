@@ -19,6 +19,7 @@ struct level_data
     std::string name;
     std::string description;
     std::string short_description;
+    std::string section;
 
     std::optional<std::string> io_program;
     std::optional<std::string> dynamic_validation_program;
@@ -51,8 +52,6 @@ private:
 
 struct assembler_state
 {
-    std::vector<int> error_locs;
-    std::vector<int> error_channels;
     bool has_error = false;
 };
 
@@ -71,12 +70,20 @@ struct level_runtime_data
     std::map<int, std::vector<uint16_t>> found_output;
 };
 
+struct runtime_errors
+{
+    std::vector<int> error_locs;
+    std::vector<int> error_channels;
+};
+
 struct level_instance
 {
     level_data data;
     level_runtime_parameters constructed_data;
     level_runtime_data runtime_data;
     assembler_state ass_state;
+
+    void update_assembly_errors(dcpu::ide::project_instance& instance);
 };
 
 struct all_level_data
@@ -86,12 +93,29 @@ struct all_level_data
     void load(const std::string& folder = "./levels");
 
     level_instance make_instance(const level_data& data);
-    void display_level_select();
+    //void display_level_select();
 };
 
 struct level_manager
 {
+    all_level_data levels;
+    std::optional<level_data> selected_level;
+
     std::optional<level_instance> current_level;
+
+    void load(const std::string& folder = "./levels");
+
+    void display_level_select(dcpu::ide::project_instance& instance);
+
+    void reset_level();
+    //void start_level(const std::string& level);
+
+    //void setup_validation(dcpu::ide::project_instance& instance);
+    void step_validation(dcpu::ide::project_instance& instance, size_t now_ms);
+
+private:
+    void switch_to_level(dcpu::ide::project_instance& instance, const level_data& data);
+    void start_level(const level_data& data);
 };
 
 #endif // LEVEL_DATA_HPP_INCLUDED
