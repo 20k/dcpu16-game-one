@@ -82,6 +82,7 @@ struct level_instance
     level_runtime_parameters constructed_data;
     level_runtime_data runtime_data;
     assembler_state ass_state;
+    runtime_errors execution_state;
 
     void update_assembly_errors(dcpu::ide::project_instance& instance);
 };
@@ -111,7 +112,7 @@ struct level_manager
     //void start_level(const std::string& level);
 
     //void setup_validation(dcpu::ide::project_instance& instance);
-    void step_validation(dcpu::ide::project_instance& instance, size_t now_ms);
+    void step_validation(dcpu::ide::project_instance& instance);
 
 private:
     void switch_to_level(dcpu::ide::project_instance& instance, const level_data& data);

@@ -315,9 +315,11 @@ void level_manager::reset_level()
     start_level(current.data);
 }
 
-void level_manager::step_validation(dcpu::ide::project_instance& instance, size_t now_ms)
+void level_manager::step_validation(dcpu::ide::project_instance& instance)
 {
+    level_instance& my_level = current_level.value();
 
+    my_level.execution_state = runtime_errors();
 }
 
 void level_manager::display_level_select(dcpu::ide::project_instance& instance)
