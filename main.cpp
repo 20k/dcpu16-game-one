@@ -590,11 +590,11 @@ int main()
 
             ImGui::Text("User    ");
 
-            for(auto& [channel, vals] : ctx.ctx.channel_to_output)
+            for(auto& [channel, vals] : current_instance.constructed_data.channel_to_output)
             {
-                if(auto it = ctx.ctx.found_output.find(channel); it != ctx.ctx.found_output.end())
+                if(auto it = current_instance.runtime_data.found_output.find(channel); it != current_instance.runtime_data.found_output.end())
                 {
-                    int my_line = ctx.ctx.inf.output_translation[channel][ctx.ctx.inf.output_cpus[channel].regs[PC_REG]] - 1;
+                    int my_line = (int)vals.size() - (int)current_instance.runtime_data.found_output[channel].size();
 
                     if(my_line < 0)
                         my_line = 0;
@@ -603,9 +603,9 @@ int main()
 
                     if(run_is_finished)
                     {
-                        if(ctx.ctx.error_locs.size() > 0)
+                        if(current_instance.execution_state.error_locs.size() > 0)
                         {
-                            offset = ctx.ctx.error_locs.front() - 8;
+                            offset = current_instance.execution_state.error_locs.front() - 8;
                         }
                         else
                         {
@@ -617,7 +617,7 @@ int main()
                         offset = my_line - 8;
                     }
 
-                    format_column(channel, it->second, page_round(offset), 32, ctx.ctx.error_locs, ctx.ctx.error_locs, is_hex, use_signed);
+                    format_column(channel, it->second, page_round(offset), 32, current_instance.execution_state.error_locs, current_instance.execution_state.error_locs, is_hex, use_signed);
 
                     ImGui::SameLine(0, ImGui::CalcTextSize(" ").x);
                 }
@@ -702,7 +702,7 @@ int main()
 
                 int mult = 2;
 
-                for(auto& buffer : ctx.ctx.real_world_state.memory)
+                for(auto& buffer : current_instance.runtime_data.real_world_state.memory)
                 {
                     ImGui::SetNextWindowSize(ImVec2(128 * mult + ImGui::CalcTextSize(" ").x*2, 96 * mult + ImGui::CalcTextSize(" ").y*2), ImGuiCond_Always);
 
