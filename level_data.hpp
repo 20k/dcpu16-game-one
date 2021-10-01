@@ -89,6 +89,7 @@ struct level_instance
     runtime_errors execution_state;
 
     bool displayed_level_over = false;
+    bool successful_validation = false;
 
     void update_assembly_errors(dcpu::ide::project_instance& instance);
 };

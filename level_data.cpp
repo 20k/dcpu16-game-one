@@ -152,9 +152,9 @@ void level_runtime_parameters::generate_io(const level_data& data)
     {
         io_cpu_c.step(&f);
 
-        if(dcpu::sim::has_write(io_cpu_c))
+        if(dcpu::sim::has_any_write(io_cpu_c))
         {
-            auto [value, channel] = dcpu::sim::drain_write(io_cpu_c, f);
+            auto [value, channel] = dcpu::sim::drain_any_write(io_cpu_c, f);
 
             if(data.is_input_channel(channel))
             {
@@ -367,6 +367,162 @@ void level_manager::step_validation(dcpu::ide::project_instance& instance)
     level_instance& my_level = current_level.value();
 
     my_level.execution_state = runtime_errors();
+
+    std::vector<dcpu::sim::CPU*> user;
+
+    for(dcpu::ide::editor& edit : instance.editors)
+    {
+        dcpu::sim::CPU& next = edit.c;
+
+        user.push_back(&next);
+    }
+
+    stack_vector<dcpu::sim::CPU*, 64> cpus;
+
+    for(auto& i : user)
+    {
+        cpus.push_back(i);
+    }
+
+    stack_vector<dcpu::sim::hardware*, 65536> all_hardware;
+
+    for(auto& i : my_level.runtime_data.hardware)
+    {
+        all_hardware.push_back(i);
+    }
+
+    int max_cycles = 1;
+
+    for(int i=0; i < max_cycles; i++)
+    {
+        for(int kk=0; kk < (int)cpus.size(); kk++)
+        {
+            instance.editors[kk].halted = instance.editors[kk].halted || cpus[kk]->cycle_step(&my_level.runtime_data.fab, &all_hardware, &my_level.runtime_data.real_world_state);
+        }
+
+        dcpu::sim::resolve_interprocessor_communication(cpus, my_level.runtime_data.fab);
+    }
+
+    for(int kk=0; kk < (int)cpus.size(); kk++)
+    {
+        dcpu::sim::CPU& c = *cpus[kk];
+
+        if(dcpu::sim::has_any_write(c))
+        {
+            auto [value, channel] = dcpu::sim::drain_any_write(c, my_level.runtime_data.fab);
+
+            my_level.runtime_data.found_output[channel].push_back(value);
+        }
+
+        for(auto& [channel, values] : my_level.runtime_data.input_queue)
+        {
+            if(values.size() == 0)
+                continue;
+
+            if(dcpu::sim::has_read(c, channel))
+            {
+                uint16_t front = values.front();
+                values.pop_front();
+
+                dcpu::sim::fulfill_read(c, my_level.runtime_data.fab, front, channel);
+            }
+        }
+    }
+
+    {
+        assert(user.size() >= 1);
+
+        int screen_idx = 0;
+
+        for(int i=0; i < (int)my_level.runtime_data.hardware.size(); i++)
+        {
+            dcpu::sim::hardware* hw = my_level.runtime_data.hardware[i];
+
+            bool is_lem = hw->hardware_id == 0x7349f615;
+
+            if(!is_lem)
+                continue;
+
+            auto& rendering = my_level.runtime_data.real_world_state.memory.at(screen_idx);
+
+            dcpu::sim::LEM1802* as_lem = dynamic_cast<dcpu::sim::LEM1802*>(hw);
+
+            assert(as_lem);
+
+            as_lem->render(&my_level.runtime_data.real_world_state, *user.front(), rendering);
+
+            screen_idx++;
+        }
+    }
+
+    for(auto& [channel, values] : my_level.runtime_data.found_output)
+    {
+        const std::vector<uint16_t>& output_vals = my_level.constructed_data.channel_to_output[channel];
+
+        for(int i=0; i < (int)values.size() && i < (int)output_vals.size(); i++)
+        {
+            if(values[i] != output_vals[i])
+            {
+                my_level.execution_state.error_locs.push_back(i);
+                my_level.execution_state.error_channels.push_back(channel);
+            }
+        }
+    }
+
+    bool hardware_errors = false;
+
+    ///todo
+    /*if(ctx.extra_validation != nullptr)
+    {
+        ///todo: DEBUGGING
+        if(ctx.extra_validation(ctx, instance))
+        {
+            hardware_errors = true;
+        }
+    }*/
+
+    bool any_errors_at_all = hardware_errors || my_level.execution_state.error_locs.size() > 0 || my_level.ass_state.has_error;
+
+    ///just succeeded
+    if(!my_level.successful_validation && !any_errors_at_all)
+    {
+        int total_cycles = 0;
+        int total_assembly = 0;
+
+        for(dcpu::ide::editor& edit : instance.editors)
+        {
+            dcpu::sim::CPU& next = edit.c;
+
+            total_cycles += next.cycle_count;
+            total_assembly += edit.translation_map.size();
+        }
+
+        level_stats::info rstat;
+        rstat.cycles = total_cycles;
+        rstat.assembly_length = total_assembly;
+        rstat.valid = true;
+
+        {
+            auto best_stats_opt = level_stats::load_best(my_level.data.name);
+
+            level_stats::info best;
+            best.assembly_length = INT_MAX;
+            best.cycles = INT_MAX;
+
+            if(best_stats_opt.has_value())
+                best = best_stats_opt.value();
+
+            best.cycles = std::min(best.cycles, rstat.cycles);
+            best.assembly_length = std::min(best.assembly_length, rstat.assembly_length);
+            best.valid = true;
+
+            level_stats::save_best(my_level.data.name, best);
+        }
+
+        my_level.runtime_data.current_run_stats = rstat;
+    }
+
+    my_level.successful_validation = !any_errors_at_all;
 }
 
 void level_manager::display_level_select(dcpu::ide::project_instance& instance)
