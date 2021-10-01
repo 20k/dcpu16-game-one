@@ -543,9 +543,9 @@ int main()
 
             ImGui::Text("Out     ");
 
-            for(auto& [channel, vals] : ctx.ctx.channel_to_output)
+            for(auto& [channel, vals] : current_instance.constructed_data.channel_to_output)
             {
-                int my_line = ctx.ctx.inf.output_translation[channel][ctx.ctx.inf.output_cpus[channel].regs[PC_REG]] - 1;
+                int my_line = (int)vals.size() - (int)current_instance.runtime_data.found_output[channel].size();
 
                 if(my_line < 0)
                     my_line = 0;
@@ -554,19 +554,19 @@ int main()
 
                 int offset = my_line - 8;
 
-                if(run_is_finished && ctx.ctx.error_locs.size() > 0)
+                if(run_is_finished && current_instance.execution_state.error_locs.size() > 0)
                 {
-                    int which_error_line = ctx.ctx.error_locs.front();
-                    int which_channel = ctx.ctx.error_channels.front();
+                    int which_error_line = current_instance.execution_state.error_locs.front();
+                    int which_channel = current_instance.execution_state.error_channels.front();
 
                     if(which_channel == channel)
                     {
                         offset = which_error_line - 8;
                     }
 
-                    else if(which_error_line >= 0 && which_error_line < (int)ctx.ctx.output_to_input_start[which_channel][channel].size())
+                    else if(which_error_line >= 0 && which_error_line < (int)current_instance.constructed_data.output_to_input_start[which_channel][channel].size())
                     {
-                        offset = ctx.ctx.output_to_input_start[which_channel][channel][which_error_line] - 8;
+                        offset = current_instance.constructed_data.output_to_input_start[which_channel][channel][which_error_line] - 8;
                     }
                 }
 
