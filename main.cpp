@@ -237,6 +237,7 @@ int main()
         if(levels.should_return_to_main_menu)
         {
             levels.current_level = std::nullopt;
+            levels.should_return_to_main_menu = false;
         }
 
         if(!levels.current_level.has_value())

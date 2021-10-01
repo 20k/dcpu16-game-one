@@ -457,11 +457,15 @@ void level_manager::step_validation(dcpu::ide::project_instance& instance)
 
     for(auto& [channel, values] : my_level.runtime_data.found_output)
     {
+        std::vector<uint16_t> current_output = values;
+
         const std::vector<uint16_t>& output_vals = my_level.constructed_data.channel_to_output[channel];
 
-        for(int i=0; i < (int)values.size() && i < (int)output_vals.size(); i++)
+        current_output.resize(output_vals.size());
+
+        for(int i=0; i < (int)current_output.size() && i < (int)output_vals.size(); i++)
         {
-            if(values[i] != output_vals[i])
+            if(current_output[i] != output_vals[i])
             {
                 my_level.execution_state.error_locs.push_back(i);
                 my_level.execution_state.error_channels.push_back(channel);
