@@ -238,6 +238,14 @@ void level_runtime_data::build_from(const level_runtime_parameters& params)
     {
         hardware.push_back(hw->clone());
     }
+
+    for(auto& [channel, vals] : params.channel_to_input)
+    {
+        for(auto& j : vals)
+        {
+            input_queue[channel].push_back(j);
+        }
+    }
 }
 
 void level_instance::update_assembly_errors(dcpu::ide::project_instance& instance)
@@ -318,7 +326,7 @@ void level_manager::save_current(dcpu::ide::project_instance& instance)
 
 void level_manager::back_to_main_menu()
 {
-    current_level = std::nullopt;
+    should_return_to_main_menu = true;
 }
 
 void level_manager::reset_level()

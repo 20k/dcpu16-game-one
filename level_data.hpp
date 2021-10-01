@@ -8,6 +8,7 @@
 #include <dcpu16-ide/base_ide.hpp>
 #include <dcpu16-sim/base_hardware.hpp>
 #include <dcpu16-sim/all_hardware.hpp>
+#include <deque>
 #include "world_state.hpp"
 #include "constant_time_exec.hpp"
 #include "level_stats.hpp"
@@ -61,6 +62,8 @@ struct level_runtime_data
 
     world_state real_world_state;
 
+    std::map<int, std::deque<uint16_t>> input_queue;
+
     std::optional<level_stats::info> current_run_stats;
     std::optional<dcpu::sim::CPU> dynamic_validation_cpu;
     std::vector<dcpu::sim::hardware*> hardware;
@@ -106,6 +109,7 @@ struct level_manager
     std::optional<level_data> selected_level;
 
     std::optional<level_instance> current_level;
+    bool should_return_to_main_menu = false;
 
     void load(const std::string& folder = "./levels");
     void save_current(dcpu::ide::project_instance& instance);

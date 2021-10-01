@@ -233,6 +233,11 @@ int main()
 
         int level_window_bottom = 20;
 
+        if(levels.should_return_to_main_menu)
+        {
+            levels.current_level = std::nullopt;
+        }
+
         if(!levels.current_level.has_value())
         {
             levels.display_level_select(current_project);
@@ -241,7 +246,6 @@ int main()
         {
             std::string name = levels.current_level.value().data.name;
             std::string description = levels.current_level.value().data.description;
-
 
             ImGui::Begin("Level", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove);
 
@@ -282,11 +286,7 @@ int main()
             style::finish();
 
             ImGui::End();
-        }
 
-        ///might have backed out to main menu. This is kind of hacky
-        if(levels.current_level.has_value())
-        {
             level_instance& current_instance = levels.current_level.value();
 
             {
@@ -448,11 +448,8 @@ int main()
 
                 if(ImGui::Selectable("> Continue"))
                 {
-                    if(levels.current_level.has_value())
-                    {
-                        levels.current_level.value().runtime_data.current_run_stats = std::nullopt;
-                        levels.current_level.value().displayed_level_over = false;
-                    }
+                    current_instance.runtime_data.current_run_stats = std::nullopt;
+                    current_instance.displayed_level_over = false;
 
                     ImGui::CloseCurrentPopup();
                 }
@@ -485,26 +482,24 @@ int main()
 
             bool run_is_finished = true;
 
-            for(auto& [channel, vals] : ctx.ctx.channel_to_output)
+            for(auto& [channel, vals] : current_instance.constructed_data.channel_to_output)
             {
-                if(ctx.ctx.inf.output_cpus[channel].regs[PC_REG] < (int)ctx.ctx.inf.output_translation[channel].size())
+                if(current_instance.runtime_data.found_output[channel].size() < current_instance.constructed_data.channel_to_output[channel].size())
                     run_is_finished = false;
+
+                //if(ctx.ctx.inf.output_cpus[channel].regs[PC_REG] < (int)ctx.ctx.inf.output_translation[channel].size())
+                //    run_is_finished = false;
             }
 
-            if(ctx.ctx.channel_to_input.size() > 0)
+            if(current_instance.constructed_data.channel_to_input.size() > 0)
             {
                 ImGui::BeginGroup();
 
                 ImGui::Text("In      ");
 
-                for(auto& [channel, vals] : ctx.ctx.channel_to_input)
+                for(auto& [channel, vals] : current_instance.constructed_data.channel_to_input)
                 {
-                    ///the -1 requires some explaining
-                    ///basically, the blocking multiprocessor instructions
-                    ///block on the *next* instruction, not the current one
-                    ///which makes sense logically, but results in bad debuggability
-                    ///this is a hack
-                    int my_line = ctx.ctx.inf.input_translation[channel][ctx.ctx.inf.input_cpus[channel].regs[PC_REG]] - 1;
+                    int my_line = (int)vals.size() - (int)current_instance.runtime_data.input_queue[channel].size();
 
                     my_line = std::max(my_line, 0);
 
@@ -512,14 +507,14 @@ int main()
 
                     std::vector<int> to_highlight;
 
-                    if(run_is_finished && ctx.ctx.error_locs.size() > 0)
+                    if(run_is_finished && current_instance.execution_state.error_locs.size() > 0)
                     {
-                        int which_error_line = ctx.ctx.error_locs.front();
-                        int which_channel = ctx.ctx.error_channels.front();
+                        int which_error_line = current_instance.execution_state.error_locs.front();
+                        int which_channel = current_instance.execution_state.error_channels.front();
 
-                        if(which_error_line >= 0 && which_error_line < (int)ctx.ctx.output_to_input_start[which_channel][channel].size())
+                        if(which_error_line >= 0 && which_error_line < (int)current_instance.constructed_data.output_to_input_start[which_channel][channel].size())
                         {
-                            int translated_line = ctx.ctx.output_to_input_start[which_channel][channel][which_error_line];
+                            int translated_line = current_instance.constructed_data.output_to_input_start[which_channel][channel][which_error_line];
 
                             to_highlight.push_back(translated_line);
 
