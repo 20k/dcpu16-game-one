@@ -43,8 +43,8 @@ struct level_runtime_parameters
     std::map<int, std::vector<uint16_t>> channel_to_output;
     std::map<int, std::map<int, std::vector<int>>> output_to_input_start;
 
-    std::optional<dcpu::sim::CPU> io_cpu;
-    std::optional<dcpu::sim::CPU> dynamic_validation_cpu;
+    std::optional<std::shared_ptr<dcpu::sim::CPU>> io_cpu;
+    std::optional<std::shared_ptr<dcpu::sim::CPU>> dynamic_validation_cpu;
     std::vector<dcpu::sim::hardware*> hardware;
 
 private:
@@ -65,7 +65,7 @@ struct level_runtime_data
     std::map<int, std::deque<uint16_t>> input_queue;
 
     std::optional<level_stats::info> current_run_stats;
-    std::optional<dcpu::sim::CPU> dynamic_validation_cpu;
+    std::optional<std::shared_ptr<dcpu::sim::CPU>> dynamic_validation_cpu;
     std::vector<dcpu::sim::hardware*> hardware;
 
     dcpu::sim::fabric fab;

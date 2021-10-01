@@ -142,7 +142,7 @@ void level_runtime_parameters::generate_io(const level_data& data)
     if(!io_cpu.has_value())
         return;
 
-    dcpu::sim::CPU& io_cpu_c = io_cpu.value();
+    dcpu::sim::CPU& io_cpu_c = *io_cpu.value();
 
     uint64_t max_cycles = 1024 * 1024;
 
@@ -174,11 +174,31 @@ void level_runtime_parameters::generate_io(const level_data& data)
     }
 }
 
+/*constexpr void test()
+{
+    constexpr std::string_view view = R"(SET Y, 256
+
+SND X, 0
+SND X, 1
+
+ADD X, 1
+
+IFN X, Y
+SET PC, 0
+
+:hold
+SET PC, hold)";
+
+    constexpr auto val = assemble(view);
+
+    static_assert(val.first.has_value());
+}*/
+
 void level_runtime_parameters::build_from(const level_data& data)
 {
     if(data.io_program.has_value())
     {
-        auto [data_opt, err] = assemble(data.io_program.value());
+        auto [data_opt, err] = assemble_fwd(data.io_program.value());
 
         if(!data_opt.has_value())
         {
@@ -186,10 +206,10 @@ void level_runtime_parameters::build_from(const level_data& data)
             return;
         }
 
-        dcpu::sim::CPU cpu;
-        cpu.load(data_opt.value().mem, 0);
+        std::shared_ptr<dcpu::sim::CPU> ptr = std::make_shared<dcpu::sim::CPU>();
+        ptr->load(data_opt.value().mem, 0);
 
-        io_cpu = cpu;
+        io_cpu = std::move(ptr);
     }
 
     if(data.dynamic_validation_program.has_value())
@@ -202,10 +222,10 @@ void level_runtime_parameters::build_from(const level_data& data)
             return;
         }
 
-        dcpu::sim::CPU cpu;
-        cpu.load(data_opt.value().mem, 0);
+        std::shared_ptr<dcpu::sim::CPU> ptr = std::make_shared<dcpu::sim::CPU>();
+        ptr->load(data_opt.value().mem, 0);
 
-        dynamic_validation_cpu = cpu;
+        dynamic_validation_cpu = std::move(ptr);
     }
 
     for(const std::string& name : data.hardware_names)
@@ -232,7 +252,13 @@ void level_runtime_parameters::build_from(const level_data& data)
 
 void level_runtime_data::build_from(const level_runtime_parameters& params)
 {
-    dynamic_validation_cpu = params.dynamic_validation_cpu;
+    if(params.dynamic_validation_cpu.has_value())
+    {
+        std::shared_ptr<dcpu::sim::CPU> ptr = std::make_shared<dcpu::sim::CPU>();
+        *ptr = *params.dynamic_validation_cpu.value();
+
+        dynamic_validation_cpu = std::move(ptr);
+    }
 
     for(dcpu::sim::hardware* hw : params.hardware)
     {
