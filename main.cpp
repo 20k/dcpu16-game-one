@@ -16,6 +16,7 @@
 #include "style.hpp"
 #include <imguicolortextedit/texteditor.h>
 //#include <dcpu16-asm/base_asm.hpp>
+#include "level_data.hpp"
 
 /*:start
 
@@ -214,8 +215,10 @@ int main()
         ImGuiFreeType::BuildFontAtlas(atlas, 0, 1);
     }
 
-    run_context ctx;
+    //run_context ctx;
     dcpu::ide::project_instance current_project;
+
+    level_manager levels;
 
     std::filesystem::create_directory("saves/");
 
@@ -228,13 +231,17 @@ int main()
     {
         win.poll();
 
-        if(ctx.ctx.level_name.size() == 0)
+        int level_window_bottom = 20;
+
+        if(!levels.current_level.has_value())
         {
-            main_menu(select, ctx, current_project);
+            levels.display_level_select(current_project);
         }
         else
         {
-            int level_window_bottom = 20;
+            std::string name = levels.current_level.value().data.name;
+            std::string description = levels.current_level.value().data.description;
+
 
             ImGui::Begin("Level", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove);
 
@@ -258,23 +265,29 @@ int main()
 
             ImGui::SetWindowPos(ImVec2(screen_size.x()/2 - dim.x/2 + offset.x, offset.y));
 
-            ImGui::Text("Level: %s", ctx.ctx.level_name.c_str());
+            ImGui::Text("Level: %s", name.c_str());
 
             ImGui::PushTextWrapPos(800);
-            ImGui::Text("%s", ctx.ctx.description.c_str());
+            ImGui::Text("%s", description.c_str());
             ImGui::PopTextWrapPos();
 
             if(ImGui::Selectable("> Back"))
             {
                 ///saves
-                level::switch_to_level(ctx, current_project, ctx.ctx.level_name);
-                ctx.ctx.level_name = "";
+                levels.save_current(current_project);
+                levels.back_to_main_menu();
             }
 
             style::pop_styles();
             style::finish();
 
             ImGui::End();
+        }
+
+        ///might have backed out to main menu. This is kind of hacky
+        if(levels.current_level.has_value())
+        {
+            level_instance& current_instance = levels.current_level.value();
 
             {
                 uint64_t now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch().count();
@@ -306,7 +319,7 @@ int main()
                     if(edit.halted)
                         any_halted = true;
 
-                    edit.is_running = (ctx.exec.max_cycles == (uint64_t)-1);
+                    edit.is_running = (current_instance.runtime_data.exec.max_cycles == (uint64_t)-1);
 
                     edit.wants_run = false;
                     edit.wants_assemble = false;
@@ -331,26 +344,25 @@ int main()
 
                 if(any_wants_assemble || any_wants_reset)
                 {
-                    ctx.ctx = level::start(ctx.ctx.level_name, 256);
+                    levels.reset_level();
+                    levels.save_current(current_project);
 
-                    level::setup_validation(ctx.ctx, current_project);
-
-                    ctx.exec.init(0, now_ms);
+                    current_instance.runtime_data.exec.init(0, now_ms);
                 }
 
                 if(any_wants_pause)
                 {
-                    ctx.exec.init(0, now_ms);
+                    current_instance.runtime_data.exec.init(0, now_ms);
                 }
 
                 if(any_wants_step)
                 {
-                    ctx.exec.init(1, now_ms);
+                    current_instance.runtime_data.exec.init(1, now_ms);
                 }
 
                 if(any_wants_run)
                 {
-                    ctx.exec.init(-1, now_ms);
+                    current_instance.runtime_data.exec.init(-1, now_ms);
                 }
 
                 for(dcpu::ide::editor& edit : current_project.editors)
@@ -358,31 +370,32 @@ int main()
                     if(edit.dirty_frequency)
                     {
                         edit.dirty_frequency = false;
-                        ctx.exec.cycles_per_s = edit.clock_hz;
+                        current_instance.runtime_data.exec.cycles_per_s = edit.clock_hz;
                     }
                 }
 
                 for(dcpu::ide::editor& edit : current_project.editors)
                 {
-                    edit.clock_hz = ctx.exec.cycles_per_s;
+                    edit.clock_hz = current_instance.runtime_data.exec.cycles_per_s;
                 }
 
-                ctx.exec.exec_until(now_ms, [&](uint64_t cycle_idx, uint64_t time_ms)
+                current_instance.runtime_data.exec.exec_until(now_ms, [&](uint64_t cycle_idx, uint64_t time_ms)
                 {
                     if(any_halted)
                         return;
 
-                    ctx.ctx.real_world_state.time_ms = time_ms;
-                    level::step_validation(ctx.ctx, current_project, 1);
+                    current_instance.runtime_data.real_world_state.time_ms = time_ms;
+
+                    levels.step_validation(current_project);
                 });
             }
 
-            if(!ctx.ctx.displayed_level_over && ctx.ctx.current_stats.has_value())
+            if(!current_instance.displayed_level_over && current_instance.runtime_data.current_run_stats.has_value())
             {
-                ctx.ctx.displayed_level_over = true;
+                current_instance.displayed_level_over = true;
 
-                level_over.best_stats = level_stats::load_best(ctx.ctx.level_name).value_or(level_stats::info());
-                level_over.current_stats = ctx.ctx.current_stats.value();
+                level_over.best_stats = level_stats::load_best(current_instance.data.name).value_or(level_stats::info());
+                level_over.current_stats = current_instance.runtime_data.current_run_stats.value();
 
                 for(dcpu::ide::editor& e : current_project.editors)
                 {
@@ -424,16 +437,22 @@ int main()
 
                 if(ImGui::Selectable("> Menu"))
                 {
-                    level::switch_to_level(ctx, current_project, ctx.ctx.level_name);
-                    ctx.ctx.level_name = "";
+                    /*level::switch_to_level(ctx, current_project, ctx.ctx.level_name);
+                    ctx.ctx.level_name = "";*/
+
+                    levels.save_current(current_project);
+                    levels.back_to_main_menu();
 
                     ImGui::CloseCurrentPopup();
                 }
 
                 if(ImGui::Selectable("> Continue"))
                 {
-                    ctx.ctx.current_stats = std::nullopt;
-                    ctx.ctx.displayed_level_over = false;
+                    if(levels.current_level.has_value())
+                    {
+                        levels.current_level.value().runtime_data.current_run_stats = std::nullopt;
+                        levels.current_level.value().displayed_level_over = false;
+                    }
 
                     ImGui::CloseCurrentPopup();
                 }

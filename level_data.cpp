@@ -308,6 +308,19 @@ void level_manager::switch_to_level(dcpu::ide::project_instance& instance, const
     current_level.value().runtime_data.exec.init(0, now_ms);
 }
 
+void level_manager::save_current(dcpu::ide::project_instance& instance)
+{
+    if(instance.proj.project_file.size() > 0)
+    {
+        instance.save();
+    }
+}
+
+void level_manager::back_to_main_menu()
+{
+    current_level = std::nullopt;
+}
+
 void level_manager::reset_level()
 {
     level_instance current = current_level.value();

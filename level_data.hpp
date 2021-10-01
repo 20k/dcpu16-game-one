@@ -61,6 +61,7 @@ struct level_runtime_data
 
     world_state real_world_state;
 
+    std::optional<level_stats::info> current_run_stats;
     std::optional<dcpu::sim::CPU> dynamic_validation_cpu;
     std::vector<dcpu::sim::hardware*> hardware;
 
@@ -84,6 +85,8 @@ struct level_instance
     assembler_state ass_state;
     runtime_errors execution_state;
 
+    bool displayed_level_over = false;
+
     void update_assembly_errors(dcpu::ide::project_instance& instance);
 };
 
@@ -105,6 +108,9 @@ struct level_manager
     std::optional<level_instance> current_level;
 
     void load(const std::string& folder = "./levels");
+    void save_current(dcpu::ide::project_instance& instance);
+
+    void back_to_main_menu();
 
     void display_level_select(dcpu::ide::project_instance& instance);
 
