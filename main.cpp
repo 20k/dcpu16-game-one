@@ -219,6 +219,7 @@ int main()
     dcpu::ide::project_instance current_project;
 
     level_manager levels;
+    levels.load();
 
     std::filesystem::create_directory("saves/");
 
