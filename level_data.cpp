@@ -6,6 +6,7 @@
 #include <dcpu16-sim/hardware_clock.hpp>
 #include <dcpu16-sim/hardware_lem1802.hpp>
 #include "style.hpp"
+#include "hardware_rng.hpp"
 
 bool level_data::is_input_channel(int c) const
 {
