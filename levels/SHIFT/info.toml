@@ -1,0 +1,14 @@
+name = "SHIFT"
+
+description =  """
+Multiply Ch:0 by 16, and output to Ch:1
+"""
+
+short_description = "MULTIPLY THE INPUT BY 16"
+
+hardware = []
+
+input_channels = [0]
+output_channels = [1]
+
+section = "TUTORIAL"

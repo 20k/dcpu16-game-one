@@ -1,0 +1,19 @@
+SET Y, 256
+
+HWI 0
+
+MOD X, (65536/32)
+
+SND X, 0
+
+MUL X, 16
+
+SND X, 1
+
+ADD Z, 1
+
+IFN Z, Y
+SET PC, 0
+
+:hold
+SET PC, hold

@@ -25,7 +25,9 @@ struct hardware_rng : dcpu::sim::hardware
 
     constexpr virtual void interrupt(dcpu::sim::world_base* state, dcpu::sim::CPU& c) override
     {
-        c.set_location(dcpu::sim::location::reg{X_REG}, next(internal_state));
+        uint16_t val = next(internal_state);
+
+        c.set_location(dcpu::sim::location::reg{X_REG}, val);
     }
 
     constexpr virtual void reset() override
