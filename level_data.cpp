@@ -143,6 +143,11 @@ void level_runtime_parameters::generate_io(const level_data& data)
     if(!io_cpu.has_value())
         return;
 
+    hardware_rng hwrng;
+
+    stack_vector<dcpu::sim::hardware*, 65536> hw;
+    hw.push_back(&hwrng);
+
     dcpu::sim::CPU& io_cpu_c = *io_cpu.value();
 
     uint64_t max_cycles = 1024 * 1024;
@@ -151,7 +156,7 @@ void level_runtime_parameters::generate_io(const level_data& data)
 
     for(uint64_t current_cycle = 0; current_cycle < max_cycles; current_cycle++)
     {
-        io_cpu_c.step(&f);
+        io_cpu_c.step(&f, &hw);
 
         if(dcpu::sim::has_any_write(io_cpu_c))
         {
