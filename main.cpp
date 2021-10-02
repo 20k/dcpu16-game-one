@@ -346,7 +346,7 @@ int main()
 
                 if(any_wants_assemble || any_wants_reset)
                 {
-                    levels.reset_level();
+                    levels.reset_level(current_project);
                     levels.save_current(current_project);
 
                     current_instance.runtime_data.exec.init(0, now_ms);

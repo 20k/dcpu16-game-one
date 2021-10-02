@@ -308,9 +308,19 @@ void level_manager::load(const std::string& folder)
     levels.load(folder);
 }
 
-void level_manager::start_level(const level_data& data)
+void level_manager::start_level(dcpu::ide::project_instance& instance, const level_data& data)
 {
     current_level = levels.make_instance(data);
+
+    bool has_error = false;
+
+    for(dcpu::ide::editor& edit : instance.editors)
+    {
+        if(edit.assemble())
+            has_error = true;
+    }
+
+    current_level.value().ass_state.has_error = has_error;
 }
 
 void level_manager::switch_to_level(dcpu::ide::project_instance& instance, const level_data& data)
@@ -342,7 +352,7 @@ void level_manager::switch_to_level(dcpu::ide::project_instance& instance, const
         instance.editors.emplace_back();
     }
 
-    start_level(data);
+    start_level(instance, data);
 
     current_level.value().update_assembly_errors(instance);
     current_level.value().runtime_data.exec.init(0, now_ms);
@@ -361,11 +371,11 @@ void level_manager::back_to_main_menu()
     should_return_to_main_menu = true;
 }
 
-void level_manager::reset_level()
+void level_manager::reset_level(dcpu::ide::project_instance& instance)
 {
     level_instance current = current_level.value();
 
-    start_level(current.data);
+    start_level(instance, current.data);
 }
 
 void level_manager::step_validation(dcpu::ide::project_instance& instance)

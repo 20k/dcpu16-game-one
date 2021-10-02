@@ -119,7 +119,7 @@ struct level_manager
 
     void display_level_select(dcpu::ide::project_instance& instance);
 
-    void reset_level();
+    void reset_level(dcpu::ide::project_instance& instance);
     //void start_level(const std::string& level);
 
     //void setup_validation(dcpu::ide::project_instance& instance);
@@ -127,7 +127,7 @@ struct level_manager
 
 private:
     void switch_to_level(dcpu::ide::project_instance& instance, const level_data& data);
-    void start_level(const level_data& data);
+    void start_level(dcpu::ide::project_instance& instance, const level_data& data);
 };
 
 #endif // LEVEL_DATA_HPP_INCLUDED
