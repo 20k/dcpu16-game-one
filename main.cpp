@@ -547,7 +547,7 @@ int main()
 
             for(auto& [channel, vals] : current_instance.constructed_data.channel_to_output)
             {
-                int my_line = (int)vals.size() - (int)current_instance.runtime_data.found_output[channel].size();
+                int my_line = (int)current_instance.runtime_data.found_output[channel].size();
 
                 if(my_line < 0)
                     my_line = 0;
@@ -596,7 +596,7 @@ int main()
             {
                 if(auto it = current_instance.runtime_data.found_output.find(channel); it != current_instance.runtime_data.found_output.end())
                 {
-                    int my_line = (int)vals.size() - (int)current_instance.runtime_data.found_output[channel].size();
+                    int my_line = (int)current_instance.runtime_data.found_output[channel].size();
 
                     if(my_line < 0)
                         my_line = 0;
