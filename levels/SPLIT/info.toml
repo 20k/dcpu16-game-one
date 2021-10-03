@@ -1,0 +1,14 @@
+name = "SPLIT"
+
+description =  """
+Load the value in Ch:0. Output (value >>> 8) to Ch:1, and (value & 0xFF) to Ch:2
+"""
+
+short_description = "SPLIT THE INPUT INTO 8-BIT UPPER AND LOWER PARTS"
+
+hardware = []
+
+input_channels = [0]
+output_channels = [1, 2]
+
+section = "TUTORIAL"

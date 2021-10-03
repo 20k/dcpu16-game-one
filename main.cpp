@@ -104,6 +104,8 @@ void format_column(int channel, const std::vector<uint16_t>& values, int offset,
     if(offset < 0)
         offset = 0;
 
+    int rendered_count = 0;
+
     for(int i=offset; i < (int)values.size() && i < (offset + count); i++)
     {
         int32_t val = use_signed ? (int32_t)(int16_t)values[i] : (int32_t)values[i];
@@ -124,9 +126,17 @@ void format_column(int channel, const std::vector<uint16_t>& values, int offset,
         }*/
 
         if(highlight_set.find(i) == highlight_set.end())
-            ImGui::TextUnformatted(base_str.c_str());
+            ImGui::TextUnformatted((base_str + "  ").c_str());
         else
             ImGui::TextUnformatted((base_str + " <").c_str());
+
+        rendered_count++;
+    }
+
+    if(rendered_count == 0)
+    {
+        ///fixed width 6 + 2 for the " <"
+        ImGui::TextUnformatted("        ");
     }
 
     ImGui::EndGroup();

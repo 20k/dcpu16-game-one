@@ -1,0 +1,18 @@
+HWI 0
+SND X, 0
+
+SET I, X
+SHR I, 8
+SND I, 1
+
+SET Y, X
+AND Y, 0xFF
+SND Y, 2
+
+ADD Z, 1
+
+IFN Z, 256
+SET PC, 0
+
+:hold
+SET PC, hold
