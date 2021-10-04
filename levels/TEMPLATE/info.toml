@@ -1,0 +1,14 @@
+name = "INTRO"
+
+description =  """
+Hello there
+"""
+
+short_description = "HELLO THERE"
+
+hardware = []
+
+input_channels = [0]
+output_channels = [1]
+
+section = "TUTORIAL"

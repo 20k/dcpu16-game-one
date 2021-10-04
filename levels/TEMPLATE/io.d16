@@ -1,0 +1,12 @@
+SET Y, 256
+
+SND X, 0
+SND X, 1
+
+ADD X, 1
+
+IFN X, Y
+SET PC, 0
+
+:hold
+SET PC, hold

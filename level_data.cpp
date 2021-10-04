@@ -30,6 +30,13 @@ bool level_data::is_output_channel(int c) const
     return false;
 }
 
+std::filesystem::path replace_filename(std::filesystem::path in, std::string_view filename)
+{
+    in.replace_filename(filename);
+
+    return in;
+}
+
 level_data load_level(const std::filesystem::path& path_to_info)
 {
     level_data ret;
@@ -50,14 +57,8 @@ level_data load_level(const std::filesystem::path& path_to_info)
         return level_data();
     }
 
-    std::string io_cpu = "io.d16";
-    std::string validation_cpu = "validation.d16";
-
-    std::filesystem::path io_path = path_to_info;
-    io_path.replace_filename(io_cpu);
-
-    std::filesystem::path validation_path = path_to_info;
-    validation_path.replace_filename(validation_cpu);
+    std::filesystem::path io_path = replace_filename(path_to_info, "io.d16");
+    std::filesystem::path validation_path = replace_filename(path_to_info, "validation.d16");
 
     if(file::exists(io_path.string()))
     {
@@ -90,6 +91,9 @@ void all_level_data::load(const std::string& folder)
         std::filesystem::path current_file = p.path();
 
         std::string filename = current_file.filename().string();
+
+        if(file::exists(replace_filename(current_file, ".ignore").string()))
+            continue;
 
         if(filename == "info.toml")
         {
