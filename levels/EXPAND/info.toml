@@ -1,0 +1,16 @@
+name = "EXPAND"
+
+description =  """
+Read v.0 from Ch:0
+Read v.1 from Ch:1
+Output v.1 number of copies of v.0 to Ch:2
+"""
+
+short_description = "REPEAT A VALUE REPEAT A VALUE REPEAT A VALUE"
+
+hardware = []
+
+input_channels = [0, 1]
+output_channels = [2]
+
+section = "TUTORIAL"
