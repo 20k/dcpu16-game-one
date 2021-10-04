@@ -1,0 +1,38 @@
+SET J, 256
+
+HWI 0
+SET Y, X
+
+HWI 0
+
+;X is value
+;Y is power
+
+MOD Y, 9
+
+SND X, 0
+SND Y, 1
+
+SET Z, 1
+
+
+IFE Y, 0
+SET PC, fin
+
+:loop
+MUL Z, X
+
+SUB Y, 1
+IFN Y, 0
+SET PC, loop
+
+:fin
+SND Z, 2
+
+ADD I, 1
+
+IFN I, J
+SET PC, 0
+
+:hold
+SET PC, hold

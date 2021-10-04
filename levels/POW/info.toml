@@ -1,0 +1,22 @@
+name = "POW"
+
+description =  """
+Read v.0 from Ch:0
+Read v.1 from Ch:1
+
+Compute v.0 to the power of v.1 and write it to Ch:2
+
+POW can be represented as a series of chained multiplication
+eg POW(x, 3) = x*x*x and POW(x, 5) = x*x*x*x*x
+
+POW(x, 0) === 1 by definition
+"""
+
+short_description = "IMPLEMENT THE POW(x, y) FUNCTION"
+
+hardware = []
+
+input_channels = [0, 1]
+output_channels = [2]
+
+section = "TUTORIAL"
