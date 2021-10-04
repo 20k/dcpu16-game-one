@@ -1,0 +1,25 @@
+SET J, 256
+
+HWI 0
+SET Y, X
+HWI 0
+
+SND X, 0
+SND Y, 1
+
+IFU X, Y
+SND -1, 2
+
+IFE X, Y
+SND 0, 2
+
+IFA X, Y
+SND 1, 2
+
+ADD I, 1
+
+IFN I, J
+SET PC, 0
+
+:hold
+SET PC, hold

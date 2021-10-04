@@ -1,0 +1,19 @@
+name = "SPACESHIP_OPERATOR"
+
+description =  """
+Read s.0 from Ch:0 and s.1 from Ch:1
+If s.0 < s.1, write -1 to Ch:2
+If s.1 == s.2, write 0 to Ch:2
+if s.1 > s.2, write 1 to Ch:2
+
+All values should be treated as signed
+"""
+
+short_description = "IMPLEMENT THE <=> OPERATOR ON SIGNED VALUES"
+
+hardware = []
+
+input_channels = [0, 1]
+output_channels = [2]
+
+section = "TUTORIAL"
