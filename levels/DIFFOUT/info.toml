@@ -1,0 +1,17 @@
+name = "DIFFOUT"
+
+description =  """
+If the absolute difference between the current value and the last value in Ch:0 is >= 256, send a 1 to Ch:1
+Else, send a 0 to Ch:1
+
+If there is no last value, output nothing
+"""
+
+short_description = "DETECT DISCONTINUITIES IN AN INPUT SEQUENCE"
+
+hardware = []
+
+input_channels = [0]
+output_channels = [1]
+
+section = "TUTORIAL"

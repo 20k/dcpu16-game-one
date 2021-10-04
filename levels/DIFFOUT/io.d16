@@ -1,0 +1,55 @@
+JSR get_rand
+SND X, 0
+SET B, X
+
+:start
+SET J, 256
+
+
+JSR get_rand
+SND X, 0
+
+; B is last value
+; X is current value
+
+; A is current temporary
+SET A, X
+; B is last temporary
+;SET B, Y
+
+IFG A, B
+SET PC, swap
+
+; B >= A
+:swap_return
+SUB B, A
+
+IFG B, 255
+SND 1, 1
+
+IFL B, 256
+SND 0, 1
+
+; update last value
+SET B, X
+
+ADD I, 1
+
+IFN I, J
+SET PC, start
+
+:hold
+SET PC, hold
+
+; swaps A and B
+:swap
+SET C, B
+SET B, A
+SET A, C
+SET PC, swap_return
+
+
+:get_rand
+HWI 0
+MOD X, 256*4
+SET PC, POP
