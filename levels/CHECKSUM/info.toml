@@ -1,0 +1,17 @@
+name = "CHECKSUM_CHECKER"
+
+description =  """
+Read Ch:1 number of values from Ch:0, and add them together to calculate the checksum
+Compare the checksum against the value v.0 in Ch:2
+If checksum == v.0, write 1 to Ch:3
+else write 0 to Ch:3
+"""
+
+short_description = "CHECK CHECKSUMS FOR CORRUPTION"
+
+hardware = []
+
+input_channels = [0, 1, 2]
+output_channels = [3]
+
+section = "TUTORIAL"
