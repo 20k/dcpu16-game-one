@@ -1,0 +1,28 @@
+SET J, 256
+
+HWI 0
+
+IFE I, 0
+SET X, 12
+
+IFE I, 1
+SET X, 24
+
+IFE I, 2
+SET X, 3
+
+MOD X, 32
+SND X, 0
+
+IFL X, 10
+SET X, 10
+
+SND X, 1
+
+ADD I, 1
+
+IFN I, J
+SET PC, 0
+
+:hold
+SET PC, hold

@@ -1,0 +1,16 @@
+name = "MAX"
+
+description =  """
+Read a value from Ch:0
+If the value is < 10, output 10
+Else, output the value
+"""
+
+short_description = "TAKE THE GREATER OF TWO VALUES"
+
+hardware = []
+
+input_channels = [0]
+output_channels = [1]
+
+section = "TUTORIAL"
