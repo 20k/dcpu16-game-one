@@ -1,11 +1,12 @@
-SET Y, 256
+SET J, 256
 
+ADD X, 1
 SND X, 0
 SND X, 1
 
-ADD X, 1
+ADD I, 1
 
-IFN X, Y
+IFN I, J
 SET PC, 0
 
 :hold
