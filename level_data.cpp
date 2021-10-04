@@ -16,7 +16,15 @@ bool level_data::is_input_channel(int c) const
             return true;
     }
 
-    return false;
+    ///if its also not specified as an output channel, then th eanswer is whether or not the unspecified trait is set
+    for(int i : output_channels)
+    {
+        ///output channel, cannot be input
+        if(i == c)
+            return false;
+    }
+
+    return unspecified_output_is_read;
 }
 
 bool level_data::is_output_channel(int c) const
@@ -27,7 +35,14 @@ bool level_data::is_output_channel(int c) const
             return true;
     }
 
-    return false;
+    for(int i : input_channels)
+    {
+        ///input channel, cannot be output
+        if(i == c)
+            return false;
+    }
+
+    return unspecified_output_is_write;
 }
 
 std::filesystem::path replace_filename(std::filesystem::path in, std::string_view filename)
@@ -65,6 +80,7 @@ level_data load_level(const std::filesystem::path& path_to_info)
         ret.io_program = file::read(io_path.string(), file::mode::TEXT);
     }
 
+
     if(file::exists(validation_path.string()))
     {
         ret.dynamic_validation_program = file::read(validation_path.string(), file::mode::TEXT);
@@ -76,8 +92,28 @@ level_data load_level(const std::filesystem::path& path_to_info)
     ret.section = toml::get<std::string>(parsed["section"]);
     ret.hardware_names = toml::get<std::vector<std::string>>(parsed["hardware"]);
 
-    ret.input_channels = toml::get<std::vector<int>>(parsed["input_channels"]);
-    ret.output_channels = toml::get<std::vector<int>>(parsed["output_channels"]);
+    if(parsed.contains("input_channels"))
+    {
+        ret.input_channels = toml::get<std::vector<int>>(parsed["input_channels"]);
+    }
+    else
+    {
+        ret.unspecified_output_is_read = true;
+    }
+
+    if(parsed.contains("output_channels"))
+    {
+        ret.output_channels = toml::get<std::vector<int>>(parsed["output_channels"]);
+    }
+    else
+    {
+        ret.unspecified_output_is_write = true;
+    }
+
+    if(ret.unspecified_output_is_read && ret.unspecified_output_is_write)
+    {
+        throw std::runtime_error("Must specify input channels or output channels or both");
+    }
 
     ret.my_best_stats = level_stats::load_best(ret.name);
 

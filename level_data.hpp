@@ -31,6 +31,9 @@ struct level_data
     std::vector<int> input_channels;
     std::vector<int> output_channels;
 
+    bool unspecified_output_is_write = false;
+    bool unspecified_output_is_read = false;
+
     bool is_input_channel(int c) const;
     bool is_output_channel(int c) const;
 };

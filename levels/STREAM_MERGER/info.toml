@@ -1,0 +1,13 @@
+name = "STREAM_MERGER"
+
+description =  """
+Load a value from Ch:0. Read from Ch:(value + 1) (fix this description). Write that value to Ch:3
+"""
+
+short_description = "MERGE THE VALUES IN TWO STREAMS TOGETHER"
+
+hardware = []
+
+output_channels = [3]
+
+section = "TUTORIAL"

@@ -1,0 +1,19 @@
+HWI 0
+MOD X, 2
+SND X, 0
+
+SET Y, X
+ADD Y, 1
+
+HWI 0
+SND X, Y
+
+SND X, 3
+
+ADD Z, 1
+
+IFN Z, 256
+SET PC, 0
+
+:hold
+SET PC, hold
