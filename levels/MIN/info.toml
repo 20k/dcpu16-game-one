@@ -1,0 +1,18 @@
+name = "MIN"
+
+description =  """
+Read v.0 from Ch:0
+Read v.1 from Ch:1
+
+If v.0 < v.1, write v.0 to Ch:2
+else write v.1 to Ch:2
+"""
+
+short_description = "TAKE THE MINIMUM OF TWO VALUES"
+
+hardware = []
+
+input_channels = [0, 1]
+output_channels = [2]
+
+section = "TUTORIAL"
