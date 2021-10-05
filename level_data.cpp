@@ -196,7 +196,8 @@ void level_runtime_parameters::generate_io(const level_data& data)
 
     for(uint64_t current_cycle = 0; current_cycle < max_cycles; current_cycle++)
     {
-        io_cpu_c.step(&f, &hw);
+        if(io_cpu_c.step(&f, &hw))
+            current_cycle = max_cycles;
 
         if(dcpu::sim::has_any_write(io_cpu_c))
         {
@@ -686,6 +687,12 @@ void level_manager::display_level_select(dcpu::ide::project_instance& instance)
             ImGui::Text("CYCLE COUNT       : %i", selected.my_best_stats.value().cycles);
             ImGui::Text("INSTRUCTION SIZE  : %i", selected.my_best_stats.value().assembly_length);
             ImGui::Text("VALIDATION        : %s", validation_string.c_str());
+        }
+        else
+        {
+            ImGui::Text("CYCLE COUNT       : 0");
+            ImGui::Text("INSTRUCTION SIZE  : 0");
+            ImGui::Text("VALIDATION        : INVALID");
         }
 
         ImGui::NewLine();

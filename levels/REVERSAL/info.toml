@@ -1,0 +1,18 @@
+name = "REVERSE"
+
+description =  """
+Read Ch:0 number of values from Ch:1
+Reverse the sequence of values
+Write the reversed sequence to Ch:2
+
+SET PUSH, value - and SET value, POP, can be used to push and pop from the stack
+"""
+
+short_description = "REVERSE A SEQUENCE OF VALUES"
+
+hardware = []
+
+input_channels = [0, 1]
+output_channels = [2]
+
+section = "TUTORIAL"

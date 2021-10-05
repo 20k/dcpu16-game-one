@@ -1,0 +1,41 @@
+SET J, 32
+
+HWI 0
+MOD X, 31
+ADD X, 1
+SND X, 1
+SET sequence_length, Y
+SET [sequence_length], X
+
+SET Y, [sequence_length]
+
+	:loop
+	HWI 0
+	SND X, 0
+	SET PUSH, X	
+
+	SUB Y, 1
+	IFN Y, 0
+	SET PC, loop
+
+
+	:read_reverse
+	
+	SET X, POP
+	SND X, 2
+	
+	SUB [sequence_length], 1
+	IFN [sequence_length], 0
+	SET PC, read_reverse
+
+ADD I, 1
+
+IFN I, J
+SET PC, 0
+
+BRK
+
+:sequence_length
+DAT 0
+:stack_start
+DAT 0xFFFF
