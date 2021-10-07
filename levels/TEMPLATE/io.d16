@@ -9,5 +9,4 @@ ADD I, 1
 IFN I, J
 SET PC, 0
 
-:hold
-SET PC, hold
+BRK

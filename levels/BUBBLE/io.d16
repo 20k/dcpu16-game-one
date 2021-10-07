@@ -1,0 +1,88 @@
+SET J, 32
+
+HWI 0
+MOD X, 31
+ADD X, 1
+SET [lenc], X
+SET [len], X
+SET [len2], X
+
+SND X, 1
+
+	:generate
+	HWI 0
+	SET PUSH, X
+	SND X, 0
+	
+	SUB [len], 1	
+	IFN [len], 0
+	SET PC, generate
+	
+SET [len], [lenc]
+
+:sort_outer
+	SET Z, 0
+	SET [len2], [lenc]
+	; skip last value
+	SUB [len2], 1
+	:sort_inner
+	SET X, SP
+	ADD X, Z
+	
+	SET A, [X]
+	SET B, [X+1]
+	
+	IFL B, A
+	JSR swapab
+	
+	SET [X], A
+	SET [X+1], B
+	
+	;X current value
+	;Y next value
+	ADD Y, 1
+	
+	ADD Z, 1
+	SUB [len2], 1
+	IFN [len2], 0
+	SET PC, sort_inner
+	
+SUB [len], 1
+IFN [len], 0
+SET PC, sort_outer
+
+SET [len], [lenc]
+
+:output
+
+SET X, POP
+SND X, 2
+
+SUB [len], 1
+IFN [len], 0
+SET PC, output
+
+ADD I, 1
+
+IFN I, J
+SET PC, 0
+
+BRK
+
+:len
+DAT 0
+
+:len2
+DAT 0
+
+:len3
+DAT 0
+
+:lenc
+DAT 0
+
+:swapab
+SET C, A
+SET A, B
+SET B, C
+SET PC, POP

@@ -1,0 +1,16 @@
+name = "BUBBLE"
+
+description =  """
+Read Ch:1 number of values from Ch:0
+Sort the values from lowest to highest
+Output the values to Ch:2
+"""
+
+short_description = "SORT A SEQUENCE OF INPUTS BY SIZE"
+
+hardware = []
+
+input_channels = [0, 1]
+output_channels = [2]
+
+section = "TUTORIAL"
