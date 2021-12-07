@@ -40,6 +40,7 @@
 			<Add option="-DSFML_STATIC" />
 			<Add option="-DGLEW_STATIC" />
 			<Add option="-DGRAPHITE2_STATIC" />
+			<Add option="-DIMGUI_ENABLE_FREETYPE" />
 			<Add directory="deps" />
 			<Add directory="deps/imgui" />
 			<Add directory="C:/msys64/mingw64/include/freetype2" />
@@ -77,6 +78,7 @@
 			<Add option="-l:libbrotlienc.a" />
 			<Add option="-l:libbrotlicommon.a" />
 			<Add option="-ldwrite" />
+			<Add option="-lImm32" />
 		</Linker>
 		<Unit filename="constant_time_exec.hpp" />
 		<Unit filename="deps/dcpu16-asm/base_asm.cpp" />
@@ -92,10 +94,11 @@
 		<Unit filename="deps/dcpu16-sim/base_sim.hpp" />
 		<Unit filename="deps/dcpu16-sim/hardware_clock.hpp" />
 		<Unit filename="deps/dcpu16-sim/hardware_lem1802.hpp" />
-		<Unit filename="deps/imgui/examples/imgui_impl_glfw.cpp" />
-		<Unit filename="deps/imgui/examples/imgui_impl_opengl3.cpp" />
+		<Unit filename="deps/imgui/backends/imgui_impl_glfw.cpp" />
+		<Unit filename="deps/imgui/backends/imgui_impl_opengl3.cpp" />
 		<Unit filename="deps/imgui/imgui.cpp" />
 		<Unit filename="deps/imgui/imgui_draw.cpp" />
+		<Unit filename="deps/imgui/imgui_tables.cpp" />
 		<Unit filename="deps/imgui/imgui_widgets.cpp" />
 		<Unit filename="deps/imgui/misc/freetype/imgui_freetype.cpp" />
 		<Unit filename="deps/imgui_club/imgui_memory_editor/imgui_memory_editor.h" />
@@ -113,6 +116,7 @@
 		<Unit filename="deps/toolkit/opencl.hpp" />
 		<Unit filename="deps/toolkit/render_window.cpp" />
 		<Unit filename="deps/toolkit/render_window.hpp" />
+		<Unit filename="deps/toolkit/render_window_glfw.cpp" />
 		<Unit filename="deps/toolkit/stacktrace.cpp" />
 		<Unit filename="deps/toolkit/stacktrace.hpp" />
 		<Unit filename="deps/toolkit/texture.cpp" />

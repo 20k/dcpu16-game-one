@@ -182,7 +182,7 @@ int main()
     render_window win(sett, "DCPU16-GAME-ONE");
 
     ImGui::PushSrgbStyleColor(ImGuiCol_Text, ImVec4(207/255.f, 207/255.f, 207/255.f, 1.f));
-    ImGui::PushStyleColor(ImGuiCol_ModalWindowDarkening, ImVec4(0,0,0,0.5));
+    ImGui::PushStyleColor(ImGuiCol_ModalWindowDimBg, ImVec4(0,0,0,0.5));
 
     ImGui::GetStyle().ItemSpacing.y = 0;
 
@@ -193,8 +193,10 @@ int main()
 
     {
         ImFontAtlas* atlas = ImGui::GetIO().Fonts;
+        atlas->FontBuilderFlags = ImGuiFreeTypeBuilderFlags_LCD | ImGuiFreeTypeBuilderFlags_FILTER_DEFAULT | ImGuiFreeTypeBuilderFlags_LoadColor;
 
         ImFontConfig font_cfg;
+        font_cfg.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_LCD | ImGuiFreeTypeBuilderFlags_FILTER_DEFAULT | ImGuiFreeTypeBuilderFlags_LoadColor;
         font_cfg.GlyphExtraSpacing = ImVec2(0, 0);
 
         ImGuiIO& io = ImGui::GetIO();
@@ -221,8 +223,6 @@ int main()
         #ifdef __EMSCRIPTEN__
         io.Fonts->AddFontDefault(); ///kinda hacky
         #endif // __EMSCRIPTEN__
-
-        ImGuiFreeType::BuildFontAtlas(atlas, 0, 1);
     }
 
     //run_context ctx;
