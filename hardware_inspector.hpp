@@ -12,7 +12,7 @@ struct cpu_proxy : dcpu::sim::hardware
 {
     dcpu::sim::CPU* c = nullptr;
 
-    constexpr virtual hardware* clone(){return nullptr;}
+    virtual hardware* clone() override {return nullptr;}
 };
 
 struct hardware_inspector : dcpu::sim::hardware
@@ -49,7 +49,7 @@ struct hardware_inspector : dcpu::sim::hardware
         }
     }
 
-    constexpr virtual hardware* clone() override {return new hardware_inspector(*this);}
+    virtual hardware* clone() override {return new hardware_inspector(*this);}
 };
 
 #endif // HARDWARE_INSPECTOR_HPP_INCLUDED

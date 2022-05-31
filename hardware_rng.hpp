@@ -35,7 +35,7 @@ struct hardware_rng : dcpu::sim::hardware
         internal_state = 1;
     }
 
-    constexpr virtual hardware* clone() override {return new hardware_rng(*this);}
+    virtual hardware* clone() override {return new hardware_rng(*this);}
 };
 
 #endif // HARDWARE_RNG_HPP_INCLUDED

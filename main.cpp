@@ -4,7 +4,6 @@
 #include <dcpu16-sim/base_sim.hpp>
 #include <dcpu16-asm/base_asm_fwd.hpp>
 #include <dcpu16-ide/base_ide.hpp>
-#include <SFML/System.hpp>
 #include <toolkit/fs_helpers.hpp>
 #include "levels.hpp"
 #include <iostream>
@@ -18,6 +17,8 @@
 //#include <dcpu16-asm/base_asm.hpp>
 #include "level_data.hpp"
 #include <dcpu16-sim/hardware_lem1802.hpp>
+#include <thread>
+#include <sstream>
 
 /*:start
 
@@ -739,7 +740,7 @@ int main()
                         {
                             int linear = y * 128 + x;
 
-                            uint32_t col = as_lem->buffer.at(linear);
+                            uint32_t col = as_lem->buffer[linear];
 
                             auto tl = ImVec2(cursor_pos.x + x * mult, cursor_pos.y + y * mult);
                             auto br = ImVec2(cursor_pos.x + x * mult + mult, cursor_pos.y + y * mult + mult);
@@ -762,7 +763,7 @@ int main()
             }
         }
 
-        sf::sleep(sf::milliseconds(1));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
         win.display();
     }
