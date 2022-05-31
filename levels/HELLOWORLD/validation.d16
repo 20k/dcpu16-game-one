@@ -1,25 +1,28 @@
-SET A, 0
-HWI 1 ; query hardware, lem. B returns vram map
+SET A, 0 ; world hardware: 0
+SET B, 0 ; mode: fetch vram address
+HWI 3 ; query inspector. C returns vram map
+SET [baseaddr], C
 
-IFE B, 0
+IFE [baseaddr], 0
 SET PC, fault
 
 ; LOOP OVER [0, hellolen]
-SET X, 0
-SET Y, [hellolen]
+SET I, 0
 
 :loopstart
-SET C, X
-ADD C, B ; get the address to read from
 
-SET A, [C] ; read the character from the address
-AND A, 0x1111111 ; take the bottom 7 bits
+SET A, 1 ; world hardware: 1
+SET B, I ; B is memory address
+ADD B, [baseaddr]
+HWI 3 ; C contains the value
 
-IFN A, [X + helloworld] ; not the correct character
+AND C, 0b1111111 ; take the bottom 7 bits
+
+IFN C, [I + helloworld] ; not the correct character
 SET PC, fault
 
-ADD X, 1
-IFL X, Y
+ADD I, 1
+IFL I, [hellolen]
 SET PC, loopstart
 
 ;fallthrough, success!
@@ -33,3 +36,6 @@ BRK
 
 :helloworld
 .DAT "Hello World!"
+
+:baseaddr
+.DAT 0

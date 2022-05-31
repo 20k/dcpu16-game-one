@@ -17,6 +17,7 @@
 #include <imguicolortextedit/texteditor.h>
 //#include <dcpu16-asm/base_asm.hpp>
 #include "level_data.hpp"
+#include <dcpu16-sim/hardware_lem1802.hpp>
 
 /*:start
 
@@ -714,8 +715,14 @@ int main()
 
                 int mult = 2;
 
-                for(auto& buffer : current_instance.runtime_data.real_world_state.memory)
+                //for(auto& buffer : current_instance.runtime_data.real_world_state.memory)
+                for(dcpu::sim::hardware* hw : current_instance.runtime_data.hardware)
                 {
+                    dcpu::sim::LEM1802* as_lem = dynamic_cast<dcpu::sim::LEM1802*>(hw);
+
+                    if(as_lem == nullptr)
+                        continue;
+
                     ImGui::SetNextWindowSize(ImVec2(128 * mult + ImGui::CalcTextSize(" ").x*2, 96 * mult + ImGui::CalcTextSize(" ").y*2), ImGuiCond_Always);
 
                     ImGui::Begin((std::string("LEM##") + std::to_string(screen_idx)).c_str(), nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);
@@ -730,7 +737,7 @@ int main()
                         {
                             int linear = y * 128 + x;
 
-                            uint32_t col = buffer.at(linear);
+                            uint32_t col = as_lem->buffer.at(linear);
 
                             auto tl = ImVec2(cursor_pos.x + x * mult, cursor_pos.y + y * mult);
                             auto br = ImVec2(cursor_pos.x + x * mult + mult, cursor_pos.y + y * mult + mult);

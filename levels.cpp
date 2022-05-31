@@ -628,7 +628,6 @@ namespace level
 
             dcpu::sim::hardware* LEM = new dcpu::sim::LEM1802;
             ctx.inf.hardware.push_back(LEM);
-            ctx.real_world_state.memory.push_back({});
 
             ctx.extra_validation = [](level_context& ctx, dcpu::ide::project_instance& instance)
             {
@@ -677,8 +676,6 @@ namespace level
             ctx.inf.hardware.push_back(LEM);
             dcpu::sim::hardware* clock = new dcpu::sim::clock;
             ctx.inf.hardware.push_back(clock);
-
-            ctx.real_world_state.memory.push_back({});
 
             ctx.extra_validation = [](level_context& ctx, dcpu::ide::project_instance& instance){return true;};
 
@@ -814,13 +811,11 @@ namespace level
                 if(!is_lem)
                     continue;
 
-                auto& rendering = ctx.real_world_state.memory.at(screen_idx);
-
                 dcpu::sim::LEM1802* as_lem = dynamic_cast<dcpu::sim::LEM1802*>(hw);
 
                 assert(as_lem);
 
-                as_lem->render(&ctx.real_world_state, *user.front(), rendering);
+                as_lem->render(&ctx.real_world_state, *user.front());
 
                 screen_idx++;
             }

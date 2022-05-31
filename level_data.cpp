@@ -301,8 +301,6 @@ void level_runtime_parameters::build_from(const level_data& data)
             dcpu::sim::hardware* hw = new dcpu::sim::LEM1802;
 
             hardware.push_back(hw);
-
-            real_world_state.memory.push_back({});
         }
 
         if(lower == "clock" || lower == "generic_clock")
@@ -529,13 +527,11 @@ void level_manager::step_validation(dcpu::ide::project_instance& instance)
             if(!is_lem)
                 continue;
 
-            auto& rendering = my_level.runtime_data.real_world_state.memory.at(screen_idx);
-
             dcpu::sim::LEM1802* as_lem = dynamic_cast<dcpu::sim::LEM1802*>(hw);
 
             assert(as_lem);
 
-            as_lem->render(&my_level.runtime_data.real_world_state, *user.front(), rendering);
+            as_lem->render(&my_level.runtime_data.real_world_state, *user.front());
 
             screen_idx++;
         }
@@ -559,18 +555,6 @@ void level_manager::step_validation(dcpu::ide::project_instance& instance)
         }
     }
 
-    bool hardware_errors = false;
-
-    ///todo
-    /*if(ctx.extra_validation != nullptr)
-    {
-        ///todo: DEBUGGING
-        if(ctx.extra_validation(ctx, instance))
-        {
-            hardware_errors = true;
-        }
-    }*/
-
     bool dynamic_validation_success = true;
 
     if(my_level.runtime_data.dynamic_validation_cpu.has_value())
@@ -587,6 +571,10 @@ void level_manager::step_validation(dcpu::ide::project_instance& instance)
             hw.push_back(i);
         }
 
+        cpu_proxy hwcpu;
+        hwcpu.c = cpus[0];
+
+        hw.push_back(&hwcpu);
         hw.push_back(&hwrng);
         hw.push_back(&hwinspec);
 
@@ -599,7 +587,7 @@ void level_manager::step_validation(dcpu::ide::project_instance& instance)
 
         for(uint64_t current_cycle = 0; current_cycle < max_cycles; current_cycle++)
         {
-            if(dynamic_cpu_c.step(&f, &hw))
+            if(dynamic_cpu_c.step(&f, &hw, &my_level.runtime_data.real_world_state))
                 current_cycle = max_cycles;
 
             if(dcpu::sim::has_any_write(dynamic_cpu_c))
@@ -609,7 +597,7 @@ void level_manager::step_validation(dcpu::ide::project_instance& instance)
         }
     }
 
-    bool any_errors_at_all = hardware_errors || my_level.execution_state.error_locs.size() > 0 || my_level.ass_state.has_error || !dynamic_validation_success;
+    bool any_errors_at_all = my_level.execution_state.error_locs.size() > 0 || my_level.ass_state.has_error || !dynamic_validation_success;
 
     ///just succeeded
     if(!my_level.successful_validation && !any_errors_at_all)

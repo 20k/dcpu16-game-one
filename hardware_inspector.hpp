@@ -6,6 +6,15 @@
 #include <dcpu16-sim/hardware_clock.hpp>
 #include <dcpu16-sim/hardware_lem1802.hpp>
 
+#include "world_state.hpp"
+
+struct cpu_proxy : dcpu::sim::hardware
+{
+    dcpu::sim::CPU* c = nullptr;
+
+    constexpr virtual hardware* clone(){return nullptr;}
+};
+
 struct hardware_inspector : dcpu::sim::hardware
 {
     uint32_t hardware_id = 0x21436587;
@@ -28,7 +37,15 @@ struct hardware_inspector : dcpu::sim::hardware
 
         if(dcpu::sim::LEM1802* lem = dynamic_cast<dcpu::sim::LEM1802*>(to_check); lem != nullptr)
         {
-            c.regs[B_REG] = lem->vram_map;
+            if(c.regs[B_REG] == 0)
+            {
+                c.regs[C_REG] = lem->vram_map;
+            }
+        }
+
+        if(cpu_proxy* prox = dynamic_cast<cpu_proxy*>(to_check); prox != nullptr)
+        {
+            c.regs[C_REG] = prox->c->mem[c.regs[B_REG]];
         }
     }
 
