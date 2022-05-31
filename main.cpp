@@ -428,16 +428,10 @@ int main()
 
                 if(any_wants_assemble || any_wants_reset)
                 {
-                    printf("Assembly\n");
-
                     levels.reset_level(current_project);
                     levels.save_current(current_project);
 
-                    printf("Preass\n");
-
                     current_instance.runtime_data.exec.init(0, now_ms);
-
-                    printf("Postrun\n");
                 }
 
                 if(any_wants_pause)

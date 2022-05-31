@@ -48,12 +48,12 @@ CPPFLAGS = -I../deps -I../deps/imgui
 #CPPFLAGS += -g
 CPPFLAGS += -Wall -Wformat -Oz -std=c++20
 CPPFLAGS += -DSDL_MAIN_HANDLED
-CPPFLAGS += -DIMGUI_ENABLE_FREETYPE
+CPPFLAGS += -DIMGUI_ENABLE_FREETYPE -fexceptions
 CPPFLAGS += $(EMS)
 LIBS = $(EMS)
 LDFLAGS = --shell-file index_in.html -s USE_PTHREADS=1 -s SOCKET_DEBUG=0 -s FETCH=1
 LDFLAGS += -s WEBSOCKET_URL=wss:// -lidbfs.js -lglfw3
-LDFLAGS += -s ASYNCIFY=1 -Oz
+LDFLAGS += -s ASYNCIFY=1 -Oz -fexceptions
 #LDFLAGS += -flto 
 #LDFLAGS += -s DISABLE_EXCEPTION_CATCHING=2 -s EXCEPTION_CATCHING_WHITELIST=["client_thread_tcp"]
 #LDFLAGS += -s ASYNCIFY_IGNORE_INDIRECT=1
