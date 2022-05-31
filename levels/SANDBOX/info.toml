@@ -1,0 +1,14 @@
+name = "SANDBOX"
+
+description =  """
+Clock and LEM sandbox
+"""
+
+short_description = "CLOCK AND LEM SANDBOX"
+
+hardware = ["generic_clock", "lem1802"]
+
+input_channels = []
+output_channels = []
+
+section = "TUTORIAL"
