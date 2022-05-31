@@ -7,6 +7,7 @@
 #include <dcpu16-sim/hardware_lem1802.hpp>
 #include "style.hpp"
 #include "hardware_rng.hpp"
+#include "hardware_inspector.hpp"
 
 bool level_data::is_input_channel(int c) const
 {
@@ -84,7 +85,6 @@ level_data load_level(const std::filesystem::path& path_to_info)
     {
         ret.io_program = file::read(io_path.string(), file::mode::TEXT);
     }
-
 
     if(file::exists(validation_path.string()))
     {
@@ -559,7 +559,38 @@ void level_manager::step_validation(dcpu::ide::project_instance& instance)
         }
     }*/
 
-    bool any_errors_at_all = hardware_errors || my_level.execution_state.error_locs.size() > 0 || my_level.ass_state.has_error;
+    bool dynamic_validation_success = true;
+
+    if(my_level.runtime_data.dynamic_validation_cpu.has_value())
+    {
+        dynamic_validation_success = false;
+
+        hardware_rng hwrng;
+        hardware_inspector hwinspec;
+
+        stack_vector<dcpu::sim::hardware*, 65536> hw;
+        hw.push_back(&hwrng);
+        hw.push_back(&hwinspec);
+
+        dcpu::sim::CPU dynamic_cpu_c = *my_level.runtime_data.dynamic_validation_cpu.value();
+
+        uint64_t max_cycles = 1024;
+
+        dcpu::sim::fabric f;
+
+        for(uint64_t current_cycle = 0; current_cycle < max_cycles; current_cycle++)
+        {
+            if(dynamic_cpu_c.step(&f, &hw))
+                current_cycle = max_cycles;
+
+            if(dcpu::sim::has_any_write(dynamic_cpu_c))
+            {
+                dynamic_validation_success = true;
+            }
+        }
+    }
+
+    bool any_errors_at_all = hardware_errors || my_level.execution_state.error_locs.size() > 0 || my_level.ass_state.has_error || !dynamic_validation_success;
 
     ///just succeeded
     if(!my_level.successful_validation && !any_errors_at_all)

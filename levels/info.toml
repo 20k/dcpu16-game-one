@@ -11,5 +11,6 @@ levels = [
 "POW",
 "CHECKSUM",
 "REVERSAL",
-"BUBBLE"
+"BUBBLE",
+"HWENUMERATE"
 ]
