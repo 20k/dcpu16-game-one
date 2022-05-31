@@ -1,0 +1,15 @@
+levels = [
+"INTRO",
+"SHIFT",
+"SPLIT",
+"STREAM_MERGER",
+"MAX",
+"MIN",
+"DIFFOUT",
+"SPACESHIP_OPERATOR",
+"EXPAND",
+"POW",
+"CHECKSUM",
+"REVERSAL",
+"BUBBLE"
+]

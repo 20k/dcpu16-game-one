@@ -52,6 +52,13 @@ std::filesystem::path replace_filename(std::filesystem::path in, std::string_vie
     return in;
 }
 
+toml::value string_to_toml(const std::string& in, const std::string& path)
+{
+    std::istringstream is(in, std::ios_base::binary | std::ios_base::in);
+
+    return toml::parse(is, path);
+}
+
 level_data load_level(const std::filesystem::path& path_to_info)
 {
     level_data ret;
@@ -62,9 +69,7 @@ level_data load_level(const std::filesystem::path& path_to_info)
 
     try
     {
-        std::istringstream is(description_toml, std::ios_base::binary | std::ios_base::in);
-
-        parsed = toml::parse(is, path_to_info.string());
+        parsed = string_to_toml(description_toml, path_to_info.string());
     }
     catch(std::exception& e)
     {
@@ -122,11 +127,27 @@ level_data load_level(const std::filesystem::path& path_to_info)
 
 void all_level_data::load(const std::string& folder)
 {
-    for(auto& p : std::filesystem::directory_iterator(folder))
-    {
-        std::filesystem::path current_file = p.path();
+    std::string base_info = file::read(folder + "/info.toml", file::mode::TEXT);
 
-        if(p.is_directory())
+    toml::value base_toml;
+
+    try
+    {
+        base_toml = string_to_toml(base_info, folder + "/info.toml");
+    }
+    catch(std::exception& e)
+    {
+        std::cout << "caught exception in load_level from root file " << base_info << " " << e.what() << std::endl;
+        assert(false);
+    }
+
+    std::vector<std::string> levels = toml::get<std::vector<std::string>>(base_toml["levels"]);
+
+    for(const std::string& level_dir : levels)
+    {
+        std::filesystem::path current_file = std::filesystem::path(folder) / level_dir;
+
+        if(std::filesystem::is_directory(current_file))
         {
             if(file::exists((current_file / ".ignore").string()))
                 continue;
