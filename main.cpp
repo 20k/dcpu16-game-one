@@ -175,6 +175,8 @@ int main()
 
     std::cout << res->which_register.value() << " " << res->op.value() << " " << res->word.value() << std::endl;*/
 
+    file::init();
+
     render_settings sett;
     sett.width = 1300;
     sett.height = 800;

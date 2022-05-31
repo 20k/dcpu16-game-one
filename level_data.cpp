@@ -64,7 +64,7 @@ level_data load_level(const std::filesystem::path& path_to_info)
 {
     level_data ret;
 
-    std::string description_toml = file::read(path_to_info.string(), file::mode::TEXT);
+    std::string description_toml = file::memfs::read(path_to_info.string(), file::mode::TEXT);
 
     toml::value parsed;
 
@@ -81,14 +81,14 @@ level_data load_level(const std::filesystem::path& path_to_info)
     std::filesystem::path io_path = replace_filename(path_to_info, "io.d16");
     std::filesystem::path validation_path = replace_filename(path_to_info, "validation.d16");
 
-    if(file::exists(io_path.string()))
+    if(file::memfs::exists(io_path.string()))
     {
-        ret.io_program = file::read(io_path.string(), file::mode::TEXT);
+        ret.io_program = file::memfs::read(io_path.string(), file::mode::TEXT);
     }
 
-    if(file::exists(validation_path.string()))
+    if(file::memfs::exists(validation_path.string()))
     {
-        ret.dynamic_validation_program = file::read(validation_path.string(), file::mode::TEXT);
+        ret.dynamic_validation_program = file::memfs::read(validation_path.string(), file::mode::TEXT);
     }
 
     ret.name = toml::get<std::string>(parsed["name"]);
@@ -127,7 +127,7 @@ level_data load_level(const std::filesystem::path& path_to_info)
 
 void all_level_data::load(const std::string& folder)
 {
-    std::string base_info = file::read(folder + "/info.toml", file::mode::TEXT);
+    std::string base_info = file::memfs::read(folder + "/info.toml", file::mode::TEXT);
 
     toml::value base_toml;
 
@@ -149,7 +149,7 @@ void all_level_data::load(const std::string& folder)
 
         if(std::filesystem::is_directory(current_file))
         {
-            if(file::exists((current_file / ".ignore").string()))
+            if(file::memfs::exists((current_file / ".ignore").string()))
                 continue;
 
             all_levels.push_back(load_level(current_file / "info.toml"));
