@@ -2,7 +2,7 @@ name = "HWENUMERATE"
 
 description =  """
 Hardware - Write the number of connected devices (HWN) to Ch:0
-Search for the clock with hardware id 0x12d0b402
+Search for the clock with hardware id 0x12d0b402 and enable it
 See https://github.com/20k/dcpu16-specs/blob/master/clock.md for the full specification (this will be in the manual later)
 """
 
@@ -11,6 +11,6 @@ short_description = "ENUMERATE HARDWARE DEVICES AND INITIALISE THE CLOCK"
 hardware = ["generic_clock"]
 
 input_channels = []
-output_channels = []
+output_channels = [0]
 
 section = "TUTORIAL"
