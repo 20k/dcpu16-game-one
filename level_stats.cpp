@@ -5,8 +5,8 @@
 
 std::optional<level_stats::info> level_stats::load_best(const std::string& level_name)
 {
-    std::filesystem::create_directory("stats");
-    std::filesystem::create_directory("stats/" + level_name);
+    file::mkdir("stats");
+    file::mkdir("stats/" + level_name);
 
     std::string data_file = "stats/" + level_name + "/stats.toml";
 
@@ -35,8 +35,8 @@ std::optional<level_stats::info> level_stats::load_best(const std::string& level
 
 void level_stats::save_best(const std::string& level_name, const level_stats::info& inf)
 {
-    std::filesystem::create_directory("stats");
-    std::filesystem::create_directory("stats/" + level_name);
+    file::mkdir("stats");
+    file::mkdir("stats/" + level_name);
     std::string data_file = "stats/" + level_name + "/stats.toml";
 
     toml::value val;

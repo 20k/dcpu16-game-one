@@ -96,7 +96,7 @@ void level::switch_to_level(run_context& ctx, dcpu::ide::project_instance& insta
 {
     uint64_t now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch().count();
 
-    std::filesystem::create_directory("saves/" + level_name);
+    file::mkdir("saves/" + level_name);
 
     std::string full_filename = "saves/" + level_name + "/save.dcpu_project";
 

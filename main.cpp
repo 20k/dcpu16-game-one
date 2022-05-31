@@ -232,7 +232,7 @@ int main()
     level_manager levels;
     levels.load();
 
-    std::filesystem::create_directory("saves/");
+    file::mkdir("saves/");
 
     dcpu::ide::reference_card card;
 
