@@ -64,7 +64,7 @@ level_data load_level(const std::filesystem::path& path_to_info)
 {
     level_data ret;
 
-    std::string description_toml = file::memfs::read(path_to_info.string(), file::mode::TEXT);
+    std::string description_toml = file::request::read(path_to_info.string(), file::mode::TEXT).value_or("");
 
     toml::value parsed;
 
@@ -81,15 +81,8 @@ level_data load_level(const std::filesystem::path& path_to_info)
     std::filesystem::path io_path = replace_filename(path_to_info, "io.d16");
     std::filesystem::path validation_path = replace_filename(path_to_info, "validation.d16");
 
-    if(file::memfs::exists(io_path.string()))
-    {
-        ret.io_program = file::memfs::read(io_path.string(), file::mode::TEXT);
-    }
-
-    if(file::memfs::exists(validation_path.string()))
-    {
-        ret.dynamic_validation_program = file::memfs::read(validation_path.string(), file::mode::TEXT);
-    }
+    ret.io_program = file::request::read(io_path.string(), file::mode::TEXT);
+    ret.dynamic_validation_program = file::request::read(validation_path.string(), file::mode::TEXT);
 
     ret.name = toml::get<std::string>(parsed["name"]);
     ret.description = toml::get<std::string>(parsed["description"]);
@@ -127,14 +120,15 @@ level_data load_level(const std::filesystem::path& path_to_info)
 
 void all_level_data::load(const std::string& folder)
 {
-    std::string base_info = file::memfs::read(folder + "/info.toml", file::mode::TEXT);
+    std::string base_info = file::request::read(folder + "/info.toml", file::mode::TEXT).value_or("");
 
     toml::value base_toml;
 
     try
     {
         base_toml = string_to_toml(base_info, folder + "/info.toml");
-    }
+
+   }
     catch(std::exception& e)
     {
         std::cout << "caught exception in load_level from root file " << base_info << " " << e.what() << std::endl;
@@ -147,10 +141,10 @@ void all_level_data::load(const std::string& folder)
     {
         std::filesystem::path current_file = std::filesystem::path(folder) / level_dir;
 
-        if(std::filesystem::is_directory(current_file))
+        //if(std::filesystem::is_directory(current_file))
         {
-            if(file::memfs::exists((current_file / ".ignore").string()))
-                continue;
+            //if(file::memfs::exists((current_file / ".ignore").string()))
+            //    continue;
 
             all_levels.push_back(load_level(current_file / "info.toml"));
         }

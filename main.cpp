@@ -20,13 +20,40 @@
 #include <thread>
 #include <sstream>
 
-/*:start
+#ifdef __EMSCRIPTEN__
 
-RCV X, 0
-SND X, 1
+#include <emscripten/emscripten.h>
+#include <emscripten/html5.h>
+#include <emscripten/bind.h>
 
-SET PC, start
-*/
+EM_JS(int, get_window_location_length, (),
+{
+    return window.location.hostname.length + window.location.pathname.length;
+});
+
+EM_JS(void, get_window_location, (char* out, int len),
+{
+    stringToUTF8(window.location.hostname + window.location.pathname, out, len);
+});
+
+EM_JS(bool, is_window_visible, (),
+{
+    return !document.hidden;
+});
+#else
+bool is_window_visible()
+{
+    return true;
+}
+#endif // __EMSCRIPTEN__
+
+
+std::function<void()> hptr;
+
+void main_loop_helper(void* ptr)
+{
+    hptr();
+}
 
 ///TODO:
 ///Need the ability to handle inputs and outputs of different respective sizes
@@ -182,68 +209,109 @@ int main()
     sett.width = 1300;
     sett.height = 800;
     sett.viewports = false;
+    sett.no_double_buffer = true;
 
     render_window win(sett, "DCPU16-GAME-ONE");
+
+    printf("Part 1\n");
 
     ImGui::PushSrgbStyleColor(ImGuiCol_Text, ImVec4(207/255.f, 207/255.f, 207/255.f, 1.f));
     ImGui::PushStyleColor(ImGuiCol_ModalWindowDimBg, ImVec4(0,0,0,0.5));
 
     ImGui::GetStyle().ItemSpacing.y = 0;
 
+    printf("Part 2\n");
+
     level_selector_state select;
     level_over_state level_over;
 
+    printf("Part 3\n");
+
     //ImGui::GetStyle().ScaleAllSizes(2);
 
-    {
-        ImFontAtlas* atlas = ImGui::GetIO().Fonts;
-        atlas->FontBuilderFlags = ImGuiFreeTypeBuilderFlags_LCD | ImGuiFreeTypeBuilderFlags_FILTER_DEFAULT | ImGuiFreeTypeBuilderFlags_LoadColor;
-
-        ImFontConfig font_cfg;
-        font_cfg.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_LCD | ImGuiFreeTypeBuilderFlags_FILTER_DEFAULT | ImGuiFreeTypeBuilderFlags_LoadColor;
-        font_cfg.GlyphExtraSpacing = ImVec2(0, 0);
-
-        ImGuiIO& io = ImGui::GetIO();
-
-        io.Fonts->Clear();
-        //io.Fonts->ClearFonts();
-
-        static const ImWchar range[] =
-        {
-            0x0020, 0x00FF, // Basic Latin + Latin Supplement
-            0x2500, 0x25EF, // Some extension characters for pipes etc
-            0,
-        };
-
-        #ifndef __EMSCRIPTEN__
-        ///BASE
-        io.Fonts->AddFontFromFileTTF("DosFont.ttf", 16, &font_cfg, &range[0]);
-        #endif // __EMSCRIPTEN__
-        ///TEXT_EDITOR
-        //io.Fonts->AddFontFromFileTTF("VeraMono.ttf", editor_font_size, &font_cfg);
-        ///DEFAULT
-        //io.Fonts->AddFontDefault();
-
-        #ifdef __EMSCRIPTEN__
-        io.Fonts->AddFontDefault(); ///kinda hacky
-        #endif // __EMSCRIPTEN__
-    }
+    printf("Part 4\n");
 
     //run_context ctx;
     dcpu::ide::project_instance current_project;
 
+    printf("Part 4.1\n");
+
     level_manager levels;
-    levels.load();
+    std::string dos_font;
+
+    std::thread lthread([&levels, &dos_font]()
+    {
+        levels.load();
+
+        dos_font = file::request::read("DosFont.ttf", file::mode::BINARY).value();
+
+        levels.finished = true;
+
+        printf("Done\n");
+    });
+
+    printf("Part 4.2\n");
 
     file::mkdir("saves/");
+
+    printf("Part 4.3\n");
 
     dcpu::ide::reference_card card;
 
     bool is_hex = true;
     bool use_signed = false;
+    bool ever_finished = false;
 
+    printf("Part 5\n");
+
+    #ifndef __EMSCRIPTEN__
     while(!win.should_close())
+    #else
+    hptr = [&]()
+    #endif
     {
+        if(!levels.finished)
+        {
+            #ifndef __EMSCRIPTEN__
+            continue;
+            #else
+            return;
+            #endif
+        }
+        else
+        {
+            if(!ever_finished)
+            {
+                ImFontAtlas* atlas = ImGui::GetIO().Fonts;
+                atlas->FontBuilderFlags = ImGuiFreeTypeBuilderFlags_LCD | ImGuiFreeTypeBuilderFlags_FILTER_DEFAULT | ImGuiFreeTypeBuilderFlags_LoadColor;
+
+                ImFontConfig font_cfg;
+                font_cfg.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_LCD | ImGuiFreeTypeBuilderFlags_FILTER_DEFAULT | ImGuiFreeTypeBuilderFlags_LoadColor;
+                font_cfg.GlyphExtraSpacing = ImVec2(0, 0);
+
+                ImGuiIO& io = ImGui::GetIO();
+
+                io.Fonts->Clear();
+                //io.Fonts->ClearFonts();
+
+                static const ImWchar range[] =
+                {
+                    0x0020, 0x00FF, // Basic Latin + Latin Supplement
+                    0x2500, 0x25EF, // Some extension characters for pipes etc
+                    0,
+                };
+
+                io.Fonts->AddFontFromMemoryTTF((void*)dos_font.c_str(), dos_font.size(), 16, &font_cfg, &range[0]);
+
+                ImGui::GetIO().Fonts->Build();
+
+                unsigned char* out_pix = nullptr;
+                ImGui::GetIO().Fonts->GetTexDataAsRGBA32(&out_pix, nullptr, nullptr, nullptr);
+            }
+
+            ever_finished = true;
+        }
+
         win.poll();
 
         int level_window_bottom = 20;
@@ -758,15 +826,20 @@ int main()
                     ImGui::End();
 
                     screen_idx++;
-
                 }
             }
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        #ifndef __EMSCRIPTEN__
+        //std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        #endif
 
         win.display();
-    }
+    };
+
+    #ifdef __EMSCRIPTEN__
+    emscripten_set_main_loop_arg((em_arg_callback_func)main_loop_helper, nullptr, 0, 1);
+    #endif
 
     if(current_project.editors.size() > 0)
     {

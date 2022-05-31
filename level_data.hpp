@@ -12,6 +12,7 @@
 #include "world_state.hpp"
 #include "constant_time_exec.hpp"
 #include "level_stats.hpp"
+#include <atomic>
 
 struct level_data
 {
@@ -111,6 +112,8 @@ struct all_level_data
 
 struct level_manager
 {
+    std::atomic_bool finished{false};
+
     all_level_data levels;
     std::optional<level_data> selected_level;
 
