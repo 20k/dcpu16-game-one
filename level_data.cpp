@@ -260,6 +260,7 @@ void level_runtime_parameters::build_from(const level_data& data)
 
         if(!data_opt.has_value())
         {
+            std::cout << "Bad io program " << data.io_program.value() << std::endl;
             print_err(err);
             return;
         }
@@ -276,6 +277,7 @@ void level_runtime_parameters::build_from(const level_data& data)
 
         if(!data_opt.has_value())
         {
+            printf("Dyn err\n");
             print_err(err);
             return;
         }
