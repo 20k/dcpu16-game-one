@@ -569,6 +569,12 @@ void level_manager::step_validation(dcpu::ide::project_instance& instance)
         hardware_inspector hwinspec;
 
         stack_vector<dcpu::sim::hardware*, 65536> hw;
+
+        for(auto& i : my_level.runtime_data.hardware)
+        {
+            hw.push_back(i);
+        }
+
         hw.push_back(&hwrng);
         hw.push_back(&hwinspec);
 

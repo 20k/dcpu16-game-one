@@ -1,2 +1,7 @@
-;SND 1, 1
+SET A, 0
+HWN C
+SUB C, 1
+HWI C ; get state of clock, puts in B
+IFE B, 1
+SND 1, 0
 BRK
