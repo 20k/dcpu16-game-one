@@ -1,4 +1,4 @@
-SET A, 0
+SET A, 1
 HWN C
 SUB C, 1
 HWI C ; get state of clock, puts in B

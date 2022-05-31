@@ -8,7 +8,7 @@ See https://github.com/20k/dcpu16-specs/blob/master/clock.md for the full specif
 
 short_description = "ENUMERATE HARDWARE DEVICES AND INITIALISE THE CLOCK"
 
-hardware = ["generic_clock"]
+hardware = ["dummy", "generic_clock"]
 
 input_channels = []
 output_channels = [0]
