@@ -1,0 +1,35 @@
+SET A, 0
+HWI 1 ; query hardware, lem. B returns vram map
+
+IFE B, 0
+SET PC, fault
+
+; LOOP OVER [0, hellolen]
+SET X, 0
+SET Y, [hellolen]
+
+:loopstart
+SET C, X
+ADD C, B ; get the address to read from
+
+SET A, [C] ; read the character from the address
+AND A, 0x1111111 ; take the bottom 7 bits
+
+IFN A, [X + helloworld] ; not the correct character
+SET PC, fault
+
+ADD X, 1
+IFL X, Y
+SET PC, loopstart
+
+;fallthrough, success!
+SND 0, 0
+
+:fault
+BRK
+
+:hellolen
+.DAT 12
+
+:helloworld
+.DAT "Hello World!"

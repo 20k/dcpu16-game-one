@@ -301,6 +301,8 @@ void level_runtime_parameters::build_from(const level_data& data)
             dcpu::sim::hardware* hw = new dcpu::sim::LEM1802;
 
             hardware.push_back(hw);
+
+            real_world_state.memory.push_back({});
         }
 
         if(lower == "clock" || lower == "generic_clock")
@@ -308,6 +310,14 @@ void level_runtime_parameters::build_from(const level_data& data)
             dcpu::sim::hardware* hw = new dcpu::sim::clock;
 
             hardware.push_back(hw);
+        }
+
+        if(lower == "dummy")
+        {
+            dcpu::sim::hardware* dummy = new dcpu::sim::hardware;
+            dummy->manufacturer_id = 0xDEADBEEF;
+
+            hardware.push_back(dummy);
         }
     }
 
@@ -336,6 +346,8 @@ void level_runtime_data::build_from(const level_runtime_parameters& params)
             input_queue[channel].push_back(j);
         }
     }
+
+    real_world_state = params.real_world_state;
 }
 
 void level_instance::update_assembly_errors(dcpu::ide::project_instance& instance)
@@ -580,7 +592,8 @@ void level_manager::step_validation(dcpu::ide::project_instance& instance)
 
         dcpu::sim::CPU dynamic_cpu_c = *my_level.runtime_data.dynamic_validation_cpu.value();
 
-        uint64_t max_cycles = 1024;
+        ///on the validation program to execute responsibly
+        uint64_t max_cycles = 1024 * 1024;
 
         dcpu::sim::fabric f;
 

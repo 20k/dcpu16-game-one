@@ -1,0 +1,17 @@
+name = "HELLOWORLD"
+
+description =  """
+Search for the LEM1802 display with hardware id 0x7349f615
+Initialise the console by sending an interrupt with HWI, with [A=0, B=0x8000]
+Write the exact string "Hello World!", in ascii, in any colour other than black
+Consult https://github.com/20k/dcpu16-specs/blob/master/lem1802.md for more details
+"""
+
+short_description = "INITIALISE THE CONSOLE AND DISPLAY HELLO WORLD"
+
+hardware = ["lem1802"]
+
+input_channels = []
+output_channels = []
+
+section = "TUTORIAL"

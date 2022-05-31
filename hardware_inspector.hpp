@@ -4,6 +4,7 @@
 #include <dcpu16-sim/base_sim.hpp>
 #include <dcpu16-sim/base_hardware.hpp>
 #include <dcpu16-sim/hardware_clock.hpp>
+#include <dcpu16-sim/hardware_lem1802.hpp>
 
 struct hardware_inspector : dcpu::sim::hardware
 {
@@ -23,6 +24,11 @@ struct hardware_inspector : dcpu::sim::hardware
         if(dcpu::sim::clock* clk = dynamic_cast<dcpu::sim::clock*>(to_check); clk != nullptr)
         {
             c.regs[B_REG] = clk->on;
+        }
+
+        if(dcpu::sim::LEM1802* lem = dynamic_cast<dcpu::sim::LEM1802*>(to_check); lem != nullptr)
+        {
+            c.regs[B_REG] = lem->vram_map;
         }
     }
 
