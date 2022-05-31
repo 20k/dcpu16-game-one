@@ -122,20 +122,16 @@ level_data load_level(const std::filesystem::path& path_to_info)
 
 void all_level_data::load(const std::string& folder)
 {
-    for(auto& p : std::filesystem::recursive_directory_iterator(folder))
+    for(auto& p : std::filesystem::directory_iterator(folder))
     {
         std::filesystem::path current_file = p.path();
 
-        std::string filename = current_file.filename().string();
-
-        if(file::exists(replace_filename(current_file, ".ignore").string()))
-            continue;
-
-        if(filename == "info.toml")
+        if(p.is_directory())
         {
-            level_data next = load_level(current_file);
+            if(file::exists((current_file / ".ignore").string()))
+                continue;
 
-            all_levels.push_back(next);
+            all_levels.push_back(load_level(current_file / "info.toml"));
         }
     }
 }
