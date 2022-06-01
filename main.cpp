@@ -189,40 +189,6 @@ int page_round(int in)
     return (in/16) * 16;
 }
 
-std::function<void(void*, const char*)> old_set_clipboard;
-std::function<const char*(void*)> old_get_clipboard;
-
-void set_clipboard_free(void* user_data, const char* text)
-{
-    #ifndef __EMSCRIPTEN__
-    old_set_clipboard(user_data, text);
-    #else
-    clipboard::set(text);
-    #endif
-}
-
-const char* get_clipboard_free(void* user_data)
-{
-    #ifndef __EMSCRIPTEN__
-    old_get_clipboard(user_data);
-    #else
-    static thread_local std::string clip_buffer;
-
-    clip_buffer = clipboard::get();
-
-    return clip_buffer.c_str();
-    #endif
-}
-
-void init_clipboard()
-{
-    old_set_clipboard = ImGui::GetIO().SetClipboardTextFn;
-    old_get_clipboard = ImGui::GetIO().GetClipboardTextFn;
-
-    ImGui::GetIO().GetClipboardTextFn = &get_clipboard_free;
-    ImGui::GetIO().SetClipboardTextFn = &set_clipboard_free;
-}
-
 int main()
 {
     //symbol_table sym;
@@ -246,8 +212,6 @@ int main()
     sett.no_double_buffer = true;
 
     render_window win(sett, "DCPU16-GAME-ONE");
-
-    init_clipboard();
 
     printf("Part 1\n");
 
