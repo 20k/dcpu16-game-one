@@ -1,7 +1,7 @@
 name = "REVERSE"
 
 description =  """
-Read Ch:0 number of values from Ch:1
+Read Ch:1 number of values from Ch:0
 Reverse the sequence of values
 Write the reversed sequence to Ch:2
 
