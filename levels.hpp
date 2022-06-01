@@ -51,7 +51,6 @@ struct run_context
 struct level_selector_state
 {
     std::string level_name;
-    level_stats::info stats;
 
     void set_level_name(const std::string& level_name);
 };

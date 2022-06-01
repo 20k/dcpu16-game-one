@@ -113,8 +113,6 @@ level_data load_level(const std::filesystem::path& path_to_info)
         throw std::runtime_error("Must specify input channels or output channels or both");
     }
 
-    ret.my_best_stats = level_stats::load_best(ret.name);
-
     return ret;
 }
 
@@ -731,12 +729,14 @@ void level_manager::display_level_select(dcpu::ide::project_instance& instance)
 
         ImGui::Indent();
 
-        if(selected.my_best_stats.has_value())
-        {
-            std::string validation_string = selected.my_best_stats.value().valid ? "VALID" : "INVALID";
+        std::optional<level_stats::info> best_stats = level_stats::load_best(selected.name);
 
-            ImGui::Text("CYCLE COUNT       : %i", selected.my_best_stats.value().cycles);
-            ImGui::Text("INSTRUCTION SIZE  : %i", selected.my_best_stats.value().assembly_length);
+        if(best_stats.has_value())
+        {
+            std::string validation_string = best_stats.value().valid ? "VALID" : "INVALID";
+
+            ImGui::Text("CYCLE COUNT       : %i", best_stats.value().cycles);
+            ImGui::Text("INSTRUCTION SIZE  : %i", best_stats.value().assembly_length);
             ImGui::Text("VALIDATION        : %s", validation_string.c_str());
         }
         else

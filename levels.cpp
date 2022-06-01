@@ -130,8 +130,6 @@ void level::switch_to_level(run_context& ctx, dcpu::ide::project_instance& insta
 void level_selector_state::set_level_name(const std::string& _level_name)
 {
     level_name = _level_name;
-
-    stats = level_stats::load_best(level_name).value_or(level_stats::info());
 }
 
 void level::display_level_select(level_selector_state& select, run_context& ctx, dcpu::ide::project_instance& instance)
@@ -220,11 +218,13 @@ void level::display_level_select(level_selector_state& select, run_context& ctx,
 
         ImGui::Indent();
 
-        std::string validation_string = select.stats.valid ? "VALID" : "INVALID";
+        level_stats::info stats = level_stats::load_best(select.level_name).value_or(level_stats::info());
+
+        std::string validation_string = stats.valid ? "VALID" : "INVALID";
 
         //ImGui::Text("NAME              : %s", select.level_name.c_str());
-        ImGui::Text("CYCLE COUNT       : %i", select.stats.cycles);
-        ImGui::Text("INSTRUCTION SIZE  : %i", select.stats.assembly_length);
+        ImGui::Text("CYCLE COUNT       : %i", stats.cycles);
+        ImGui::Text("INSTRUCTION SIZE  : %i", stats.assembly_length);
         ImGui::Text("VALIDATION        : %s", validation_string.c_str());
 
         ImGui::NewLine();

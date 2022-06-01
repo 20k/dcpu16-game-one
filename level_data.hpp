@@ -27,8 +27,6 @@ struct level_data
     std::optional<std::string> dynamic_validation_program;
     std::vector<std::string> hardware_names;
 
-    std::optional<level_stats::info> my_best_stats;
-
     std::vector<int> input_channels;
     std::vector<int> output_channels;
 
