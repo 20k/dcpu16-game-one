@@ -20,14 +20,9 @@ std::optional<level_stats::info> level_stats::load_best(const std::string& level
 
         level_stats::info ret;
 
-        if(val.contains("assembly_length"))
-            ret.assembly_length = toml::get<int>(val["assembly_length"]);
-
-        if(val.contains("cycles"))
-            ret.cycles = toml::get<int>(val["cycles"]);
-
-        if(val.contains("valid"))
-            ret.valid = toml::get<bool>(val["valid"]);
+        ret.assembly_length = toml::get<int>(val["assembly_length"]);
+        ret.cycles = toml::get<int>(val["cycles"]);
+        ret.valid = toml::get<bool>(val["valid"]);
 
         return ret;
     }
