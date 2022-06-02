@@ -770,12 +770,7 @@ namespace level
             cpus.push_back(&sim);
         }
 
-        stack_vector<dcpu::sim::hardware*, 65536> all_hardware;
-
-        for(auto& i : ctx.inf.hardware)
-        {
-            all_hardware.push_back(i);
-        }
+        std::span<dcpu::sim::hardware*> all_hardware{ctx.inf.hardware};
 
         int max_cycles = cycles;
 
@@ -785,11 +780,11 @@ namespace level
             {
                 if(kk < (int)user.size())
                 {
-                    instance.editors[kk].halted = instance.editors[kk].halted || cpus[kk]->cycle_step(&ctx.inf.fab, &all_hardware, &ctx.real_world_state);
+                    instance.editors[kk].halted = instance.editors[kk].halted || cpus[kk]->cycle_step(&ctx.inf.fab, all_hardware, &ctx.real_world_state);
                 }
                 else
                 {
-                    cpus[kk]->cycle_step(&ctx.inf.fab, &all_hardware, &ctx.real_world_state);
+                    cpus[kk]->cycle_step(&ctx.inf.fab, all_hardware, &ctx.real_world_state);
                 }
 
             }

@@ -205,7 +205,7 @@ void level_runtime_parameters::generate_io(const level_data& data)
 
     for(uint64_t current_cycle = 0; current_cycle < max_cycles; current_cycle++)
     {
-        if(io_cpu_c.step(&f, &hw))
+        if(io_cpu_c.step(&f, hw.as_span()))
             current_cycle = max_cycles;
 
         if(dcpu::sim::has_any_write(io_cpu_c))
@@ -475,7 +475,7 @@ void level_manager::step_validation(dcpu::ide::project_instance& instance)
     {
         for(int kk=0; kk < (int)cpus.size(); kk++)
         {
-            instance.editors[kk].halted = instance.editors[kk].halted || cpus[kk]->cycle_step(&my_level.runtime_data.fab, &all_hardware, &my_level.runtime_data.real_world_state);
+            instance.editors[kk].halted = instance.editors[kk].halted || cpus[kk]->cycle_step(&my_level.runtime_data.fab, all_hardware.as_span(), &my_level.runtime_data.real_world_state);
         }
 
         dcpu::sim::resolve_interprocessor_communication(cpus, my_level.runtime_data.fab);
@@ -581,7 +581,7 @@ void level_manager::step_validation(dcpu::ide::project_instance& instance)
 
         for(uint64_t current_cycle = 0; current_cycle < max_cycles; current_cycle++)
         {
-            if(dynamic_cpu_c.step(&f, &hw, &my_level.runtime_data.real_world_state))
+            if(dynamic_cpu_c.step(&f, hw.as_span(), &my_level.runtime_data.real_world_state))
                 current_cycle = max_cycles;
 
             if(dcpu::sim::has_any_write(dynamic_cpu_c))
