@@ -14,6 +14,12 @@
 #include "level_stats.hpp"
 #include <atomic>
 
+struct level_over_state
+{
+    level_stats::info best_stats;
+    level_stats::info current_stats;
+};
+
 struct level_data
 {
     int cpus = 1;

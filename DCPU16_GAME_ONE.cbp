@@ -130,8 +130,6 @@
 		<Unit filename="level_hardware.hpp" />
 		<Unit filename="level_stats.cpp" />
 		<Unit filename="level_stats.hpp" />
-		<Unit filename="levels.cpp" />
-		<Unit filename="levels.hpp" />
 		<Unit filename="main.cpp" />
 		<Unit filename="style.hpp" />
 		<Unit filename="world_state.hpp" />

@@ -5,7 +5,6 @@
 #include <dcpu16-asm/base_asm_fwd.hpp>
 #include <dcpu16-ide/base_ide.hpp>
 #include <toolkit/fs_helpers.hpp>
-#include "levels.hpp"
 #include <iostream>
 #include <filesystem>
 #include <set>
@@ -171,11 +170,6 @@ void format_column(int channel, const std::vector<uint16_t>& values, int offset,
     ImGui::EndGroup();
 }
 
-void main_menu(level_selector_state& select, run_context& ctx, dcpu::ide::project_instance& current_project)
-{
-    level::display_level_select(select, ctx, current_project);
-}
-
 /*void squarify()
 {
     auto dim = ImGui::GetWindowSize();
@@ -220,12 +214,9 @@ int main()
 
     ImGui::GetStyle().ItemSpacing.y = 0;
 
-    printf("Part 2\n");
-
-    level_selector_state select;
-    level_over_state level_over;
-
     printf("Part 3\n");
+
+    level_over_state level_over;
 
     //ImGui::GetStyle().ScaleAllSizes(2);
 
