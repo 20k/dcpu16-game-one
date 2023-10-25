@@ -765,7 +765,7 @@ int main()
             style::start();
             style::push_styles();
 
-            ImGui::Text("Instructions");
+            ImGui::Text("Documentation");
 
             style::text_separator();
 
