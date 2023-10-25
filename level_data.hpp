@@ -101,7 +101,7 @@ struct level_instance
     bool displayed_level_over = false;
     bool successful_validation = false;
 
-    void update_assembly_errors(dcpu::ide::project_instance& instance);
+    void update_assembly_errors(dcpu::ide::project_instance<dcpu::ide::editor>& instance);
 };
 
 struct all_level_data
@@ -125,21 +125,21 @@ struct level_manager
     bool should_return_to_main_menu = false;
 
     void load(const std::string& folder = "./levels");
-    void save_current(dcpu::ide::project_instance& instance);
+    void save_current(dcpu::ide::project_instance<dcpu::ide::editor>& instance);
 
     void back_to_main_menu();
 
-    void display_level_select(dcpu::ide::project_instance& instance);
+    void display_level_select(dcpu::ide::project_instance<dcpu::ide::editor>& instance);
 
-    void reset_level(dcpu::ide::project_instance& instance);
+    void reset_level(dcpu::ide::project_instance<dcpu::ide::editor>& instance);
     //void start_level(const std::string& level);
 
     //void setup_validation(dcpu::ide::project_instance& instance);
-    void step_validation(dcpu::ide::project_instance& instance);
+    void step_validation(dcpu::ide::project_instance<dcpu::ide::editor>& instance);
 
 private:
-    void switch_to_level(dcpu::ide::project_instance& instance, const level_data& data);
-    void start_level(dcpu::ide::project_instance& instance, const level_data& data);
+    void switch_to_level(dcpu::ide::project_instance<dcpu::ide::editor>& instance, const level_data& data);
+    void start_level(dcpu::ide::project_instance<dcpu::ide::editor>& instance, const level_data& data);
 };
 
 #endif // LEVEL_DATA_HPP_INCLUDED

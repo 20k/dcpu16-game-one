@@ -342,7 +342,7 @@ void level_runtime_data::build_from(const level_runtime_parameters& params)
     real_world_state = params.real_world_state;
 }
 
-void level_instance::update_assembly_errors(dcpu::ide::project_instance& instance)
+void level_instance::update_assembly_errors(dcpu::ide::project_instance<dcpu::ide::editor>& instance)
 {
     bool has_error = false;
 
@@ -370,7 +370,7 @@ void level_manager::load(const std::string& folder)
     levels.load(folder);
 }
 
-void level_manager::start_level(dcpu::ide::project_instance& instance, const level_data& data)
+void level_manager::start_level(dcpu::ide::project_instance<dcpu::ide::editor>& instance, const level_data& data)
 {
     current_level = levels.make_instance(data);
 
@@ -385,7 +385,7 @@ void level_manager::start_level(dcpu::ide::project_instance& instance, const lev
     current_level.value().ass_state.has_error = has_error;
 }
 
-void level_manager::switch_to_level(dcpu::ide::project_instance& instance, const level_data& data)
+void level_manager::switch_to_level(dcpu::ide::project_instance<dcpu::ide::editor>& instance, const level_data& data)
 {
     uint64_t now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch().count();
 
@@ -399,7 +399,7 @@ void level_manager::switch_to_level(dcpu::ide::project_instance& instance, const
         instance.save();
     }
 
-    instance = dcpu::ide::project_instance();
+    instance = dcpu::ide::project_instance<dcpu::ide::editor>();
 
     if(file::exists(full_filename))
     {
@@ -420,7 +420,7 @@ void level_manager::switch_to_level(dcpu::ide::project_instance& instance, const
     current_level.value().runtime_data.exec.init(0, now_ms);
 }
 
-void level_manager::save_current(dcpu::ide::project_instance& instance)
+void level_manager::save_current(dcpu::ide::project_instance<dcpu::ide::editor>& instance)
 {
     if(instance.proj.project_file.size() > 0)
     {
@@ -433,14 +433,14 @@ void level_manager::back_to_main_menu()
     should_return_to_main_menu = true;
 }
 
-void level_manager::reset_level(dcpu::ide::project_instance& instance)
+void level_manager::reset_level(dcpu::ide::project_instance<dcpu::ide::editor>& instance)
 {
     level_instance current = current_level.value();
 
     start_level(instance, current.data);
 }
 
-void level_manager::step_validation(dcpu::ide::project_instance& instance)
+void level_manager::step_validation(dcpu::ide::project_instance<dcpu::ide::editor>& instance)
 {
     level_instance& my_level = current_level.value();
 
@@ -635,7 +635,7 @@ void level_manager::step_validation(dcpu::ide::project_instance& instance)
     my_level.successful_validation = !any_errors_at_all;
 }
 
-void level_manager::display_level_select(dcpu::ide::project_instance& instance)
+void level_manager::display_level_select(dcpu::ide::project_instance<dcpu::ide::editor>& instance)
 {
     auto section_rank = [](const std::string& in)
     {
