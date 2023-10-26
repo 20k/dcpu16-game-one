@@ -8,6 +8,7 @@
 #include "style.hpp"
 #include "hardware_rng.hpp"
 #include "hardware_inspector.hpp"
+#include "hardware_bad_gyro.hpp"
 
 bool level_data::is_input_channel(int c) const
 {
@@ -651,7 +652,13 @@ void level_manager::display_level_select(dcpu::ide::project_instance<dcpu::ide::
         return 3;
     };
 
-    std::sort(levels.all_levels.begin(), levels.all_levels.end(), [&](auto& p1, auto& p2){return section_rank(p1.section) < section_rank(p2.section);});
+    std::stable_sort(levels.all_levels.begin(), levels.all_levels.end(), [&](auto& p1, auto& p2)
+    {
+        int rank1 = section_rank(p1.section);
+        int rank2 = section_rank(p2.section);
+
+        return rank1 < rank2;
+    });
 
     ImGui::SetNextWindowSize(ImVec2(300, 0));
 
