@@ -54,9 +54,8 @@ struct hardware_inspector : dcpu::sim::hardware
 
         if(hardware_bad_gyro* gyro = dynamic_cast<hardware_bad_gyro*>(to_check); gyro != nullptr)
         {
-            printf("Gyro\n");
-
-            gyro->sequence.push_back(c.regs[B_REG]);
+            if(c.regs[B_REG] == 0)
+                gyro->sequence.push_back(c.regs[C_REG]);
         }
     }
 

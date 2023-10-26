@@ -1,0 +1,24 @@
+HWN I
+SUB I, 1 ; the hardware inspector is always N-1
+SET J, I
+SUB J, 1 ; the hardware RNG is always N-2
+
+set X, 0
+
+:start
+IFE X, 22
+SET PC, stop
+
+SET A, 2 ; world hardware, 2, gyroscope
+SET B, 0 
+SET C, [str + X] ; first value
+HWI I ; set the first value 
+
+ADD X, 1
+SND C, 0
+SET PC, start
+
+:str
+.DAT "loremipsumdolorsitamet"
+
+:stop

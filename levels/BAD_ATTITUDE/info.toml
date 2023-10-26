@@ -1,0 +1,22 @@
+name = "BAD_ATTITUDE"
+
+description =  """
+Search for the gyroscope with hardware id 0x7370696E
+
+Initialise the gyroscope to update with a frequency of 1Hz, and then output every unique value to Ch:0 for debugging
+
+The gyroscope can be initialised by sending an interrupt with A=0. The B register sets the gyroscope to update at 60/B times per second. If B=0, the gyroscope is turned off
+If A=1, the current gyroscope angle from 0-65535 inclusive is read into C
+If A=2, and B is non zero, turn on interrupts with message B. If B is zero, disable interrupts
+
+When interrupts are sent, the C register is overwritten with the current angle between the gyroscope's starting orientation, and its current orientation, from 0-65535 inclusive. Angles are measured clockwise
+"""
+
+short_description = "INITIALISE AND DEBUG GYROSCOPE"
+
+hardware = ["dummy", "generic_clock", "bad_gyroscope"]
+
+input_channels = []
+output_channels = [0]
+
+section = "TUTORIAL"
