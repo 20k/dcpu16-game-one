@@ -5,6 +5,7 @@
 #include <dcpu16-sim/base_hardware.hpp>
 #include <dcpu16-sim/hardware_clock.hpp>
 #include <dcpu16-sim/hardware_lem1802.hpp>
+#include "hardware_gyro.hpp"
 
 #include "world_state.hpp"
 
@@ -49,6 +50,13 @@ struct hardware_inspector : dcpu::sim::hardware
         if(cpu_proxy* prox = dynamic_cast<cpu_proxy*>(to_check); prox != nullptr)
         {
             c.regs[C_REG] = prox->c->mem[c.regs[B_REG]];
+        }
+
+        if(hardware_bad_gyro* gyro = dynamic_cast<hardware_bad_gyro*>(to_check); gyro != nullptr)
+        {
+            printf("Gyro\n");
+
+            gyro->sequence.push_back(c.regs[B_REG]);
         }
     }
 

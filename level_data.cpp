@@ -188,15 +188,23 @@ std::string to_lower(std::string in)
     return in;
 }
 
-void level_runtime_parameters::generate_io(const level_data& data)
+void level_runtime_parameters::generate_io(std::span<dcpu::sim::hardware*> hws, const level_data& data)
 {
     if(!io_cpu.has_value())
         return;
 
     hardware_rng hwrng;
+    hardware_inspector hwinspec;
 
     stack_vector<dcpu::sim::hardware*, 65536> hw;
+
+    for(auto& i : hws)
+    {
+        hw.push_back(i);
+    }
+
     hw.push_back(&hwrng);
+    hw.push_back(&hwinspec);
 
     dcpu::sim::CPU& io_cpu_c = *io_cpu.value();
 
@@ -312,9 +320,16 @@ void level_runtime_parameters::build_from(const level_data& data)
 
             hardware.push_back(dummy);
         }
+
+        if(lower == "bad_gyroscope")
+        {
+            dcpu::sim::hardware* hw = new hardware_bad_gyro;
+
+            hardware.push_back(hw);
+        }
     }
 
-    generate_io(data);
+    generate_io(hardware, data);
 }
 
 void level_runtime_data::build_from(const level_runtime_parameters& params)

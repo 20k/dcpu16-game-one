@@ -58,7 +58,7 @@ struct level_runtime_parameters
     world_state real_world_state;
 
 private:
-    void generate_io(const level_data& data);
+    void generate_io(std::span<dcpu::sim::hardware*> hw, const level_data& data);
 };
 
 struct assembler_state

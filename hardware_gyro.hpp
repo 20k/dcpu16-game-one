@@ -6,6 +6,7 @@
 
 struct hardware_bad_gyro : dcpu::sim::hardware
 {
+    ///the sequence is set by the validator
     std::vector<uint16_t> sequence;
     uint32_t sequence_counter = 0;
 
@@ -17,7 +18,7 @@ struct hardware_bad_gyro : dcpu::sim::hardware
 
     uint16_t interrupt_message = 0;
 
-    hardware_bad_gyro(const std::vector<uint16_t>& seq) : sequence(seq)
+    hardware_bad_gyro()
     {
         manufacturer_id = 0x6E617361;
         hardware_id = 0x7370696E;
