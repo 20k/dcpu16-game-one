@@ -123,6 +123,7 @@
 		<Unit filename="deps/toolkit/texture.cpp" />
 		<Unit filename="deps/toolkit/texture.hpp" />
 		<Unit filename="deps/toolkit/vertex.hpp" />
+		<Unit filename="hardware_gyro.hpp" />
 		<Unit filename="hardware_inspector.hpp" />
 		<Unit filename="hardware_rng.hpp" />
 		<Unit filename="level_data.cpp" />

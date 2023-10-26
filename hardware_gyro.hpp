@@ -1,5 +1,5 @@
-#ifndef HARDWARE_BAD_GYRO_HPP_INCLUDED
-#define HARDWARE_BAD_GYRO_HPP_INCLUDED
+#ifndef HARDWARE_GYRO_HPP_INCLUDED
+#define HARDWARE_GYRO_HPP_INCLUDED
 
 #include <dcpu16-sim/base_sim.hpp>
 #include <dcpu16-sim/base_hardware.hpp>
@@ -22,6 +22,11 @@ struct hardware_bad_gyro : dcpu::sim::hardware
         manufacturer_id = 0x6E617361;
         hardware_id = 0x7370696E;
         hardware_version = 0;
+    }
+
+    uint16_t next_random_id()
+    {
+         return sequence[(sequence_counter++) % (uint32_t)sequence.size()];
     }
 
     virtual void interrupt2(std::span<dcpu::sim::hardware*> all, dcpu::sim::world_base* state, dcpu::sim::CPU& c) override
@@ -52,8 +57,7 @@ struct hardware_bad_gyro : dcpu::sim::hardware
 
         if(c.regs[A_REG] == 1)
         {
-            ///deliberate bug
-            c.regs[C_REG] = sequence[(sequence_counter++) % (uint32_t)sequence.size()];
+            c.regs[C_REG] = next_random_id();
         }
 
         if(c.regs[A_REG] == 2)
@@ -86,6 +90,7 @@ struct hardware_bad_gyro : dcpu::sim::hardware
             dcpu::interrupt_type type;
             type.is_software = 0;
             type.message = interrupt_message;
+            type.overrides[C_REG] = next_random_id();
 
             c.add_interrupt(type);
         }
@@ -107,4 +112,4 @@ struct hardware_bad_gyro : dcpu::sim::hardware
     }
 };
 
-#endif // HARDWARE_BAD_GYRO_HPP_INCLUDED
+#endif // HARDWARE_GYRO_HPP_INCLUDED

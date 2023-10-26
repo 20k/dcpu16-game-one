@@ -8,7 +8,7 @@
 #include "style.hpp"
 #include "hardware_rng.hpp"
 #include "hardware_inspector.hpp"
-#include "hardware_bad_gyro.hpp"
+#include "hardware_gyro.hpp"
 
 bool level_data::is_input_channel(int c) const
 {
