@@ -55,7 +55,7 @@ struct level_runtime_parameters
     std::optional<std::shared_ptr<dcpu::sim::CPU>> dynamic_validation_cpu;
     std::vector<dcpu::sim::hardware*> hardware;
 
-    world_state real_world_state;
+    //world_state real_world_state;
 
 private:
     void generate_io(std::span<dcpu::sim::hardware*> hw, const level_data& data);

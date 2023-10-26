@@ -9,6 +9,7 @@
 #include "hardware_rng.hpp"
 #include "hardware_inspector.hpp"
 #include "hardware_gyro.hpp"
+#include "hardware_rocket.hpp"
 
 bool level_data::is_input_channel(int c) const
 {
@@ -327,6 +328,20 @@ void level_runtime_parameters::build_from(const level_data& data)
 
             hardware.push_back(hw);
         }
+
+        if(lower == "gyroscope")
+        {
+            dcpu::sim::hardware* hw = new hardware_gyro;
+
+            hardware.push_back(hw);
+        }
+
+        if(lower == "rocket")
+        {
+            dcpu::sim::hardware* hw = new hardware_rocket;
+
+            hardware.push_back(hw);
+        }
     }
 
     generate_io(hardware, data);
@@ -355,7 +370,15 @@ void level_runtime_data::build_from(const level_runtime_parameters& params)
         }
     }
 
-    real_world_state = params.real_world_state;
+    for(dcpu::sim::hardware* hw : hardware)
+    {
+        if(auto rocket = dynamic_cast<hardware_rocket*>(hw); rocket != nullptr)
+        {
+            real_world_state.player.base = rocket;
+        }
+    }
+
+    //real_world_state = params.real_world_state;
 }
 
 void level_instance::update_assembly_errors(dcpu::ide::project_instance<dcpu::ide::editor>& instance)
