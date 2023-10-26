@@ -4,30 +4,34 @@
 #include <dcpu16-sim/base_sim.hpp>
 #include <dcpu16-sim/base_hardware.hpp>
 
-struct hardware_bad_gyro : dcpu::sim::hardware
+#ifndef M_PI
+#define M_PI (3.14159265358979323846)
+#endif
+
+struct hardware_gyro : dcpu::sim::hardware
 {
-    ///the sequence is set by the validator
-    std::vector<uint16_t> sequence;
-    uint32_t sequence_counter = 0;
-
-    bool on = false;
-
     uint64_t time_started_ms = 0;
     uint64_t last_tick_time_ms = 0;
     uint16_t tick_divisor = 0;
 
     uint16_t interrupt_message = 0;
+    bool on = false;
 
-    hardware_bad_gyro()
+    virtual uint16_t get_next_angle(dcpu::sim::world_base* state)
+    {
+        world_state* st = dynamic_cast<world_state*>(state);
+
+        assert(st);
+
+        ///check negatives
+        return (std::fmod(st->player.angle, 2 * M_PI) / (2 * M_PI)) * 65536;
+    }
+
+    hardware_gyro()
     {
         manufacturer_id = 0x6E617361;
         hardware_id = 0x7370696E;
-        hardware_version = 0;
-    }
-
-    uint16_t next_random_id()
-    {
-         return sequence[(sequence_counter++) % (uint32_t)sequence.size()];
+        hardware_version = 1;
     }
 
     virtual void interrupt2(std::span<dcpu::sim::hardware*> all, dcpu::sim::world_base* state, dcpu::sim::CPU& c) override
@@ -58,7 +62,7 @@ struct hardware_bad_gyro : dcpu::sim::hardware
 
         if(c.regs[A_REG] == 1)
         {
-            c.regs[C_REG] = next_random_id();
+            c.regs[C_REG] = get_next_angle(state);
         }
 
         if(c.regs[A_REG] == 2)
@@ -91,7 +95,7 @@ struct hardware_bad_gyro : dcpu::sim::hardware
             dcpu::interrupt_type type;
             type.is_software = 0;
             type.message = interrupt_message;
-            type.overrides[C_REG] = next_random_id();
+            type.overrides[C_REG] = get_next_angle(state);
 
             c.add_interrupt(type);
         }
@@ -99,13 +103,43 @@ struct hardware_bad_gyro : dcpu::sim::hardware
 
     constexpr virtual void reset() override
     {
-        sequence.clear();
         time_started_ms = 0;
         last_tick_time_ms = 0;
         tick_divisor = 0;
         on = false;
         interrupt_message = 0;
+    }
+
+    virtual hardware* clone() override
+    {
+        return new hardware_gyro(*this);
+    }
+};
+
+struct hardware_bad_gyro : hardware_gyro
+{
+    ///the sequence is set by the validator
+    std::vector<uint16_t> sequence;
+    uint32_t sequence_counter = 0;
+
+    hardware_bad_gyro()
+    {
+        manufacturer_id = 0x6E617361;
+        hardware_id = 0x7370696E;
+        hardware_version = 0;
+    }
+
+    virtual uint16_t get_next_angle(dcpu::sim::world_base* state) override
+    {
+         return sequence[(sequence_counter++) % (uint32_t)sequence.size()];
+    }
+
+    constexpr virtual void reset() override
+    {
+        sequence.clear();
         sequence_counter = 0;
+
+        hardware_gyro::reset();
     }
 
     virtual hardware* clone() override
