@@ -8,9 +8,12 @@ struct hardware_rng : dcpu::sim::hardware
 {
     uint64_t internal_state = 1;
 
-    uint32_t hardware_id = 0x12345678;
-    uint16_t hardware_version = 0;
-    uint32_t manufacturer_id = 0x20000;
+    hardware_rng()
+    {
+        hardware_id = 0x12345678;
+        hardware_version = 0;
+        manufacturer_id = 0x20000;
+    }
 
     constexpr static
     uint16_t next(uint64_t& state)

@@ -17,9 +17,12 @@ struct cpu_proxy : dcpu::sim::hardware
 
 struct hardware_inspector : dcpu::sim::hardware
 {
-    uint32_t hardware_id = 0x21436587;
-    uint16_t hardware_version = 0;
-    uint32_t manufacturer_id = 0x20000;
+    hardware_inspector()
+    {
+        hardware_id = 0x21436587;
+        hardware_version = 0;
+        manufacturer_id = 0x20000;
+    }
 
     constexpr virtual void interrupt2(std::span<hardware*> all_hardware, dcpu::sim::world_base* state, dcpu::sim::CPU& c) override
     {
