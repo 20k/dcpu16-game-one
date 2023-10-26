@@ -99,6 +99,7 @@ struct hardware_bad_gyro : dcpu::sim::hardware
 
     constexpr virtual void reset() override
     {
+        sequence.clear();
         time_started_ms = 0;
         last_tick_time_ms = 0;
         tick_divisor = 0;
