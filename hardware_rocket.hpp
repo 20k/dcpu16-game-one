@@ -7,8 +7,8 @@
 struct hardware_rocket : dcpu::sim::hardware
 {
     bool on = false;
-    double propellant = 0;
-    double propellant_ejected_ps = 0;
+    double propellant = 60;
+    double propellant_ejected_ps = 1;
 
     hardware_rocket()
     {

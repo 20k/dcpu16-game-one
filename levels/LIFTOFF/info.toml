@@ -1,0 +1,16 @@
+name = "LIFTOFF"
+
+description =  """
+Search for the rocket thrusters with hardware id 0x66697265
+
+Initialise the rocket thrusters, by sending a hardware interrupt with A=0, B>0
+"""
+
+short_description = "FIRE UP THE ENGINES"
+
+hardware = ["dummy", "generic_clock", "gyroscope", "rocket", "rangefinder"]
+
+input_channels = []
+output_channels = []
+
+section = "TUTORIAL"

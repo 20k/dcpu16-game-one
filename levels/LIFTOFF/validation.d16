@@ -1,0 +1,23 @@
+HWN I
+
+:start
+SUB I, 1
+HWQ I      ; store hardware info in registers
+
+IFE A, 0x4E44 ; if rangefinder hardware low bits
+IFE B, 0x4649 ; and if rangefinder hardware high bits
+SET PC, found ; i am the rangefinder
+
+IFN I, 0
+SET PC, start
+
+:found
+SET A, 0 ; get range
+SET B, 1 ; kilometers
+SET C, 0 ; blank out register
+HWI I
+
+IFG C, 9
+SND 1, 0
+
+BRK

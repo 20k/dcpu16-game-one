@@ -18,7 +18,7 @@ void step_world(world_state& st, double step_ds)
                 rocket->propellant = std::max(rocket->propellant - rocket->propellant_ejected_ps * step_ds, 0.);
 
                 double diff = prev - rocket->propellant;
-                double frac = diff / rocket->propellant_ejected_ps * step_ds;
+                double frac = diff / (rocket->propellant_ejected_ps * step_ds);
 
                 float linear_accel_ms = 1 * frac;
                 vec2f accel = dir * linear_accel_ms * step_ds;
@@ -30,4 +30,6 @@ void step_world(world_state& st, double step_ds)
 
     st.player.position += st.player.velocity * step_ds;
     st.player.angle += st.player.angular_velocity * step_ds;
+
+    std::cout << "Pos " << st.player.position.x() << " " << st.player.position.y() << std::endl;
 }

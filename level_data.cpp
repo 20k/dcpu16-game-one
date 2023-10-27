@@ -343,6 +343,13 @@ void level_runtime_parameters::build_from(const level_data& data)
 
             hardware.push_back(hw);
         }
+
+        if(lower == "rangefinder")
+        {
+            dcpu::sim::hardware* hw = new hardware_rangefinder;
+
+            hardware.push_back(hw);
+        }
     }
 
     generate_io(hardware, data);
