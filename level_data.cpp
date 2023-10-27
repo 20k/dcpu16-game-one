@@ -10,6 +10,7 @@
 #include "hardware_inspector.hpp"
 #include "hardware_gyro.hpp"
 #include "hardware_rocket.hpp"
+#include "hardware_rangefinder.hpp"
 
 bool level_data::is_input_channel(int c) const
 {
