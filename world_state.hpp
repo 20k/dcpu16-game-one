@@ -9,6 +9,6 @@ struct world_state : dcpu::sim::time_state, dcpu::sim::world_base
     ship player;
 };
 
-void step_world(world_state& st);
+void step_world(world_state& st, double step_ds);
 
 #endif // WORLD_STATE_HPP_INCLUDED

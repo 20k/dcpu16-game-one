@@ -1,10 +1,8 @@
 #include "world_state.hpp"
 #include "hardware_rocket.hpp"
 
-void step_world(world_state& st)
+void step_world(world_state& st, double step_ds)
 {
-    float step_ds = 16.f/1000.f;
-
     if(st.player.base)
     {
         hardware_rocket* rocket = st.player.base;

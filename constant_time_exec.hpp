@@ -8,12 +8,22 @@ struct constant_time_exec
 {
     uint64_t last_time_ms = 0;
 
+    uint64_t total_cycles = 0;
     uint64_t current_cycles = 0;
     uint64_t max_cycles = 0;
 
     double cycle_budget_ms = 0;
 
     uint64_t cycles_per_s = 1000;
+
+    void reset(uint64_t current_time_ms)
+    {
+        total_cycles = 0;
+        current_cycles = 0;
+        max_cycles = 0;
+        last_time_ms = current_time_ms;
+        cycle_budget_ms = 0;
+    }
 
     void init(uint64_t _max_cycles, uint64_t current_time_ms)
     {
@@ -53,6 +63,7 @@ struct constant_time_exec
         }
 
         current_cycles += cycles_to_exec;
+        total_cycles += cycles_to_exec;
 
         assert(current_cycles <= max_cycles);
 

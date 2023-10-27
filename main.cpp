@@ -424,6 +424,7 @@ int main()
                     levels.reset_level(current_project);
                     levels.save_current(current_project);
 
+                    current_instance.runtime_data.exec.reset(now_ms);
                     current_instance.runtime_data.exec.init(0, now_ms);
                 }
 
@@ -456,12 +457,25 @@ int main()
                     edit.clock_hz = current_instance.runtime_data.exec.cycles_per_s;
                 }
 
+                double clock_dt = 1./current_instance.runtime_data.exec.cycles_per_s;
+                double desired_dt = 1/30.;
+
+                ///world should step every multiple of this update rate
+                uint64_t nearest_multiple = floor(desired_dt / clock_dt);
+
+                assert(nearest_multiple != 0);
+
+                double real_dt = nearest_multiple * clock_dt;
+
                 current_instance.runtime_data.exec.exec_until(now_ms, [&](uint64_t cycle_idx, uint64_t time_ms)
                 {
                     if(any_halted)
                         return;
 
                     current_instance.runtime_data.real_world_state.time_ms = time_ms;
+
+                    if((current_instance.runtime_data.exec.current_cycles % nearest_multiple) == 0)
+                        step_world(current_instance.runtime_data.real_world_state, real_dt);
 
                     levels.step_validation(current_project);
                 });
