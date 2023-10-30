@@ -95,6 +95,7 @@
 		<Unit filename="deps/dcpu16-sim/base_sim.hpp" />
 		<Unit filename="deps/dcpu16-sim/hardware_clock.hpp" />
 		<Unit filename="deps/dcpu16-sim/hardware_lem1802.hpp" />
+		<Unit filename="deps/dcpu16-sim/hardware_m35fd.hpp" />
 		<Unit filename="deps/imgui/backends/imgui_impl_glfw.cpp" />
 		<Unit filename="deps/imgui/backends/imgui_impl_opengl3.cpp" />
 		<Unit filename="deps/imgui/imgui.cpp" />

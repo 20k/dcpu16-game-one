@@ -11,6 +11,7 @@
 #include "hardware_gyro.hpp"
 #include "hardware_rocket.hpp"
 #include "hardware_rangefinder.hpp"
+#include <dcpu16-sim/hardware_m35fd.hpp>
 
 bool level_data::is_input_channel(int c) const
 {
